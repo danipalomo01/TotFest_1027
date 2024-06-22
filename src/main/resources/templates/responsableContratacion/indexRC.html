@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TotFest</title>
+    <link rel="stylesheet" href="/styles/menu_lateral.css" />
+    <link rel="stylesheet" href="/styles/index.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+</head>
+<body>
+
+<div class="topbar"></div>
+<div class="rightbar"></div>
+
+<nav class="sidebar">
+    <a href="#" class="titulo">Explorar</a>
+
+    <div class="menu-content">
+        <ul class="menu-items">
+
+            <li class="item">
+                <a href="/responsableContratacion/indexRC" class="submenu-item">
+                    <span>Inicio</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+
+            <li class="item">
+                <a href="responsablecontratacion/contracteartista/list" class="submenu-item">
+                    <span>Gestionar Contratos</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="responsablecontratacion/artista/list" class="submenu-item">
+                    <span>Gestionar Artistas</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="festival/list" class="submenu-item">
+                    <span>Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="/logout" class="submenu-item">
+                    <span>Cerrar Sesión</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+</nav>
+
+<div class="container">
+    <h1>Responsable de Contratacion</h1>
+    <div class="div1">
+        <h1>- TotFest -</h1>
+    </div>
+    <div style="display: flex">
+        <h2>Usuario:&nbsp;</h2> <h2 th:text="${session.userName}"></h2>
+    </div>
+    <h3 style="font-size 90px;">Panel de Administrador</h3>
+
+
+</div>
+
+
+</body>
+</html>

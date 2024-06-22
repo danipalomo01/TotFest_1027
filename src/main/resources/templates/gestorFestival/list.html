@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Listado de Festivales</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival.css}"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"/>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+    <a href="#" class="titulo">Explorar</a>
+    <div class="menu-content">
+        <ul class="menu-items">
+            <li class="item">
+                <a href="/gestorFestival/indexGF" class="submenu-item">
+                    <span>Inicio</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/gestorFestival/list" class="submenu-item">
+                    <span>Gestionar Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/festival/list" class="submenu-item">
+                    <span>Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/logout" class="submenu-item">
+                    <span>Cerrar Sesión</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</nav>
+
+<div class="mainc">
+    <div class="container">
+        <h1>Listado de Festivales</h1>
+        <div class="initiative-list">
+
+            <div class="initiative-card" th:each="festival : ${festivals}">
+                <h2 th:text="${festival.nom}" style="text-transform: capitalize;">Título </h2>
+                <div class="field">
+                    <span th:text="${festival.anyo}" style="text-transform: capitalize;"></span>
+                </div>
+                <div class="field">
+                    <label><strong>Categoria Musical:</strong></label>
+                    <span th:text="${festival.categoriaMusical}" style="text-transform: capitalize;"></span>
+                </div>
+                <div class="field">
+                    <label><strong>Fecha de inicio:</strong></label>
+                    <span th:text="${festival.dataInici}" style="text-transform: capitalize;"></span>
+                </div>
+                <div class="field">
+                    <label><strong>Fecha de fin:</strong></label>
+                    <span th:text="${festival.dataFi}" style="text-transform: capitalize;"></span>
+                </div>
+
+                <div class="field">
+                    <label><strong>Número de festival:</strong></label>
+                    <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
+                </div>
+
+
+                <ul>
+                    <li th:each="artista : ${actuacionesFestivales[festival.idFestival]}" th:text="${artista}">Nombre
+                        del Artista
+                    </li>
+                </ul>
+                <p th:if="${#lists.isEmpty(actuacionesFestivales[festival.idFestival])}">Sin Actuaciones</p>
+
+
+                <label><strong>Actuaciones:</strong></label>
+
+                <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
+            <div class="buttons-wrapper">
+                <a th:href="@{update/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Editar</a>
+                <a th:href="@{delete/{id}(id=${festival.idFestival})}" class="btn btn-danger" role="button">Borrar</a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="btn-anyadir">
+        <a href="add" class="btn btn-success" role="button">Añadir festival</a>
+    </div>
+</div>
+</div>
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80
+    00</p>
+
+</body>
+</html>

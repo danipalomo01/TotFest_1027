@@ -65,6 +65,16 @@
             <artifactId>delegating-spring-request-context</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-spi</artifactId>
+            <version>0.8.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-pool</artifactId>
+            <version>0.8.6.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>

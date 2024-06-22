@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listado de Festivales</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival.css}" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+  <a href="#" class="titulo">Explorar</a>
+  <div class="menu-content">
+    <ul class="menu-items">
+      <li class="item">
+        <a href="index.html" class="submenu-item">
+          <span>Inicio</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="/login" class="submenu-item">
+          <span>Login</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="/festival/list" class="submenu-item">
+          <span>Festivales</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</nav>
+
+<div class="mainc" >
+  <div class="container" style="background-image: url('/images/lfest.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat; height: 100vh;">
+    <h1>Listado de Festivales</h1>
+    <div class="initiative-list">
+      <div class="initiative-card" th:each="festival : ${festivals}">
+        <h2 th:text="${festival.nom}" style="text-transform: capitalize;">Título </h2>
+        <div class="field">
+          <span th:text="${festival.anyo}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>Categoria Musical:</strong></label>
+          <span th:text="${festival.categoriaMusical}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>Fecha de inicio:</strong></label>
+          <span th:text="${festival.dataInici}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>Fecha de fin:</strong></label>
+          <span th:text="${festival.dataFi}" style="text-transform: capitalize;"></span>
+        </div>
+
+        <div class="field">
+          <label><strong>Número de festival:</strong></label>
+          <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
+        </div>
+
+
+          <div class="buttons-wrapper">
+            <a th:href="@{/festival/info/{id}(id=${festival.idFestival})}" class="btn btn-warning" role="button">Info</a>
+          </div>
+
+        <div class="buttons-wrapper"
+             th:if="${festival.estatFestival.name()} == 'publica'">
+          <a th:href="@{/compra-entradas/compra/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Comprar Entradas</a>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div class="pagination justify-content-center">
+      <ul class="pagination" style="list-style:none">
+        <li th:class="${currentPage == 0} ? 'page-item disabled' : 'page-item'">
+          <a class="page-link" th:if="${currentPage > 0}" th:href="@{/festival/list(page=${currentPage - 1},size=${size})}">Anterior</a>
+        </li>
+
+        <li th:each="pageNo : ${#numbers.sequence(0, totalPages - 1)}" th:class="${currentPage == pageNo} ? 'page-item active' : 'page-item'">
+          <a class="page-link" th:href="@{/festival/list(page=${pageNo},size=${size})}" th:text="${pageNo + 1}"></a>
+        </li>
+
+        <li th:class="${currentPage == totalPages - 1} ? 'page-item disabled' : 'page-item'">
+          <a class="page-link" th:if="${currentPage <= totalPages - 1}" th:href="@{/festival/list(page=${currentPage + 1},size=${size})}">Siguiente</a>
+        </li>
+      </ul>
+    </div>
+
+    <form th:action="@{/festival/list}" method="get">
+      <label for="pageSize">Mostrar por página:</label>
+      <select id="pageSize" name="size" onchange="this.form.submit()" class="form-control">
+        <option value="1" th:selected="${size == 1}">1</option>
+        <option value="2" th:selected="${size == 2}">2</option>
+        <option value="10" th:selected="${size == 10}">10</option>
+        <option value="20" th:selected="${size == 20}">20</option>
+      </select>
+    </form>
+
+
+
+
+
+
+  </div>
+</div>
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+
+</body>
+</html>

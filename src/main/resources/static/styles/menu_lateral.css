@@ -1,0 +1,164 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "sans-serif", sans-serif;
+}
+
+.sidebar {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  position: fixed;
+  height: 100%;
+  width: 260px;
+  background: #11101d;
+  padding: 15px;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.titulo {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 15px;
+  z-index: 1003;
+}
+
+.sidebar a {
+  color: #99daff;
+  text-decoration: none;
+  z-index: 1003;
+}
+
+.menu-content {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  margin-top: 40px;
+  overflow-y: scroll;
+}
+
+.menu-content::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-items {
+  height: 100%;
+  width: 100%;
+  list-style: none;
+  transition: all 0.4s ease;
+}
+
+.submenu-active .menu-items {
+  transform: translateX(-56%);
+}
+
+.menu-title {
+  color: #00BFFF;
+  font-size: 14px;
+  padding: 15px 20px;
+}
+
+.submenu-item {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  color: #99daff;
+  cursor: pointer;
+}
+
+.item i {
+  font-size: 12px;
+}
+
+.item a:hover,
+.submenu-item:hover,
+.submenu .menu-title:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.submenu {
+  position: absolute;
+  height: calc(100% + 100vh);
+  width: 100%;
+  top: 0;
+  right: calc(-100% - 26px);
+  background: #11101d;
+  display: none;
+}
+
+.show-submenu ~ .submenu {
+  display: block;
+}
+
+.submenu .menu-title {
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.submenu .menu-title i {
+  margin-right: 10px;
+}
+
+.navbar {
+  left: 260px;
+  width: calc(100% - 260px);
+  transition: all 0.5s ease;
+  z-index: 1002;
+}
+
+.navbar {
+  position: fixed;
+  color: #99daff;
+  padding: 15px 20px;
+  font-size: 25px;
+  background: #4070f4;
+  cursor: pointer;
+}
+
+.menu-image {
+  display: block;
+  margin-top: 50%;
+  width: 190px;
+  height: auto;
+  z-index: 1002;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #11101d;
+  color: #11101d;
+  padding: 10px;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.rightbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 100%;
+  background-color: #11101d;
+  color: #11101d;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.footer {
+  margin-left: 480px !important;
+}

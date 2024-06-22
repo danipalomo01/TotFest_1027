@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listado de Contratos</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .no-items-message {
+            border: 1px solid #ccc;
+            background-color: #F17575;
+            width: 30%;
+            padding: 15px;
+            text-align: center;
+            color: #000000;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin: 20px auto;
+        }
+
+        .table {
+    background-color: #ffffff; /* Color de fondo de la tabla */
+    width: 100%;
+}
+.table th, .table td {
+    white-space: nowrap; /* Evita que el contenido se ajuste automáticamente */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Color de fondo para filas alternas */
+}
+
+.table-bordered {
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra alrededor de la tabla */
+}
+
+.table-bordered td, .table-bordered th {
+    border: 1px solid #dee2e6; /* Color y grosor de los bordes */
+}
+
+.table-rounded {
+    border-radius: 8px; /* Radio de los bordes redondeados */
+}
+
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<div>
+<nav class="sidebar" style="margin-top:30px">
+    <a href="#" class="titulo">Explorar</a>
+    <div class="menu-content">
+        <ul class="menu-items">
+            <li class="item">
+                <a href="/responsableContratacion/indexRC" class="submenu-item">
+                    <span>Inicio</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+
+            <li class="item">
+                <a href="responsablecontratacion/contracteartista/list" class="submenu-item">
+                    <span>Gestionar Contratos</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="responsablecontratacion/artista/list" class="submenu-item">
+                    <span>Gestionar Artistas</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="festival/list" class="submenu-item">
+                    <span>Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="item">
+                <a href="/logout" class="submenu-item">
+                    <span>Cerrar Sesión</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="mainc">
+    <div style="width: 70%; margin-left: 20%; margin-right: 10%">
+        <div>
+            <h1 style="text-align:center; padding-top: 10%">Listado de Contratos de <span th:text="${session.userName}"></span></h1>
+
+            <!-- Mensaje de no hay contratos -->
+            <div th:if="${#lists.isEmpty(contratos)}" class="no-items-message">
+                <p>No existe ningún contrato disponible.</p>
+            </div>
+
+            <!-- Tabla de contratos -->
+            <div th:unless="${#lists.isEmpty(contratos)}">
+                <div class="table-responsive" >
+                    <table class="table table-bordered table-striped rounded">
+
+                    <thead>
+                        <tr>
+                            <th>ID Contrato</th>
+                            <th>ID Artista</th>
+                            <th>Fecha de inicio</th>
+                            <th>Fecha de fin</th>
+                            <th>Condiciones Descriptivas</th>
+                            <th>Número de Actuaciones por Año</th>
+                            <th>Importe del Contrato</th>
+                            <th>ID Comercial</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="contract-table-body">
+                        <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
+                        <tr th:each="contracte : ${contratos}">
+                            <td th:text="${contracte.idContracte}"></td>
+                            <td th:text="${contracte.idArtista}"></td>
+                            <td th:text="${#dates.format(contracte.dataInici, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${#dates.format(contracte.dataFi, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${contracte.condicionsDescriptiu}"></td>
+                            <td th:text="${contracte.numActuacionsAny}"></td>
+                            <td th:text="${T(java.lang.String).format('%.2f', contracte.importContracte)}"></td>
+                            <td th:text="${contracte.idComercial}"></td>
+                            <td>
+                                <a th:href="@{/responsablecontratacion/actuaciones/{id}/{idartista}(id=${contracte.idContracte}, idartista=${contracte.idArtista})}" class="btn btn-success btn-sm" role="button">Gestionar Actuaciones</a>
+                                <a th:href="@{/responsablecontratacion/contracteartista/update/{id}(id=${contracte.idContracte})}" class="btn btn-warning btn-sm" role="button">Editar</a>
+                                <a th:href="@{/responsablecontratacion/contracteartista/delete/{id}(id=${contracte.idContracte})}" class="btn btn-danger btn-sm" role="button">Borrar</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mensajes de no hay artistas o festivales -->
+            <!-- Mensajes de no hay artistas o festivales -->
+            <div th:if="${#lists.isEmpty(artistas) or #lists.isEmpty(festivales)}" class="no-items-message">
+                <p>No existe ningún artista o festival disponible, no se pueden añadir contratos.</p>
+            </div>
+
+
+            <!-- Botón de añadir contrato -->
+            <div style="margin-left:40%" class="btn-anyadir" th:if="${!#lists.isEmpty(artistas)} and ${!#lists.isEmpty(festivales)}">
+                <a  th:href="@{/responsablecontratacion/contracteartista/add}" class="btn btn-success" role="button">Añadir Contrato</a>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</div>
+
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+
+<!-- Scripts de Bootstrap y otros -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

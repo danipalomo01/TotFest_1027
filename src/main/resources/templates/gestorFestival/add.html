@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Añadir Festival</title>
+    <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+    <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+    <a href="#" class="titulo">Explorar</a>
+    <div class="menu-content">
+        <ul class="menu-items">
+            <li class="item">
+                <a href="/gestorFestival/indexGF" class="submenu-item">
+                    <span>Inicio</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/gestorFestival/list" class="submenu-item">
+                    <span>Gestionar Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/festival/list" class="submenu-item">
+                    <span>Festivales</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <li class="item">
+                <a href="/logout" class="submenu-item">
+                    <span>Cerrar Sesión</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="content">
+    <form class="form" th:action="@{/gestorFestival/add}" th:object="${festival}" method="POST" novalidate>
+        <h1>Añadir un festival</h1>
+
+        <div class="form-group">
+            <label for="nom">Nombre</label>
+            <input type="text" class="form-control" id="nom" th:field="*{nom}" maxlength="250" required/>
+            <div th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="anyo">Año</label>
+            <input type="text" class="form-control" id="anyo" th:field="*{anyo}" maxlength="4" required/>
+            <div th:if="${#fields.hasErrors('anyo')}" th:errors="*{anyo}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="dataInici">Fecha de inicio</label>
+            <input type="date" class="form-control" id="dataInici" th:field="*{dataInici}" maxlength="50" required/>
+            <div th:if="${#fields.hasErrors('dataInici')}" th:errors="*{dataInici}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="dataFi">Fecha de fin</label>
+            <input type="date" class="form-control" id="dataFi" th:field="*{dataFi}" maxlength="50" required/>
+            <div th:if="${#fields.hasErrors('dataFi')}" th:errors="*{dataFi}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="descripcio">Descripción</label>
+            <input type="text" class="form-control" id="descripcio" th:field="*{descripcio}" maxlength="250" required/>
+            <div th:if="${#fields.hasErrors('descripcio')}" th:errors="*{descripcio}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="categoriaMusical">Categoría Musical</label>
+            <input type="text" class="form-control" id="categoriaMusical" th:field="*{categoriaMusical}" maxlength="100" required/>
+            <div th:if="${#fields.hasErrors('categoriaMusical')}" th:errors="*{categoriaMusical}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="pressupostContractacio">Presupuesto de Contratación</label>
+            <input type="text" class="form-control" id="pressupostContractacio" th:field="*{pressupostContractacio}" maxlength="100" required/>
+            <div th:if="${#fields.hasErrors('pressupostContractacio')}" th:errors="*{pressupostContractacio}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="aforamentMaxim">Aforo Máximo</label>
+            <input type="number" class="form-control" id="aforamentMaxim" th:field="*{aforamentMaxim}" required/>
+            <div th:if="${#fields.hasErrors('aforamentMaxim')}" th:errors="*{aforamentMaxim}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="localitzacioDescriptiva">Localización Descriptiva</label>
+            <input type="text" class="form-control" id="localitzacioDescriptiva" th:field="*{localitzacioDescriptiva}" maxlength="100" required/>
+            <div th:if="${#fields.hasErrors('localitzacioDescriptiva')}" th:errors="*{localitzacioDescriptiva}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="localitzacioGeografica">Localización Geográfica</label>
+            <input type="text" class="form-control" id="localitzacioGeografica" th:field="*{localitzacioGeografica}" maxlength="100" required/>
+            <div th:if="${#fields.hasErrors('localitzacioGeografica')}" th:errors="*{localitzacioGeografica}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="publicEnfocat">Público Objetivo</label>
+            <input type="text" class="form-control" id="publicEnfocat" th:field="*{publicEnfocat}" maxlength="100" required/>
+            <div th:if="${#fields.hasErrors('publicEnfocat')}" th:errors="*{publicEnfocat}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="requisitMinimEdat">Requisito Mínimo de Edad</label>
+            <input type="number" class="form-control" id="requisitMinimEdat" th:field="*{requisitMinimEdat}" required/>
+            <div th:if="${#fields.hasErrors('requisitMinimEdat')}" th:errors="*{requisitMinimEdat}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="dataIniciPublicacio">Fecha de Inicio de Publicación</label>
+            <input type="date" class="form-control" id="dataIniciPublicacio" th:field="*{dataIniciPublicacio}" required/>
+            <div th:if="${#fields.hasErrors('dataIniciPublicacio')}" th:errors="*{dataIniciPublicacio}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="dataIniciVenda">Fecha de Inicio de Venta</label>
+            <input type="date" class="form-control" id="dataIniciVenda" th:field="*{dataIniciVenda}" required/>
+            <div th:if="${#fields.hasErrors('dataIniciVenda')}" th:errors="*{dataIniciVenda}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="precioFestivalCompleto">Precio del Festival Completo</label>
+            <input type="number" step="0.01" class="form-control" id="precioFestivalCompleto" th:field="*{precioFestivalCompleto}" required/>
+            <div th:if="${#fields.hasErrors('precioFestivalCompleto')}" th:errors="*{precioFestivalCompleto}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="precioDia">Precio por Día</label>
+            <input type="number" step="0.01" class="form-control" id="precioDia" th:field="*{precioDia}" required/>
+            <div th:if="${#fields.hasErrors('precioDia')}" th:errors="*{precioDia}" class="error-message"></div>
+        </div>
+
+
+        <div class="form-group">
+            <button type="submit" class="button">Actualizar festival</button>
+        </div>
+    </form>
+</div>
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+</body>
+</html>

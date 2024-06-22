@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listado de Artistas</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival.css}" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <style>
+    .no-items-message {
+      border: 1px solid #ccc;
+      background-color: #F17575;
+      width: 30%;
+      padding: 15px;
+      text-align: center;
+      color: #000000;
+      font-size: 1.2em;
+      border-radius: 5px;
+      margin-right: 20% 0;
+      margin-left: 20% 0;
+      margin-bottom: 10px;
+       margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+  <a href="#" class="titulo">Explorar</a>
+  <div class="menu-content">
+    <ul class="menu-items">
+      <li class="item">
+        <a href="/responsableContratacion/indexRC" class="submenu-item">
+          <span>Inicio</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+
+      <li class="item">
+        <a href="responsablecontratacion/contracteartista/list" class="submenu-item">
+          <span>Gestionar Contratos</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="responsablecontratacion/artista/list" class="submenu-item">
+          <span>Gestionar Artistas</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="festival/list" class="submenu-item">
+          <span>Festivales</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="/logout" class="submenu-item">
+          <span>Cerrar Sesión</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</nav>
+
+<div class="mainc">
+  <div class="container">
+    <h1>Listado de Artistas/Grupos</h1>
+    <div class="initiative-list">
+      <div class="initiative-card" th:each="artista : ${artistas}">
+        <h2 th:text="${artista.nom}" style="text-transform: capitalize;">Nombre del Artista/Grupo</h2>
+        <div class="field">
+          <label><strong>Tipo de Música:</strong></label>
+          <span th:text="${artista.tipusMusica}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>Descripción:</strong></label>
+          <span th:text="${artista.descripcio}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>Cachet Actual:</strong></label>
+          <span th:text="${artista.cachetActual}" style="text-transform: capitalize;"></span>
+        </div>
+        <div class="field">
+          <label><strong>ID del Artista/Grupo:</strong></label>
+          <span th:text="${artista.idArtista}" style="text-transform: capitalize;"></span>
+        </div>
+
+          <div class="buttons-wrapper">
+            <a th:href="@{update/{id}(id=${artista.idArtista})}" class="btn btn-warning" role="button">Editar</a>
+            <a th:href="@{delete/{id}(id=${artista.idArtista})}" class="btn btn-danger" role="button">Borrar</a>
+          </div>
+
+      </div>
+
+      <div th:if="${#lists.isEmpty(artistas)}" class="no-items-message">
+        <p>No existe ningún artista</p>
+      </div>
+
+  </div>
+    <div class="btn-anyadir">
+      <a href="add" class="btn btn-success" role="button">Añadir artista</a>
+    </div>
+</div>
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+
+</body>
+</html>

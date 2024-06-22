@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Información del Festival</title>
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+
+  <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+        }
+
+        .festival-header {
+            color: white;
+            padding: 60px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .festival-header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s;
+        }
+        .festival-header p {
+            font-size: 1.5em;
+            animation: fadeInUp 1s;
+        }
+        .festival-body {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 20px 20px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s;
+        }
+        .festival-body p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+  <a href="#" class="titulo">Explorar</a>
+  <div class="menu-content">
+    <ul class="menu-items">
+      <li class="item">
+        <a href="index.html" class="submenu-item">
+          <span>Inicio</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="/login" class="submenu-item">
+          <span>Login</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+
+      <li class="item">
+        <a href="/festival/list" class="submenu-item">
+          <span>Festivales</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="container">
+  <div class="containerinfo">
+    <div class="festival-header">
+      <h1 id="festival-name" th:text="${festival.nom}">Nombre del Festival</h1>
+      <p id="festival-category" th:text="'Categoría: ' + ${festival.categoriaMusical}">Categoría: Música</p>
+    </div>
+    <div style="display:flex" class="festival-body">
+      <div>
+        <p><strong>ID:</strong> <span id="festival-id" th:text="${festival.idFestival}">123</span></p>
+        <p><strong>Año:</strong> <span id="festival-year" th:text="${festival.anyo}">2024</span></p>
+        <p><strong>Fecha de Inicio:</strong> <span id="festival-start-date" th:text="${festival.dataInici}">2024-06-01</span></p>
+        <p><strong>Fecha de Fin:</strong> <span id="festival-end-date" th:text="${festival.dataFi}">2024-06-03</span></p>
+        <p><strong>Estado:</strong> <span id="festival-status" th:text="${festival.estatFestival}">Activo</span></p>
+        <p><strong>Descripción:</strong> <span id="festival-description" th:text="${festival.descripcio}">Un festival increíble.</span></p>
+        <p><strong>Aforo Máximo:</strong> <span id="festival-capacity" th:text="${festival.aforamentMaxim}">5000</span></p>
+        <p><strong>Localización:</strong> <span id="festival-location" th:text="${festival.localitzacioDescriptiva}">Parque Central</span></p>
+        <p><strong>Localización Geográfica:</strong> <span id="festival-geo-location" th:text="${festival.localitzacioGeografica}">40.7128° N, 74.0060° W</span></p>
+        <p><strong>Público Objetivo:</strong> <span id="festival-audience" th:text="${festival.publicEnfocat}">Todos los públicos</span></p>
+        <p><strong>Requisito Mínimo de Edad:</strong> <span id="festival-age" th:text="${festival.requisitMinimEdat}">18</span></p>
+        <p><strong>Fecha de Inicio de Publicación:</strong> <span id="festival-publication-start-date" th:text="${festival.dataIniciPublicacio}">2024-05-01</span></p>
+        <p><strong>Fecha de Inicio de Venta:</strong> <span id="festival-sale-start-date" th:text="${festival.dataIniciVenda}">2024-05-15</span></p>
+      </div>
+
+      <div style="margin-left: 10%" th:each="actuacio : ${actuaciones}">
+        <p><strong>Artistas:</strong></p>
+        <p><strong> <span id="actuacio-nomartista" th:text="${actuacio.nomartista}">123</span></strong></p>
+        <p><strong> <span>Hora de inicio:</span></strong></p>
+        <p><strong> <span id="actuacio-inicio" th:text="${actuacio.horainici}">123</span></strong></p>
+        <p><strong> <span>Hora de fin prevista:</span></strong></p>
+        <p><strong> <span id="actuacio-fin" th:text="${actuacio.horafiprevista}">123</span></strong></p>
+
+      </div>
+      <p style="margin-auto" th:if="${#lists.isEmpty(actuaciones)}">Sin actuaciones aún</p>
+
+    </div>
+  </div>
+</div>
+<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+</body>
+</html>

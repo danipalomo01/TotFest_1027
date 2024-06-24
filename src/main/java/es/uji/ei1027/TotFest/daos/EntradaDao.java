@@ -37,7 +37,8 @@ public class EntradaDao {
 
     public EntradaTipus getEntradaTipus(int idFestival, String tipusEntrada) {
         try {
-            return jdbcTemplate.queryForObject("SELECT * FROM entradatipus WHERE idfestival = ? AND tipusentrada = ?", new EntradaTipusRowMapper(), idFestival, tipusEntrada);
+            String sql = "SELECT * FROM entradatipus WHERE idfestival=? AND tipusentrada=?";
+            return jdbcTemplate.queryForObject(sql, new Object[]{idFestival, tipusEntrada}, new EntradaTipusRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

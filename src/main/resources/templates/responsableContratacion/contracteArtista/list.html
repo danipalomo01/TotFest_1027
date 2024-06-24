@@ -8,6 +8,9 @@
     <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         .no-items-message {
             border: 1px solid #ccc;
@@ -22,162 +25,191 @@
         }
 
         .table {
-    background-color: #ffffff; /* Color de fondo de la tabla */
-    width: 100%;
-}
-.table th, .table td {
-    white-space: nowrap; /* Evita que el contenido se ajuste automáticamente */
-}
+            background-color: #ffffff; /* Color de fondo de la tabla */
+            width: 100%;
+            max-width: 100%; /* Ajustar la tabla al contenedor */
+        }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f9f9f9; /* Color de fondo para filas alternas */
-}
+        .table th, .table td {
+            white-space: nowrap; /* Evita que el contenido se ajuste automáticamente */
+            overflow: hidden; /* Oculta el contenido desbordado */
+            text-overflow: ellipsis; /* Muestra puntos suspensivos para contenido desbordado */
+            max-width: 150px; /* Ajusta el ancho máximo de las celdas */
+        }
 
-.table-bordered {
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra alrededor de la tabla */
-}
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9; /* Color de fondo para filas alternas */
+        }
 
-.table-bordered td, .table-bordered th {
-    border: 1px solid #dee2e6; /* Color y grosor de los bordes */
-}
+        .table-bordered {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra alrededor de la tabla */
+        }
 
-.table-rounded {
-    border-radius: 8px; /* Radio de los bordes redondeados */
-}
+        .table-bordered td, .table-bordered th {
+            border: 1px solid #dee2e6; /* Color y grosor de los bordes */
+        }
 
+        .table-rounded {
+            border-radius: 8px; /* Radio de los bordes redondeados */
+        }
+
+        .btn-sm {
+            font-size: 0.8rem; /* Reducir el tamaño del texto de los botones */
+        }
+
+        .form-select {
+            display: inline-block;
+            width: auto;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
 <div class="topbar"></div>
 <div class="rightbar"></div>
 <div>
-<nav class="sidebar" style="margin-top:30px">
-    <a href="#" class="titulo">Explorar</a>
-    <div class="menu-content">
-        <ul class="menu-items">
-            <li class="item">
-                <a href="/responsableContratacion/indexRC" class="submenu-item">
-                    <span>Inicio</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-
-
-            <li class="item">
-                <a href="responsablecontratacion/contracteartista/list" class="submenu-item">
-                    <span>Gestionar Contratos</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-
-            <li class="item">
-                <a href="responsablecontratacion/artista/list" class="submenu-item">
-                    <span>Gestionar Artistas</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-
-            <li class="item">
-                <a href="festival/list" class="submenu-item">
-                    <span>Festivales</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-
-            <li class="item">
-                <a href="/logout" class="submenu-item">
-                    <span>Cerrar Sesión</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-
-<div class="mainc">
-    <div style="width: 70%; margin-left: 20%; margin-right: 10%">
-        <div>
-            <h1 style="text-align:center; padding-top: 10%">Listado de Contratos de <span th:text="${session.userName}"></span></h1>
-
-            <!-- Mensaje de no hay contratos -->
-            <div th:if="${#lists.isEmpty(contratos)}" class="no-items-message">
-                <p>No existe ningún contrato disponible.</p>
-            </div>
-
-            <!-- Tabla de contratos -->
-            <div th:unless="${#lists.isEmpty(contratos)}">
-                <div class="table-responsive" >
-                    <table class="table table-bordered table-striped rounded">
-
-                    <thead>
-                        <tr>
-                            <th>ID Contrato</th>
-                            <th>ID Artista</th>
-                            <th>Fecha de inicio</th>
-                            <th>Fecha de fin</th>
-                            <th>Condiciones Descriptivas</th>
-                            <th>Número de Actuaciones por Año</th>
-                            <th>Importe del Contrato</th>
-                            <th>ID Comercial</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody id="contract-table-body">
-                        <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-                        <tr th:each="contracte : ${contratos}">
-                            <td th:text="${contracte.idContracte}"></td>
-                            <td th:text="${contracte.idArtista}"></td>
-                            <td th:text="${#dates.format(contracte.dataInici, 'dd/MM/yyyy')}"></td>
-                            <td th:text="${#dates.format(contracte.dataFi, 'dd/MM/yyyy')}"></td>
-                            <td th:text="${contracte.condicionsDescriptiu}"></td>
-                            <td th:text="${contracte.numActuacionsAny}"></td>
-                            <td th:text="${T(java.lang.String).format('%.2f', contracte.importContracte)}"></td>
-                            <td th:text="${contracte.idComercial}"></td>
-                            <td>
-                                <a th:href="@{/responsablecontratacion/actuaciones/{id}/{idartista}(id=${contracte.idContracte}, idartista=${contracte.idArtista})}" class="btn btn-success btn-sm" role="button">Gestionar Actuaciones</a>
-                                <a th:href="@{/responsablecontratacion/contracteartista/update/{id}(id=${contracte.idContracte})}" class="btn btn-warning btn-sm" role="button">Editar</a>
-                                <a th:href="@{/responsablecontratacion/contracteartista/delete/{id}(id=${contracte.idContracte})}" class="btn btn-danger btn-sm" role="button">Borrar</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Mensajes de no hay artistas o festivales -->
-            <!-- Mensajes de no hay artistas o festivales -->
-            <div th:if="${#lists.isEmpty(artistas) or #lists.isEmpty(festivales)}" class="no-items-message">
-                <p>No existe ningún artista o festival disponible, no se pueden añadir contratos.</p>
-            </div>
-
-
-            <!-- Botón de añadir contrato -->
-            <div style="margin-left:40%" class="btn-anyadir" th:if="${!#lists.isEmpty(artistas)} and ${!#lists.isEmpty(festivales)}">
-                <a  th:href="@{/responsablecontratacion/contracteartista/add}" class="btn btn-success" role="button">Añadir Contrato</a>
-            </div>
-        </div>
-
-        <!-- Paginación -->
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+    <nav class="sidebar" style="margin-top:30px">
+        <a href="#" class="titulo">Explorar</a>
+        <div class="menu-content">
+            <ul class="menu-items">
+                <li class="item">
+                    <a href="/responsableContratacion/indexRC" class="submenu-item">
+                        <span>Inicio</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
                 </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Siguiente</a>
+                <li class="item">
+                    <a href="/responsablecontratacion/contracteartista/list" class="submenu-item">
+                        <span>Gestionar Contratos</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/responsablecontratacion/artista/list" class="submenu-item">
+                        <span>Gestionar Artistas</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/festival/list" class="submenu-item">
+                        <span>Festivales</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/logout" class="submenu-item">
+                        <span>Cerrar Sesión</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
                 </li>
             </ul>
-        </nav>
+        </div>
+    </nav>
+    <div class="mainc">
+        <div style="width: 70%; margin-left: 22%; margin-right: 10%">
+            <div>
+                <h1 style="text-align:center; padding-top: 5%"><strong>Listado de Contratos</strong></h1>
+                <!-- Mensaje de no hay contratos -->
+                <div th:if="${#lists.isEmpty(contratos)}" class="no-items-message">
+                    <p>No existe ningún contrato disponible.</p>
+                </div>
+                <!-- Tabla de contratos -->
+                <div th:unless="${#lists.isEmpty(contratos)}">
+                    <form method="get" th:action="@{/responsablecontratacion/contracteartista/list}">
+                        <label style="padding-top: 3%" for="size">Contratos por página:</label>
+                        <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
+                            <option th:value="5" th:selected="${size == 5}">5</option>
+                            <option th:value="10" th:selected="${size == 10}">10</option>
+                            <option th:value="20" th:selected="${size == 20}">20</option>
+                            <option th:value="50" th:selected="${size == 50}">50</option>
+                        </select>
+                        <input type="hidden" name="page" th:value="${currentPage}" />
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped rounded">
+                            <thead>
+                            <tr>
+                                <th>ID Contrato</th>
+                                <th>ID Artista</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                                <th>Condiciones<br> Descriptivas</th>
+                                <th>Nº actuaciones<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/año</th>
+                                <th>Importe <br> Contrato (€)</th>
+                                <th>ID Comercial</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody id="contract-table-body">
+                            <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
+                            <tr th:each="contracte : ${contratos}">
+                                <td th:text="${contracte.idContracte}"></td>
+                                <td th:text="${contracte.idArtista}"></td>
+                                <td th:text="${#dates.format(contracte.dataInici, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${#dates.format(contracte.dataFi, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <button style="margin-left: 30%" type="button" class="btn btn-primary btn-sm" data-toggle="modal" th:data-target="'#condicionesModal' + ${contracte.idContracte}">
+                                        Ver
+                                    </button>
+                                    <!-- Modal -->
+                                    <div class="modal" style="margin-top:10%" th:id="'condicionesModal' + ${contracte.idContracte}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Condiciones Descriptivas</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body" th:text="${contracte.condicionsDescriptiu}">
+                                                    <!-- Aquí se mostrarán las condiciones descriptivas -->
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${contracte.numActuacionsAny}"></td>
+                                <td th:text="${T(java.lang.String).format('%.2f', contracte.importContracte)}"></td>
+                                <td th:text="${contracte.idComercial}"></td>
+                                <td>
+                                    <a th:href="@{/responsablecontratacion/actuaciones/{id}/{idartista}(id=${contracte.idContracte}, idartista=${contracte.idArtista})}" class="btn btn-success btn-sm" role="button" title="Gestionar Actuaciones"><i class="fa-solid fa-list"></i></a>
+                                    <a th:href="@{/responsablecontratacion/contracteartista/update/{id}(id=${contracte.idContracte})}" class="btn btn-warning btn-sm" role="button" title="Editar"><i class="fa-solid fa-edit"></i></a>
+                                    <a th:href="@{/responsablecontratacion/contracteartista/delete/{id}(id=${contracte.idContracte})}" class="btn btn-danger btn-sm" role="button" title="Borrar"><i class="fa-solid fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Mensajes de no hay artistas o festivales -->
+                <div th:if="${#lists.isEmpty(artistas) or #lists.isEmpty(festivales)}" class="no-items-message">
+                    <p>No existe ningún artista o festival disponible, no se pueden añadir contratos.</p>
+                </div>
+                <!-- Botón de añadir contrato -->
+                <div style="margin-left:44%; margin-top: 30px" class="btn-anyadir" th:if="${!#lists.isEmpty(artistas)} and ${!#lists.isEmpty(festivales)}">
+                    <a th:href="@{/responsablecontratacion/contracteartista/add}" class="btn btn-success" role="button">Añadir Contrato</a>
+                </div>
+            </div>
+            <!-- Paginación -->
+            <nav aria-label="Page navigation example" style="margin-top: 30px">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/responsablecontratacion/contracteartista/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:href="@{/responsablecontratacion/contracteartista/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/responsablecontratacion/contracteartista/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
-</div>
-
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
-
 <!-- Scripts de Bootstrap y otros -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>

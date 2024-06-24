@@ -2,16 +2,14 @@ package es.uji.ei1027.TotFest.controllers.ResponsableContratacion;
 
 import es.uji.ei1027.TotFest.daos.ArtistaGrupDao;
 import es.uji.ei1027.TotFest.models.ArtistaGrup;
+import es.uji.ei1027.TotFest.models.ContracteArtista;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -31,13 +29,34 @@ public class GFArtistaController {
         this.artistaGrupDao = artistaGrupDao;
     }
 
+
     @RequestMapping("/list")
-    public String listArtistas(HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
-            return "redirect:/login";
+    public String listArtistas(HttpSession session,
+                                         @RequestParam(value = "page", defaultValue = "0") int page,
+                                         @RequestParam(value = "size", defaultValue = "1") int size,
+                                         Model model) {
+
+
+        //if (session == null || session.getAttribute("user") == null) {
+        //    return "redirect:/login";
+        //}
+
+        if (session.getAttribute("size") != null && size == 1) {
+            size = (int) session.getAttribute("size");
+        } else {
+            session.setAttribute("size", size);
         }
-        List<ArtistaGrup> artistas = artistaGrupDao.getArtistaGrups();
+        List<ArtistaGrup> artistasTotales = artistaGrupDao.getArtistaGrups();
+        List<ArtistaGrup> artistas = artistaGrupDao.getArtistaGrups(page, size);
+        int totalArtistas = artistasTotales.size();
+        int totalPages = (int) Math.ceil((double) totalArtistas / size);
+
         model.addAttribute("artistas", artistas);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+
         return "responsableContratacion/gestionArtistas/list";
     }
 
@@ -54,9 +73,9 @@ public class GFArtistaController {
     public String processAddSubmit(
             @ModelAttribute("artista") ArtistaGrup artista,
             BindingResult bindingResult, HttpSession session) {
-        if (session == null || session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
+        //if (session == null || session.getAttribute("user") == null) {
+        //    return "redirect:/login";
+        //}
         validarAddArtista(artista, bindingResult);
         if (bindingResult.hasErrors()) {
             return "responsablecontratacion/gestionArtistas/add";

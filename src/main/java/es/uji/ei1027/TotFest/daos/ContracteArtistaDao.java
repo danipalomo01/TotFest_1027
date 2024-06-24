@@ -1,5 +1,6 @@
 package es.uji.ei1027.TotFest.daos;
 
+import es.uji.ei1027.TotFest.models.Actuacio;
 import es.uji.ei1027.TotFest.models.ContracteArtista;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -51,7 +52,6 @@ public class ContracteArtistaDao {
     }
 
     public List<ContracteArtista> getContractesArtistes(int page, int size) {
-        List<ContracteArtista> contractesArtistes = new ArrayList<>();
         int offset = page * size;
 
         return jdbcTemplate.query("SELECT * FROM contracteartista LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), size, offset);
@@ -61,6 +61,23 @@ public class ContracteArtistaDao {
     public ContracteArtista getContracteArtista(int idContracte) {
         try {
             return jdbcTemplate.queryForObject("SELECT * FROM contracteartista WHERE idcontracte = ?", new ContracteArtistaRowMapper(), idContracte);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public List<Actuacio> getActuacionesContrato(int idContracte) {
+        try {
+            String sql = "SELECT * FROM actuacio WHERE idcontracte=?";
+            return jdbcTemplate.query(sql, new ActuacioRowMapper(), idContracte);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public Boolean contratoCerrado(int idcontrato, int numActuacionsAny) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT COUNT(*) as count FROM actuacio WHERE idcontracte = ?", Integer.class, idcontrato) == numActuacionsAny;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

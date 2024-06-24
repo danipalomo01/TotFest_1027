@@ -98,14 +98,6 @@ public class FestivalDao {
         }
     }
 
-    public List<Festival> getFestivals(int size, int offset) {
-        try {
-            return jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
-        } catch (EmptyResultDataAccessException e) {
-            return new ArrayList<Festival>();
-        }
-    }
-
     public List<Festival> getFestivals() {
         try {
             return jdbcTemplate.query("SELECT * FROM festival", new FestivalRowMapper());
@@ -121,5 +113,10 @@ public class FestivalDao {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    public List<Festival> getFestivals(int size, int offset) {
+        return jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
+
     }
 }

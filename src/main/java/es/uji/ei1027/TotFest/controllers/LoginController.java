@@ -28,6 +28,10 @@ public class LoginController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String checkLogin(@ModelAttribute("user") UserDetails user,
                              BindingResult bindingResult, HttpSession session) {
+
+        if (session.getAttribute("size") == null) {
+            session.setAttribute("size", 10);
+        }
         UserValidator userValidator = new UserValidator();
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {

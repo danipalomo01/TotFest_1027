@@ -9,12 +9,18 @@
   <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
   <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+
 
   <style>
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             color: #333;
+        }
+
+        .p {
+          font-family: 'Roboto', sans-serif;
         }
 
         .festival-header {
@@ -84,38 +90,58 @@
   </div>
 </nav>
 <div class="container">
-  <div class="containerinfo">
+  <div class="containerinfo" style="padding-left: 20%; padding-right: 7%">
     <div class="festival-header">
-      <h1 id="festival-name" th:text="${festival.nom}">Nombre del Festival</h1>
+      <h1 id="festival-name" th:text="${festival.nom} + ' ' + ${festival.anyo}">Nombre del Festival</h1>
       <p id="festival-category" th:text="'Categoría: ' + ${festival.categoriaMusical}">Categoría: Música</p>
     </div>
+    <div style=" background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 16px;">
+      <p>Bienvenidos al <strong th:text="${festival.nom}">Nombre del Festival</strong>, un evento cultural excepcional que reúne a miles de personas apasionadas por la música, el arte y la diversión.</p>
+      <p>En <strong th:text="${festival.anyo}">2024</strong>, celebramos desde el <strong th:text="${festival.dataInici}">2024-06-01</strong> hasta el <strong th:text="${festival.dataFi}">2024-06-03</strong>, ofreciendo tres días de experiencias inolvidables y momentos únicos.</p>
+      <p>Este año nos reunimos en <strong th:text="${festival.localitzacioDescriptiva}">Ubicación del Festival</strong>, un lugar emblemático donde la música se encuentra con la naturaleza y la diversión no tiene límites.</p>
+      <p>Con un aforo máximo de <strong th:text="${festival.aforamentMaxim}">5000</strong> personas, aseguramos un ambiente vibrante y seguro para todos nuestros asistentes.</p>
+      <p>Descubre artistas de renombre internacional que deleitarán tus sentidos con sus actuaciones en vivo, desde el amanecer hasta el anochecer.</p>
+      <p>No te pierdas esta oportunidad única de vivir la magia del <strong th:text="${festival.nom}">Nombre del Festival</strong> 2024.</p>
+    </div>
+    <hr style="border-top: 1px solid #ccc; margin: 20px 0;">
     <div style="display:flex" class="festival-body">
       <div>
-        <p><strong>ID:</strong> <span id="festival-id" th:text="${festival.idFestival}">123</span></p>
         <p><strong>Año:</strong> <span id="festival-year" th:text="${festival.anyo}">2024</span></p>
         <p><strong>Fecha de Inicio:</strong> <span id="festival-start-date" th:text="${festival.dataInici}">2024-06-01</span></p>
         <p><strong>Fecha de Fin:</strong> <span id="festival-end-date" th:text="${festival.dataFi}">2024-06-03</span></p>
-        <p><strong>Estado:</strong> <span id="festival-status" th:text="${festival.estatFestival}">Activo</span></p>
         <p><strong>Descripción:</strong> <span id="festival-description" th:text="${festival.descripcio}">Un festival increíble.</span></p>
         <p><strong>Aforo Máximo:</strong> <span id="festival-capacity" th:text="${festival.aforamentMaxim}">5000</span></p>
         <p><strong>Localización:</strong> <span id="festival-location" th:text="${festival.localitzacioDescriptiva}">Parque Central</span></p>
         <p><strong>Localización Geográfica:</strong> <span id="festival-geo-location" th:text="${festival.localitzacioGeografica}">40.7128° N, 74.0060° W</span></p>
-        <p><strong>Público Objetivo:</strong> <span id="festival-audience" th:text="${festival.publicEnfocat}">Todos los públicos</span></p>
         <p><strong>Requisito Mínimo de Edad:</strong> <span id="festival-age" th:text="${festival.requisitMinimEdat}">18</span></p>
-        <p><strong>Fecha de Inicio de Publicación:</strong> <span id="festival-publication-start-date" th:text="${festival.dataIniciPublicacio}">2024-05-01</span></p>
-        <p><strong>Fecha de Inicio de Venta:</strong> <span id="festival-sale-start-date" th:text="${festival.dataIniciVenda}">2024-05-15</span></p>
-      </div>
-
-      <div style="margin-left: 10%" th:each="actuacio : ${actuaciones}">
-        <p><strong>Artistas:</strong></p>
-        <p><strong> <span id="actuacio-nomartista" th:text="${actuacio.nomartista}">123</span></strong></p>
-        <p><strong> <span>Hora de inicio:</span></strong></p>
-        <p><strong> <span id="actuacio-inicio" th:text="${actuacio.horainici}">123</span></strong></p>
-        <p><strong> <span>Hora de fin prevista:</span></strong></p>
-        <p><strong> <span id="actuacio-fin" th:text="${actuacio.horafiprevista}">123</span></strong></p>
 
       </div>
-      <p style="margin-auto" th:if="${#lists.isEmpty(actuaciones)}">Sin actuaciones aún</p>
+
+      <div style="justify-content: center; align-items: center; margin-left: 30%">
+        <p style="margin-auto" th:if="${#lists.isEmpty(actuaciones)}">Sin actuaciones aún</p>
+
+        <div style="display: flex">
+          <p th:unless="${#lists.isEmpty(actuaciones)}"><strong>Artistas:</strong></p>
+          <p style="margin-left: 40%" th:unless="${#lists.isEmpty(actuaciones)}"><strong>Horas:</strong></p>
+        </div>
+        <hr style="border-top: 1px solid #ccc;">
+
+        <div style="margin-top: 10%; display: flex" th:each="actuacio : ${actuaciones}">
+            <div>
+              <p><strong> <span id="actuacio-nomartista" th:text="${actuacio.nomartista}">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></p>
+            </div>
+            <div>
+              <p><strong><span id="actuacio-inicio" th:text="${actuacio.horaInici}"></span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;<span id="actuacio-fin" th:text="${actuacio.horaFiPrevista}"></span></strong></p>
+            </div>
+
+          </div>
+      </div>
+
 
     </div>
   </div>

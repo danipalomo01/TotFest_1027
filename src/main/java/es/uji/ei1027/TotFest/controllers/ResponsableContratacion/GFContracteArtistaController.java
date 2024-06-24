@@ -41,13 +41,20 @@ public class GFContracteArtistaController {
     @RequestMapping("/list")
     public String listContractesArtistes(HttpSession session,
                                          @RequestParam(value = "page", defaultValue = "0") int page,
-                                         @RequestParam(value = "size", defaultValue = "10") int size,
+                                         @RequestParam(value = "size", defaultValue = "1") int size,
                                          Model model) {
 
 
         //if (session == null || session.getAttribute("user") == null) {
         //    return "redirect:/login";
         //}
+
+        session.setAttribute("solapamiento", "false");
+        if (session.getAttribute("size") != null && size == 1) {
+            size = (int) session.getAttribute("size");
+        } else {
+            session.setAttribute("size", size);
+        }
 
         List<ContracteArtista> contractesArtistes = contracteArtistaDao.getContractesArtistes(page, size);
         int totalContracts = contracteArtistaDao.getContractesArtistes().size();
@@ -58,6 +65,7 @@ public class GFContracteArtistaController {
         model.addAttribute("festivales", festivalDao.getFestivals());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+        model.addAttribute("size", size);
 
         return "responsablecontratacion/contracteartista/list";
     }
@@ -143,7 +151,7 @@ public class GFContracteArtistaController {
 
     private void validarAddContratoArtista(ContracteArtista contrato, BindingResult bindingResult) {
         if (contrato.getIdArtista() == 0) {
-            bindingResult.rejectValue("contrato.idArtista", "error.idArtista", "Debes seleccionar un artista.");
+            bindingResult.rejectValue("idArtista", "error.idArtista", "Debes seleccionar un artista.");
         }
 
         if(contrato.getDataInici() == null || contrato.getDataFi() == null) {

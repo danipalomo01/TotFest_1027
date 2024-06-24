@@ -2,6 +2,7 @@ package es.uji.ei1027.TotFest.daos;
 
 import es.uji.ei1027.TotFest.models.Actuacio;
 import es.uji.ei1027.TotFest.models.ArtistaGrup;
+import es.uji.ei1027.TotFest.models.ContracteArtista;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -58,5 +59,12 @@ public class ArtistaGrupDao {
         } catch (EmptyResultDataAccessException e) {
             return new ArtistaGrup();
         }
+    }
+
+    public List<ArtistaGrup> getArtistaGrups(int page, int size) {
+        int offset = page * size;
+
+        return jdbcTemplate.query("SELECT * FROM artistagrup LIMIT ? OFFSET ?", new ArtistaGrupRowMapper(), size, offset);
+
     }
 }

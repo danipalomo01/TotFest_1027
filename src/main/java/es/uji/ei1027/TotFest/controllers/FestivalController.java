@@ -30,34 +30,38 @@ public class FestivalController {
     }
 
     @RequestMapping("/list")
-    public String listFestivals(HttpSession session, Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-
+    public String listFestivals(HttpSession session,
+                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "size", defaultValue = "5") int size,
+                                Model model) {
         int offset = page * size;
 
-        List<Festival> festivalesTodos = festivalDao.getFestivals(size, offset);
+        List<Festival> festivalesTodos = festivalDao.getFestivals();
+        List<Festival> festivalesOffset = festivalDao.getFestivals(size, offset);
         List<Festival> festivales = new ArrayList<>();
 
         LocalDate fechaActual = LocalDate.now();
 
-        for (Festival festival : festivalesTodos) {
+        for (Festival festival : festivalesOffset) {
             if (festival.getDataIniciPublicacio().toLocalDate().isEqual(fechaActual) ||
                     festival.getDataIniciPublicacio().toLocalDate().isBefore(fechaActual)) {
                 festivales.add(festival);
             }
         }
         model.addAttribute("fechaActual", fechaActual);
-        if (session.getAttribute("cif") != null) {
-            model.addAttribute("cif", session.getAttribute("cif"));
-        } else {
-            model.addAttribute("cif", "noCif");
-        }
+
         model.addAttribute("currentPage", page);
-        int totalFestivales = festivales.size();
+        int totalFestivales = festivalesTodos.size();
         int totalPages = (int) Math.ceil((double) totalFestivales / size);
+        model.addAttribute("festivales", festivales);
+        model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("festivals", festivales);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
         return "festival/list";
     }
+
+
 
     @RequestMapping(value = "/info/{idFestival}", method = RequestMethod.GET)
     public String info(Model model, @PathVariable int idFestival) {

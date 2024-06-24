@@ -15,13 +15,14 @@ public class Actuacio {
     private String comentaris;
     private int idFestival;
     private String nomartista;
+    private int idartista;
 
 
     public Actuacio(){
 
     }
 
-    public Actuacio(int idActuacio, int idContracte, Date data, Time horaInici, Time horaFiPrevista, BigDecimal preuContracteActuacio, String comentaris, int idFestival, String nomartista) {
+    public Actuacio(int idActuacio, int idContracte, Date data, Time horaInici, Time horaFiPrevista, BigDecimal preuContracteActuacio, String comentaris, int idFestival, String nomartista, int idartista) {
         this.idActuacio = idActuacio;
         this.idContracte = idContracte;
         this.data = data;
@@ -31,6 +32,7 @@ public class Actuacio {
         this.comentaris = comentaris;
         this.idFestival = idFestival;
         this.nomartista = nomartista;
+        this.idartista = idartista;
     }
 
     public int getIdActuacio() {
@@ -103,6 +105,14 @@ public class Actuacio {
 
     public void setNomartista(String nomartista) {
         this.nomartista = nomartista;
+    }
+
+    public int getIdartista() {
+        return idartista;
+    }
+
+    public void setIdartista(int idartista) {
+        this.idartista = idartista;
     }
 }
 

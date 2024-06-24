@@ -11,15 +11,14 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -48,28 +47,33 @@ public class GFFestivalController {
     }
 
     @RequestMapping("/list")
-    public String listFestivals(HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-        List<Festival> festivales = festivalDao.getFestivals();
-        if (session.getAttribute("cif") != null) {
-            model.addAttribute("cif", session.getAttribute("cif"));
-        } else {
-            model.addAttribute("cif", "noCif");
-        }
-        model.addAttribute("festivals", festivales);
+    public String listFestivals(HttpSession session,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "size", defaultValue = "5") int size,
+                               Model model) {
 
-        HashMap<Integer, List<String>> actuacionesFestivales = new HashMap<>();
-        for (Festival festivale : festivales) {
-            List<String> nombreArtistas = new ArrayList<>();
-            List<Actuacio> acts = festivalDao.getActuacionesFestival(festivale.getIdFestival());
-            for(Actuacio act: acts) {
-                nombreArtistas.add(artistaGrupDao.getArtistaGrup(contracteArtistaDao.getContracteArtista(act.getIdContracte()).getIdArtista()).getNom());
-            }
-            actuacionesFestivales.put(festivale.getIdFestival(), nombreArtistas);
+
+        //if (session == null || session.getAttribute("user") == null) {
+        //    return "redirect:/login";
+        //}
+
+        if (session.getAttribute("size") != null && size == 1) {
+            size = (int) session.getAttribute("size");
+        } else {
+            session.setAttribute("size", size);
         }
-        model.addAttribute("actuacionesFestivales", actuacionesFestivales);
+        List<Festival> festivalesTotales = festivalDao.getFestivals();
+        int offset = page * size;
+        List<Festival> festivales = festivalDao.getFestivals(size, offset);
+        int totalfestivales = festivalesTotales.size();
+        int totalPages = (int) Math.ceil((double) totalfestivales / size);
+
+        model.addAttribute("festivales", festivales);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+
         return "gestorFestival/list";
     }
 
@@ -84,10 +88,16 @@ public class GFFestivalController {
 
     @RequestMapping("/add")
     public String addFestival(HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("festival", new FestivalForm());
+        //if (session == null || session.getAttribute("user") == null) {
+        //    return "redirect:/login";
+        //}
+        FestivalForm festivalForm = new FestivalForm();
+        festivalForm.setDataInici(Date.valueOf(LocalDate.of(2024,1,1)));
+        festivalForm.setDataFi(Date.valueOf(LocalDate.of(2024,1,1)));
+        festivalForm.setDataIniciPublicacio(Date.valueOf(LocalDate.of(2024,1,1)));
+        festivalForm.setDataIniciVenda(Date.valueOf(LocalDate.of(2024,1,1)));
+        festivalForm.setAnyo(2024);
+        model.addAttribute("festival", festivalForm);
         return "gestorFestival/add";
     }
 
@@ -137,6 +147,7 @@ public class GFFestivalController {
 
             entradaDao.addEntradaTipus(entradaTipusCompleto);
             entradaDao.addEntradaTipus(entradaTipusDia);
+            return "redirect:/gestorFestival/list";
         } catch (DuplicateKeyException e) {
             // Manejar la excepción de clave duplicada si es necesario
         } catch (DataAccessException e) {
@@ -145,7 +156,7 @@ public class GFFestivalController {
             // Manejar otras excepciones no esperadas si es necesario
         }
 
-        return "redirect:list";
+        return "redirect:/gestorFestival/list";
     }
 
     public void validarAddHtml(Festival festival, BindingResult bindingResult) {
@@ -178,9 +189,7 @@ public class GFFestivalController {
             }
         }
 
-        if(festival.getAforamentMaxim() <= 0) {
-            bindingResult.rejectValue("aforamentMaxim", "error.aforamentMaxim","El aforo máximo no puede ser un número negativo.");
-        }
+
 
         if (festival.getPressupostContractacio() != null && festival.getPressupostContractacio().compareTo(BigDecimal.ZERO) < 0) {
             bindingResult.rejectValue("pressupostContractacio", "error.pressupostContractacio","El presupuesto de contratación no puede ser un número negativo.");
@@ -221,7 +230,7 @@ public class GFFestivalController {
             return "redirect:/login";
         }
         festivalDao.deleteFestival(idFestival);
-        return "redirect:list";
+        return "redirect:/gestorFestival/list";
     }
 
     public static void validateFestival(Festival festival, BindingResult bindingResult) {
@@ -235,8 +244,8 @@ public class GFFestivalController {
             bindingResult.rejectValue("nom", "error.nom", "El nombre del festival no puede estar vacío.");
         }
 
-        if (festival.getAnyo() <= 0) {
-            bindingResult.rejectValue("anyo", "error.anyo", "El año del festival debe ser mayor que cero.");
+        if (festival.getAnyo() < 2024) {
+            bindingResult.rejectValue("anyo", "error.anyo", "El año del festival no puede ser inferior al año actual.");
         }
 
         if (festival.getDataInici() == null) {
@@ -290,6 +299,13 @@ public class GFFestivalController {
 
     private static boolean isEmptyOrNull(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    public void clearBindingResult(BindingResult bindingResult) {
+        List<FieldError> fieldErrors = new ArrayList<>(bindingResult.getFieldErrors());
+        for (FieldError fieldError : fieldErrors) {
+            bindingResult.rejectValue(fieldError.getField(), null, null);
+        }
     }
 }
 

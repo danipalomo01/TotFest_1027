@@ -1,106 +1,245 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Listado de Festivales</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .no-items-message {
+            border: 1px solid #ccc;
+            background-color: #F17575;
+            width: 30%;
+            padding: 15px;
+            text-align: center;
+            color: #000000;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin: 20px auto;
+        }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"/>
+        .table {
+            background-color: #ffffff; /* Color de fondo de la tabla */
+            width: 100%;
+            max-width: 100%; /* Ajustar la tabla al contenedor */
+        }
+
+        .table th, .table td {
+            white-space: nowrap; /* Evita que el contenido se ajuste automáticamente */
+            overflow: hidden; /* Oculta el contenido desbordado */
+            text-overflow: ellipsis; /* Muestra puntos suspensivos para contenido desbordado */
+            max-width: 150px; /* Ajusta el ancho máximo de las celdas */
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9; /* Color de fondo para filas alternas */
+        }
+
+        .table-bordered {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra alrededor de la tabla */
+        }
+
+        .table-bordered td, .table-bordered th {
+            border: 1px solid #dee2e6; /* Color y grosor de los bordes */
+        }
+
+        .table-rounded {
+            border-radius: 8px; /* Radio de los bordes redondeados */
+        }
+
+        .btn-sm {
+            font-size: 0.8rem; /* Reducir el tamaño del texto de los botones */
+        }
+
+        .form-select {
+            display: inline-block;
+            width: auto;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="topbar"></div>
 <div class="rightbar"></div>
-<nav class="sidebar">
-    <a href="#" class="titulo">Explorar</a>
-    <div class="menu-content">
-        <ul class="menu-items">
-            <li class="item">
-                <a href="/gestorFestival/indexGF" class="submenu-item">
-                    <span>Inicio</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/gestorFestival/list" class="submenu-item">
-                    <span>Gestionar Festivales</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/festival/list" class="submenu-item">
-                    <span>Festivales</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/logout" class="submenu-item">
-                    <span>Cerrar Sesión</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-        </ul>
-    </div>
+<div>
+    <nav class="sidebar" style="margin-top:30px">
+        <a href="#" class="titulo">Explorar</a>
+        <div class="menu-content">
+            <ul class="menu-items">
+                <li class="item">
+                    <a href="/gestorFestival/indexGF" class="submenu-item">
+                        <span>Inicio</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/gestorFestival/list" class="submenu-item">
+                        <span>Gestionar Festivales</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/festival/list" class="submenu-item">
+                        <span>Festivales</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/logout" class="submenu-item">
+                        <span>Cerrar Sesión</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="mainc">
+        <div style="width: 70%; margin-left: 22%; margin-right: 10%">
+            <div>
+                <h1 style="text-align:center; padding-top: 10%"><strong>Listado de Festivales</strong></h1>
 
-</nav>
-
-<div class="mainc">
-    <div class="container">
-        <h1>Listado de Festivales</h1>
-        <div class="initiative-list">
-
-            <div class="initiative-card" th:each="festival : ${festivals}">
-                <h2 th:text="${festival.nom}" style="text-transform: capitalize;">Título </h2>
-                <div class="field">
-                    <span th:text="${festival.anyo}" style="text-transform: capitalize;"></span>
+                <!-- Tabla de festivales -->
+                <div th:unless="${#lists.isEmpty(festivales)}">
+                    <form method="get" th:action="@{/gestorFestival/list}">
+                        <label style="padding-top: 3%" for="size">Festivales por página:</label>
+                        <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
+                            <option th:value="5" th:selected="${size == 5}">5</option>
+                            <option th:value="10" th:selected="${size == 10}">10</option>
+                            <option th:value="20" th:selected="${size == 20}">20</option>
+                            <option th:value="50" th:selected="${size == 50}">50</option>
+                        </select>
+                        <input type="hidden" name="page" th:value="${currentPage}" />
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped rounded">
+                            <thead>
+                            <tr>
+                                <th>ID Festival</th>
+                                <th>CIF Promotor</th>
+                                <th>Nombre</th>
+                                <th>Año</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                                <th>Estado</th>
+                                <th>Descripción</th>
+                                <th>Categoría Musical</th>
+                                <th>Presupuesto Contratación (€)</th>
+                                <th>Aforo Máximo</th>
+                                <th>Localización Descriptiva</th>
+                                <th>Localización Geográfica</th>
+                                <th>Público Enfocado</th>
+                                <th>Requisito Mínimo Edad</th>
+                                <th>Fecha Inicio Publicación</th>
+                                <th>Fecha Inicio Venta</th>
+                                <th>Número de Entradas Vendidas</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody id="festival-table-body">
+                            <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
+                            <tr th:each="festival : ${festivales}">
+                                <td th:text="${festival.idFestival}"></td>
+                                <td th:text="${festival.cifPromotor}"></td>
+                                <td th:text="${festival.nom}"></td>
+                                <td th:text="${festival.anyo}"></td>
+                                <td th:text="${#dates.format(festival.dataInici, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${#dates.format(festival.dataFi, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${festival.estatFestival}"></td>
+                                <td>
+                                    <button style="margin-left: 30%" type="button" class="btn btn-primary btn-sm" data-toggle="modal" th:data-target="'#descripcioModal' + ${festival.idFestival}">
+                                        Ver
+                                    </button>
+                                    <!-- Modal -->
+                                    <div class="modal" style="margin-top:10%" th:id="'descripcioModal' + ${festival.idFestival}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body" th:text="${festival.descripcio}">
+                                                    <!-- Aquí se mostrará la descripción -->
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${festival.categoriaMusical}"></td>
+                                <td th:text="${festival.pressupostContractacio}"></td>
+                                <td th:text="${festival.aforamentMaxim}"></td>
+                                <td th:text="${festival.localitzacioDescriptiva}"></td>
+                                <td th:text="${festival.localitzacioGeografica}"></td>
+                                <td th:text="${festival.publicEnfocat}"></td>
+                                <td th:text="${festival.requisitMinimEdat}"></td>
+                                <td th:text="${#dates.format(festival.dataIniciPublicacio, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${#dates.format(festival.dataIniciVenda, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${festival.numEntradasVendidas}"></td>
+                                <td>
+                                    <a th:href="@{/gestorFestival/update/{id}(id=${festival.idFestival})}"
+                                       class="btn btn-warning btn-sm" role="button" title="Editar">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/gestorFestival/delete/{id}(id=${festival.idFestival})}"
+                                       class="btn btn-danger btn-sm" role="button" title="Borrar">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="field">
-                    <label><strong>Categoria Musical:</strong></label>
-                    <span th:text="${festival.categoriaMusical}" style="text-transform: capitalize;"></span>
+
+                <!-- Mensajes de no hay festivales -->
+                <div th:if="${#lists.isEmpty(festivales)}" class="no-items-message">
+                    <p>No existe ningún festival.</p>
                 </div>
-                <div class="field">
-                    <label><strong>Fecha de inicio:</strong></label>
-                    <span th:text="${festival.dataInici}" style="text-transform: capitalize;"></span>
+                <!-- Botón de añadir festival -->
+                <div style="margin-left:44%; margin-top: 30px" class="btn-anyadir">
+                    <a th:href="@{/gestorFestival/add}" class="btn btn-success" role="button">Añadir Festival</a>
                 </div>
-                <div class="field">
-                    <label><strong>Fecha de fin:</strong></label>
-                    <span th:text="${festival.dataFi}" style="text-transform: capitalize;"></span>
-                </div>
-
-                <div class="field">
-                    <label><strong>Número de festival:</strong></label>
-                    <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
-                </div>
-
-
-                <ul>
-                    <li th:each="artista : ${actuacionesFestivales[festival.idFestival]}" th:text="${artista}">Nombre
-                        del Artista
-                    </li>
-                </ul>
-                <p th:if="${#lists.isEmpty(actuacionesFestivales[festival.idFestival])}">Sin Actuaciones</p>
-
-
-                <label><strong>Actuaciones:</strong></label>
-
-                <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
-            <div class="buttons-wrapper">
-                <a th:href="@{update/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Editar</a>
-                <a th:href="@{delete/{id}(id=${festival.idFestival})}" class="btn btn-danger" role="button">Borrar</a>
             </div>
-
+            <!-- Paginación -->
+            <div th:unless="${#lists.isEmpty(festivales)}">
+                <nav aria-label="Page navigation example" style="margin-top: 30px">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/gestorFestival/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                            <a class="page-link" th:href="@{/gestorFestival/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/gestorFestival/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 
-    <div class="btn-anyadir">
-        <a href="add" class="btn btn-success" role="button">Añadir festival</a>
-    </div>
 </div>
-</div>
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80
-    00</p>
-
+<!-- Scripts de Bootstrap y otros -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  if (festivales && festivales.length > 0) {
+    console.log('La lista de festivales no está vacía');
+} else {
+    console.log('La lista de festivales está vacía o no está definida');
+}
+</script>
 </body>
 </html>

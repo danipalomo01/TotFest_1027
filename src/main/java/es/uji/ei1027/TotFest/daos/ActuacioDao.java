@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +32,7 @@ public class ActuacioDao {
         int nextId = maxId + 1;
         actuacio.setIdActuacio(nextId);
 
-        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 actuacio.getIdActuacio(),
                 actuacio.getIdContracte(),
                 actuacio.getData(),
@@ -38,7 +41,8 @@ public class ActuacioDao {
                 actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
                 actuacio.getIdFestival(),
-                actuacio.getNomartista()
+                actuacio.getNomartista(),
+                actuacio.getIdartista()
         );
     }
 
@@ -73,5 +77,12 @@ public class ActuacioDao {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    public boolean horasActuacionesSeSolapan(Date fecha, Time horaInicio, Time horaFinPrevista, int idArtista) throws SQLException {
+        String sql = "SELECT COUNT(*) AS count FROM actuacio WHERE data = ? AND (     (? >= horaInici AND ? < horaFiPrevista) OR     (? > horaInici AND ? <= horaFiPrevista) OR     (horaInici >= ? AND horaInici < ?) OR     (horaFiPrevista > ? AND horaFiPrevista <= ?) ) AND idartista = ?";
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{fecha, horaInicio, horaInicio, horaFinPrevista, horaFinPrevista, horaInicio, horaFinPrevista, horaInicio, horaFinPrevista, idArtista}, Integer.class) > 0;
+
     }
 }

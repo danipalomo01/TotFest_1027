@@ -58,7 +58,7 @@
 </nav>
 <div class="content">
     <form class="form" th:action="@{/responsablecontratacion/artista/add}" th:object="${artista}" method="POST" novalidate>
-        <h1>Añadir un artista</h1>
+        <h1 style="font-size: 40px">Añadir un artista</h1>
         <div class="form-group">
             <label for="nom">Nombre</label>
             <input type="text" class="form-control" id="nom" th:field="*{nom}" maxlength="250" required/>

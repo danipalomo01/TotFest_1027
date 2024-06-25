@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -45,9 +47,9 @@ public class GFContracteArtistaController {
                                          Model model) {
 
 
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
 
         session.setAttribute("solapamiento", "false");
         if (session.getAttribute("size") != null && size == 1) {
@@ -56,9 +58,20 @@ public class GFContracteArtistaController {
             session.setAttribute("size", size);
         }
 
+        if (session.getAttribute("mensajeConfirmacionContrato") != null && session.getAttribute("mensajeConfirmacionContrato") != "nada") {
+            model.addAttribute("mensajeConfirmacionContrato", session.getAttribute("mensajeConfirmacionContrato"));
+            session.setAttribute("mensajeConfirmacionContrato", "nada");
+        } else {
+            model.addAttribute("mensajeConfirmacionContrato", "nada");
+        }
+
+
         List<ContracteArtista> contractesArtistes = contracteArtistaDao.getContractesArtistes(page, size);
         int totalContracts = contracteArtistaDao.getContractesArtistes().size();
         int totalPages = (int) Math.ceil((double) totalContracts / size);
+
+        contractesArtistes.sort(Comparator.comparingInt(ContracteArtista::getIdContracte));
+
 
         model.addAttribute("contratos", contractesArtistes);
         model.addAttribute("artistas", artistaDao.getArtistaGrups());
@@ -72,9 +85,12 @@ public class GFContracteArtistaController {
 
     @RequestMapping("/add")
     public String addContracteArtista(HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
+        ContracteArtista contracteArtista = new ContracteArtista();
+        contracteArtista.setDataInici(Date.valueOf(LocalDate.now()));
+        contracteArtista.setDataFi(Date.valueOf(LocalDate.now()));
         model.addAttribute("contratoNuevo", new ContracteArtista());
         model.addAttribute("artistas", artistaDao.getArtistaGrups());
 
@@ -85,7 +101,7 @@ public class GFContracteArtistaController {
     public String processAddSubmit(
             @ModelAttribute("contratoNuevo") ContracteArtista contracteArtista,
             BindingResult bindingResult, HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         validarAddContratoArtista(contracteArtista, bindingResult);
@@ -96,6 +112,7 @@ public class GFContracteArtistaController {
         try {
             contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
             contracteArtistaDao.addContracteArtista(contracteArtista);
+            session.setAttribute("mensajeConfirmacionContrato", " añadido ");
 
         } catch (DuplicateKeyException e) {
             bindingResult.rejectValue("idContracte", "duplicate", "Este ID de contrato ya existe");
@@ -109,7 +126,7 @@ public class GFContracteArtistaController {
 
     @RequestMapping(value = "/update/{idContracte}", method = RequestMethod.GET)
     public String editContracteArtista(HttpSession session, Model model, @PathVariable int idContracte) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         model.addAttribute("artistas", artistaDao.getArtistaGrups());
@@ -122,7 +139,7 @@ public class GFContracteArtistaController {
     public String processUpdateSubmit(HttpSession session,
                                       @ModelAttribute("contracteArtista") ContracteArtista contracteArtista,
                                       BindingResult bindingResult, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         validarAddContratoArtista(contracteArtista, bindingResult);
@@ -134,6 +151,8 @@ public class GFContracteArtistaController {
             contracteArtista.setIdContracte(Integer.parseInt(session.getAttribute("lastContratoUpdate").toString()));
             contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
             contracteArtistaDao.updateContracteArtista(contracteArtista);
+            session.setAttribute("mensajeConfirmacionContrato", " editado ");
+
         } catch (Exception e) {
             return "responsablecontratacion/contracteartista/update";
         }
@@ -142,11 +161,13 @@ public class GFContracteArtistaController {
 
     @RequestMapping(value = "/delete/{idContracte}")
     public String processDelete(HttpSession session, @PathVariable int idContracte) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         contracteArtistaDao.deleteContracteArtista(idContracte);
-        return "redirect:/list";
+        session.setAttribute("mensajeConfirmacionContrato", " eliminado ");
+
+        return "redirect:/responsablecontratacion/contracteartista/list";
     }
 
     private void validarAddContratoArtista(ContracteArtista contrato, BindingResult bindingResult) {

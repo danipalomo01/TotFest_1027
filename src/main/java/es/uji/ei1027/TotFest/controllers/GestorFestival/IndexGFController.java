@@ -12,7 +12,7 @@ public class IndexGFController {
 
     @RequestMapping("/indexGF")
     public String goToIndex(HttpSession session) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
         return "/gestorFestival/indexGF";

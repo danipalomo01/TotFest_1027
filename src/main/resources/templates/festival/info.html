@@ -15,8 +15,11 @@
   <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             color: #333;
+            background-image: url('/images/noptiop.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat; height: 100vh;
         }
 
         .p {
@@ -25,7 +28,7 @@
 
         .festival-header {
             color: white;
-            padding: 60px;
+            padding: 30px;
             border-radius: 20px 20px 0 0;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -34,6 +37,7 @@
             font-size: 3.5em;
             margin-bottom: 10px;
             animation: fadeInDown 1s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         .festival-header p {
             font-size: 1.5em;
@@ -67,7 +71,7 @@
   <div class="menu-content">
     <ul class="menu-items">
       <li class="item">
-        <a href="index.html" class="submenu-item">
+        <a href="/index.html" class="submenu-item">
           <span>Inicio</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
@@ -89,61 +93,64 @@
     </ul>
   </div>
 </nav>
-<div class="container">
-  <div class="containerinfo" style="padding-left: 20%; padding-right: 7%">
-    <div class="festival-header">
-      <h1 id="festival-name" th:text="${festival.nom} + ' ' + ${festival.anyo}">Nombre del Festival</h1>
-      <p id="festival-category" th:text="'Categoría: ' + ${festival.categoriaMusical}">Categoría: Música</p>
-    </div>
-    <div style=" background-color: #f9f9f9;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 16px;">
-      <p>Bienvenidos al <strong th:text="${festival.nom}">Nombre del Festival</strong>, un evento cultural excepcional que reúne a miles de personas apasionadas por la música, el arte y la diversión.</p>
-      <p>En <strong th:text="${festival.anyo}">2024</strong>, celebramos desde el <strong th:text="${festival.dataInici}">2024-06-01</strong> hasta el <strong th:text="${festival.dataFi}">2024-06-03</strong>, ofreciendo tres días de experiencias inolvidables y momentos únicos.</p>
-      <p>Este año nos reunimos en <strong th:text="${festival.localitzacioDescriptiva}">Ubicación del Festival</strong>, un lugar emblemático donde la música se encuentra con la naturaleza y la diversión no tiene límites.</p>
-      <p>Con un aforo máximo de <strong th:text="${festival.aforamentMaxim}">5000</strong> personas, aseguramos un ambiente vibrante y seguro para todos nuestros asistentes.</p>
-      <p>Descubre artistas de renombre internacional que deleitarán tus sentidos con sus actuaciones en vivo, desde el amanecer hasta el anochecer.</p>
-      <p>No te pierdas esta oportunidad única de vivir la magia del <strong th:text="${festival.nom}">Nombre del Festival</strong> 2024.</p>
+<div class="container" style="height: 100vh">
+  <div class="containerinfo" style="padding-top: 5%; padding-left: 20%; padding-right: 7%">
+    <div class="festival-header" style="background-color: #84BDC7">
+      <div>
+        <h1 id="festival-name" th:text="${festival.nom} + ' ' + ${festival.anyo}">Nombre del Festival</h1>
+        <p style="font-weight: bold;" id="festival-category" th:text="'Categoría: ' + ${festival.categoriaMusical}">Categoría: Música</p>
+        <p style="padding-top:1%"><strong th:text="${festival.localitzacioDescriptiva}"></strong></p>
+        <p><strong><span th:text="${#dates.format(festival.dataInici, 'dd/MM/yyyy')}"></span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;<span th:text="${#dates.format(festival.dataFi, 'dd/MM/yyyy')}"></span></strong></p>
+      </div>
     </div>
     <hr style="border-top: 1px solid #ccc; margin: 20px 0;">
-    <div style="display:flex" class="festival-body">
-      <div>
-        <p><strong>Año:</strong> <span id="festival-year" th:text="${festival.anyo}">2024</span></p>
-        <p><strong>Fecha de Inicio:</strong> <span id="festival-start-date" th:text="${festival.dataInici}">2024-06-01</span></p>
-        <p><strong>Fecha de Fin:</strong> <span id="festival-end-date" th:text="${festival.dataFi}">2024-06-03</span></p>
-        <p><strong>Descripción:</strong> <span id="festival-description" th:text="${festival.descripcio}">Un festival increíble.</span></p>
-        <p><strong>Aforo Máximo:</strong> <span id="festival-capacity" th:text="${festival.aforamentMaxim}">5000</span></p>
-        <p><strong>Localización:</strong> <span id="festival-location" th:text="${festival.localitzacioDescriptiva}">Parque Central</span></p>
-        <p><strong>Localización Geográfica:</strong> <span id="festival-geo-location" th:text="${festival.localitzacioGeografica}">40.7128° N, 74.0060° W</span></p>
-        <p><strong>Requisito Mínimo de Edad:</strong> <span id="festival-age" th:text="${festival.requisitMinimEdat}">18</span></p>
 
-      </div>
 
-      <div style="justify-content: center; align-items: center; margin-left: 30%">
-        <p style="margin-auto" th:if="${#lists.isEmpty(actuaciones)}">Sin actuaciones aún</p>
 
-        <div style="display: flex">
-          <p th:unless="${#lists.isEmpty(actuaciones)}"><strong>Artistas:</strong></p>
-          <p style="margin-left: 40%" th:unless="${#lists.isEmpty(actuaciones)}"><strong>Horas:</strong></p>
+      <div style=" background-color: #B1EDF7;
+              padding: 20px;
+              margin-bottom: 20px;
+              border-radius: 8px;
+              margin: 10px 0;
+              font-size: 16px;margin-top: 25px">
+
+        <div th:if="${#maps.isEmpty(actuaciones)}">
+          <p style="color: red; text-align:center; font-size: 25px"><strong>Aún no hay actuaciones confirmadas para este festival</strong></p>
         </div>
-        <hr style="border-top: 1px solid #ccc;">
+        <div th:unless="${#maps.isEmpty(actuaciones)}">
+           <h2 style="align-items:center; text-align:center; margin-top: 20 px; font-family: 'Poppins', sans-serif; text-decoration: underline;">-&nbsp;&nbsp;&nbsp;ACTUACIONES CONFIRMADAS&nbsp;&nbsp;-</h2>
+        </div>
 
-        <div style="margin-top: 10%; display: flex" th:each="actuacio : ${actuaciones}">
-            <div>
-              <p><strong> <span id="actuacio-nomartista" th:text="${actuacio.nomartista}">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></p>
-            </div>
-            <div>
-              <p><strong><span id="actuacio-inicio" th:text="${actuacio.horaInici}"></span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;<span id="actuacio-fin" th:text="${actuacio.horaFiPrevista}"></span></strong></p>
-            </div>
+        <div style="margin-top: 30px" th:if="${!#maps.isEmpty(actuaciones)}">
 
+          <div style="display: flex">
+            <p style="text-decoration: underline;font-size: 20px; margin-left: 5px" th:unless="${#lists.isEmpty(actuaciones)}"><strong>Fechas:</strong></p>
+            <p th:unless="${#lists.isEmpty(actuaciones)}" style="margin-left: 42%; text-decoration: underline;font-size: 20px"><strong>Artistas:</strong></p>
+            <p style="margin-left: 17%; text-decoration: underline;font-size: 20px" th:unless="${#lists.isEmpty(actuaciones)}"><strong>Horas:</strong></p>
           </div>
+          <hr style="border-top: 1px solid #ccc;">
+          <div th:each="entry : ${actuaciones}">
+            <h3 style="margin-top: 20px" th:text="${#dates.format(entry.key, 'dd/MM/yyyy')}">Fecha</h3>
+            <div style="margin-left: 50%;">
+
+
+              <div th:each="actuacion : ${entry.value}" style="display: flex">
+                <div style="width: 150px;">
+                    <td style="margin-left: 25%" th:text="${actuacion.nomartista}"></td>
+                </div>
+                <div style="width: 400px;margin-left: 22%">
+                    <td style="margin-left: 30px" th:text="${actuacion.horaInici}"><span></span></td>
+                    <td>&nbsp&nbsp&nbsp&nbsp-&nbsp&nbsp&nbsp&nbsp</td>
+                    <td th:text="${actuacion.horaFiPrevista}"></td>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
 
-    </div>
   </div>
 </div>
 <p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>

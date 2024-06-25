@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class EntradaDao {
         int nextId = maxId + 1;
         entrada.setNumero(nextId);
 
-        jdbcTemplate.update("INSERT INTO entrada VALUES (?, ?, ?, ?)", entrada.getNumero(), entrada.getPreuVendaEntradaIndividual(), entrada.getData(), entrada.getIdFestival());
+        jdbcTemplate.update("INSERT INTO entrada VALUES (?, ?, ?, ?, ?, ?)", entrada.getNumero(), entrada.getPreuVendaEntradaIndividual(), entrada.getData(), entrada.getIdFestival(), entrada.getDatacompra(), entrada.getEntradaTipus());
     }
 
     public void addNumEntradasVendidasEntradaTipus(int idfestival, String tipusEntrada, int num) {
@@ -77,13 +78,39 @@ public class EntradaDao {
         }
     }
 
-    public int getEntradesVenudesPerDia(int idFestival, Date dataEntrada) {
+    public int getEntradesVenudesPerDiaDeDia(int idFestival, Date dataEntrada) {
         try {
-            String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ? AND data = ?";
+            String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ? AND datacompra = ? AND identradatipus=1";
             return jdbcTemplate.queryForObject(sql, new Object[]{idFestival, dataEntrada}, Integer.class);
 
         } catch (EmptyResultDataAccessException e) {
             return -1;
         }
+    }
+
+    public BigDecimal getPrecioDiaFestival(int idFestival) {
+        try {
+            String sql = "SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus='dia'";
+            return jdbcTemplate.queryForObject(sql, new Object[]{idFestival}, BigDecimal.class);
+
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public BigDecimal getPrecioCompletoFestival(int idFestival) {
+        try {
+            String sql = "SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus='festivalComplet'";
+            return jdbcTemplate.queryForObject(sql, new Object[]{idFestival}, BigDecimal.class);
+
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public void updatePrecioEntradaTipus(int idFestival, BigDecimal precioDia, BigDecimal precioCompleto) {
+        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND tipusentrada='dia'", precioDia, idFestival);
+        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND tipusentrada='festivalComplet'", precioCompleto, idFestival);
+
     }
 }

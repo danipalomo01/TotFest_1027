@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Añadir Contrato - ${nombreArtista}</title>
+  <title>Añadir Actuaciones - [[${nombreArtista}]]</title>
   <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}"/>
   <link rel="stylesheet" type="text/css" th:href="@{/styles/add_festival.css}"/>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -32,8 +32,7 @@
   $(document).ready(function() {
         var solapamiento = document.getElementById('solapamiento').value;
         $('#solapamientoModal').modal('hide');
-        console.log("Valor de solapamiento:", solapamiento);
-        console.log(solapamiento !== "false");
+
         if (solapamiento !== "false") {
             $('#solapamientoModal').modal('show');
             $(document).off('focusin.modal');
@@ -182,7 +181,7 @@ form.addEventListener('submit', function(event) {
 
   <form style="width: 80%;" class="form" th:action="@{/responsablecontratacion/actuaciones/add}" th:object="${contratoActuaciones}" method="POST" novalidate>
 
-    <h1 style="text-size: 55px"><strong>Contrato con <span th:text="${session.nombreArtista}"></span></strong></h1>
+    <h1 style="font-size: 40px"><strong>Contrato con <span th:text="${session.nombreArtista}"></span></strong></h1>
 
       <div style="justify-content: center; align-items: center; margin-top: 40px">
         <div style="display: flex; justify-content: center; align-items: center;">
@@ -231,8 +230,8 @@ form.addEventListener('submit', function(event) {
             <td th:text="${actuacion.horaFiPrevista}"></td>
             <td th:text="${actuacion.comentaris}"></td>
             <td th:text="${actuacion.idFestival}"></td>
-            <td th:text="${actuacion.nomArtista}"></td>
-            <td th:text="${actuacion.idArtista}"></td>
+            <td th:text="${actuacion.nomartista}"></td>
+            <td th:text="${actuacion.idartista}"></td>
           </tr>
           </tbody>
         </table>

@@ -56,6 +56,7 @@ public class LoginController {
             if (extraInfo.size() > 0) {
                 String cif = user.getUserExtraInfo().get(0);
                 cif.replaceAll("[\\[\\]]", "");
+                session.setAttribute("idComercial", null);
                 session.setAttribute("cif", cif);
             }
 
@@ -66,6 +67,7 @@ public class LoginController {
             if (extraInfo.size() > 0) {
                 String idComercial = user.getUserExtraInfo().get(0);
                 idComercial.replaceAll("[\\[\\]]", "");
+                session.setAttribute("cif", null);
                 session.setAttribute("idComercial", idComercial);
             }
             return "responsableContratacion/indexRC";

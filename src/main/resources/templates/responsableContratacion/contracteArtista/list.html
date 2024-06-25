@@ -105,6 +105,45 @@
             </ul>
         </div>
     </nav>
+    <input type="hidden" id="mensajeConfirmacionContrato" th:value="${mensajeConfirmacionContrato}" />
+
+    <!-- Modal mensaje Confirmación-->
+    <div class="container">
+        <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="margin-top: 40%; margin-left: 15%;background-color: #C3F892">
+                    <div class="modal-body">
+                        <p style="font-size: 25px; text-align: center"><strong>Se ha<span th:text="${mensajeConfirmacionContrato}"></span> correctamente el contrato.</strong></p>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="aceptarMensajeConfirmacion" href="/responsablecontratacion/contracteartista/list" class="btn btn-success">Aceptar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Borrado -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">¿Estás seguro de que deseas borrar este contrato?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div style="font-size: 25px; text-align: center" class="modal-body">
+                    Se eliminarán todas las actuaciones asociadas a este contrato
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <a id="confirmDeleteButton" href="#" class="btn btn-danger">Borrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mainc">
         <div style="width: 70%; margin-left: 22%; margin-right: 10%">
             <div>
@@ -176,8 +215,10 @@
                                 <td th:text="${contracte.idComercial}"></td>
                                 <td>
                                     <a th:href="@{/responsablecontratacion/actuaciones/{id}/{idartista}(id=${contracte.idContracte}, idartista=${contracte.idArtista})}" class="btn btn-success btn-sm" role="button" title="Gestionar Actuaciones"><i class="fa-solid fa-list"></i></a>
-                                    <a th:href="@{/responsablecontratacion/contracteartista/update/{id}(id=${contracte.idContracte})}" class="btn btn-warning btn-sm" role="button" title="Editar"><i class="fa-solid fa-edit"></i></a>
-                                    <a th:href="@{/responsablecontratacion/contracteartista/delete/{id}(id=${contracte.idContracte})}" class="btn btn-danger btn-sm" role="button" title="Borrar"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" role="button" title="Borrar"
+                                       th:onclick="'confirmDelete(' + ${contracte.idContracte} + ')'">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                             </tbody>
@@ -214,5 +255,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
+      $(document).ready(function() {
+        var mensajeConfirmacionContrato = /*[[${mensajeConfirmacionContrato}]]*/ '';
+        $('#successModal').modal('hide');
+        $('#deleteConfirmationModal').modal('hide');
+
+        console.log(mensajeConfirmacionContrato);
+        if (mensajeConfirmacionContrato !== "nada") {
+            $('#successModal').modal('show');
+            $(document).off('focusin.modal');
+        }
+    });
+
+    function confirmDelete(idContrato) {
+      // Actualiza el href del botón de confirmación en el modal
+      document.getElementById('confirmDeleteButton').setAttribute('href', '/responsablecontratacion/contracteartista/delete/' + idContrato);
+
+      // Muestra el modal de confirmación
+      $('#deleteConfirmationModal').modal('show');
+    }
+</script>
 </body>
 </html>

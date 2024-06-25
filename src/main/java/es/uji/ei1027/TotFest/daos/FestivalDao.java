@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,12 +57,12 @@ public class FestivalDao {
         updateFestivalState(festival);
         jdbcTemplate.update("UPDATE festival SET cif_promotor=?, nom=?, anyo=?, datainici=?, datafi=?, estatfestival=?, descripcio=?, " +
                         "categoriamusical=?, pressupostcontractacio=?, aforamentmaxim=?, localitzaciodescriptiva=?, localitzaciogeografica=?, " +
-                        "publicenfocat=?, requisitminimedat=?, datainicipublicacio=?, datainicivenda=?, num_entradas_vendidas=?, WHERE idfestival=?",
+                        "publicenfocat=?, requisitminimedat=?, datainicipublicacio=?, datainicivenda=?, num_entradas_vendidas=? WHERE idfestival=?",
                 festival.getCifPromotor(), festival.getNom(), festival.getAnyo(), festival.getDataInici(), festival.getDataFi(),
                 festival.getEstatFestival().name(), festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
                 festival.getPublicEnfocat(), festival.getRequisitMinimEdat(), festival.getDataIniciPublicacio(), festival.getDataIniciVenda(),
-                festival.getIdFestival(), festival.getNumEntradasVendidas());
+                festival.getNumEntradasVendidas(), festival.getIdFestival());
     }
 
     public int getNumEntradasVendidas(int idFestival) {
@@ -69,22 +71,23 @@ public class FestivalDao {
     }
 
     public void updateFestivalState(Festival festival) {
-        Date dataFi = festival.getDataFi();
-        Date dataInici = festival.getDataInici();
-        Date dataIniciVenda = festival.getDataIniciVenda();
-        Date dataIniciPublicacio = festival.getDataIniciPublicacio();
-        Date today = new Date();
+        java.sql.Date dataFiSql = festival.getDataFi();
+        java.sql.Date dataIniciVendaSql = festival.getDataIniciVenda();
+        java.sql.Date dataIniciPublicacioSql = festival.getDataIniciPublicacio();
 
-        if (dataFi != null && dataFi.before(today)) {
+        LocalDate dataFi = dataFiSql != null ? dataFiSql.toLocalDate() : null;
+        LocalDate dataIniciVenda = dataIniciVendaSql != null ? dataIniciVendaSql.toLocalDate() : null;
+        LocalDate dataIniciPublicacio = dataIniciPublicacioSql != null ? dataIniciPublicacioSql.toLocalDate() : null;
+        LocalDate today = LocalDate.now();
+
+        if (dataFi != null && today.isAfter(dataFi)) {
             festival.setEstatFestival(EstatFestivalEnum.finalitzat);
-        } else if (dataIniciVenda != null && dataIniciVenda.before(today) && (dataFi == null || dataFi.after(today))) {
+        } else if (dataIniciVenda != null && (dataIniciVenda.isBefore(today) || dataIniciVenda.equals(today))) {
             festival.setEstatFestival(EstatFestivalEnum.obertVenda);
-        } else if (dataInici != null && dataInici.after(today) && (dataIniciPublicacio == null || dataIniciPublicacio.after(today))) {
-            festival.setEstatFestival(EstatFestivalEnum.enPreparacio);
-        } else if (dataInici != null && dataInici.after(today) && dataIniciPublicacio != null && dataIniciPublicacio.before(today)) {
+        } else if (dataIniciPublicacio != null && (dataIniciPublicacio.isBefore(today) || dataIniciPublicacio.equals(today))) {
             festival.setEstatFestival(EstatFestivalEnum.publica);
-        }else {
-            festival.setEstatFestival(EstatFestivalEnum.finalitzat);
+        } else {
+            festival.setEstatFestival(EstatFestivalEnum.enPreparacio);
         }
     }
 
@@ -100,7 +103,11 @@ public class FestivalDao {
 
     public List<Festival> getFestivals() {
         try {
-            return jdbcTemplate.query("SELECT * FROM festival", new FestivalRowMapper());
+            List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival", new FestivalRowMapper());
+            for(Festival festival: festivales) {
+                updateFestivalState(festival);
+            }
+            return festivales;
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<Festival>();
         }
@@ -109,14 +116,20 @@ public class FestivalDao {
     public Festival getFestival(int idFestival) {
         try {
 
-            return jdbcTemplate.queryForObject("SELECT * FROM festival WHERE idfestival=?", new FestivalRowMapper(), idFestival);
+            Festival festival = jdbcTemplate.queryForObject("SELECT * FROM festival WHERE idfestival=?", new FestivalRowMapper(), idFestival);
+            updateFestivalState(festival);
+            return festival;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
     public List<Festival> getFestivals(int size, int offset) {
-        return jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
 
+        List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
+        for(Festival festival: festivales) {
+            updateFestivalState(festival);
+        }
+        return festivales;
     }
 }

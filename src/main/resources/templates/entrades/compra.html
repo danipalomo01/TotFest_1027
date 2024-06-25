@@ -1,44 +1,116 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Comprar Entradas</title>
-  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
-  <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Información del Festival</title>
+
+  <!-- CSS de terceros primero -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <style>
-    .error-message {
-      color: red;
-      font-size: 0.9em;
-      margin-top: 5px;
-    }
-    .flatpickr-day.available {
-      background-color: #90EE90; /* Light green */
-    }
-    .flatpickr-calendar {
-      width: 300px; /* Ajusta esto al tamaño deseado del calendario */
-    }
-    .flatpickr-input {
-      width: 250px; /* Ajusta esto al tamaño deseado del campo de entrada */
-    }
-    #resumenCompra {
-      list-style-type: none; /* Elimina los puntos de la lista */
-      padding: 0;
-    }
-    #resumenCompra li {
-      padding: 5px 0; /* Espaciado entre los elementos de la lista */
-    }
-    #total {
-      border-top: 2px solid #000; /* Línea larga */
-      margin-top: 10px;
-      padding-top: 10px;
-      font-size: 1.2em;
-      font-weight: bold;
-    }
-  </style>
+
+  <!-- CSS personalizados después -->
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival_true.css}" />
+
+  <!-- JavaScript de terceros -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+
+<style>
+        body {
+            font-family: 'sans-serif', sans-serif;
+            color: #333;
+            background-size: cover;
+            background-position: center;
+            background-image: url('/images/fondocompra.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat; height: 100vh;
+        }
+
+        .p {
+          font-family: 'Roboto', sans-serif;
+        }
+
+        .festival-header {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700; /* Para negrita */
+            color: #ffffff; /* Color blanco */
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .festival-header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s;
+        }
+        .festival-header p {
+            font-size: 1.5em;
+            animation: fadeInUp 1s;
+        }
+        .festival-body {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 20px 20px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s;
+        }
+        .festival-body p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .datepicker-margin {
+            margin-left: 36%;
+        }
+        .error-message {
+          color: red;
+          font-size: 0.9em;
+          margin-top: 5px;
+        }
+        .flatpickr-day.available {
+          background-color: #90EE90; /* Light green */
+        }
+        .flatpickr-calendar {
+          width: 300px; /* Ajusta esto al tamaño deseado del calendario */
+        }
+        .flatpickr-input {
+          width: 250px; /* Ajusta esto al tamaño deseado del campo de entrada */
+        }
+        #resumenCompra {
+          list-style-type: none; /* Elimina los puntos de la lista */
+          padding: 0;
+        }
+        #resumenCompra li {
+          padding: 5px 0; /* Espaciado entre los elementos de la lista */
+        }
+        #total {
+          border-top: 2px solid #000; /* Línea larga */
+          margin-top: 10px;
+          padding-top: 10px;
+          font-size: 1.2em;
+          font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-
 <div class="topbar"></div>
 <div class="rightbar"></div>
 <nav class="sidebar">
@@ -46,19 +118,21 @@
   <div class="menu-content">
     <ul class="menu-items">
       <li class="item">
-        <a th:href="@{/index}" class="submenu-item">
+        <a href="/index.html" class="submenu-item">
           <span>Inicio</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
+
       <li class="item">
-        <a href="@{/login}" class="submenu-item">
+        <a href="/login" class="submenu-item">
           <span>Login</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
+
       <li class="item">
-        <a href="@{/festival/list}" class="submenu-item">
+        <a href="/festival/list" class="submenu-item">
           <span>Festivales</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
@@ -66,75 +140,108 @@
     </ul>
   </div>
 </nav>
-<div class="content" style="background-image: url('/images/festivalfondo.avif');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat; height: 100vh;">
-  <h1 th:text="${festival.nom}" style="margin-top: 8%; font-size: 50px;font-weight: bold;align:center"></h1>
-  <form style="margin-top: 50px;" class="form" th:action="@{/compra-entradas/compra}" th:object="${compraForm}" method="POST" novalidate>
-    <h2>Comprar Entradas</h2>
-
-    <!-- telefono -->
-    <div class="form-group" style="margin-top: 40px;">
-      <label for="telefono">Teléfono</label>
-      <input style="width: 70%; height: 20px" type="text" id="telefono" name="telefon" class="form-control" required maxlength="9">
-    </div>
-
-    <!-- Email -->
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input style="width: 70%; height: 20px" type="email" id="email" name="email" class="form-control" required maxlength="120">
-    </div>
-
-    <div style="display: flex">
-      <!-- Festival Completo -->
-      <div class="form-group" style="margin-top: 30px; margin-left: auto; margin-right: auto; margin-bottom: 40px">
-        <label for="festivalCompleto">Festival Completo</label>
-
-        <div class="counter">
-          <p style="margin-top: 30px; margin-bottom: 30px"> Precio: <span th:text="${precioCompleto}"></span>€</p>
-          <button type="button" onclick="decreaseCount('festivalCompleto')">-</button>
-          <input type="number" id="festivalCompleto" name="festivalCompleto" value="0" min="0" max="${numEntradasCompleto}" readonly/>
-          <button type="button" onclick="increaseCount('festivalCompleto')">+</button>
-        </div>
-      </div>
-
-      <!-- Pase de un Día -->
-      <div class="form-group" style="margin-top: 30px; margin-left: auto; margin-right: auto; margin-bottom: 40px">
-        <label for="paseDia">Pase de un Día</label>
-        <div class="counter">
-          <p style="margin-top: 30px; margin-bottom: 30px"> Precio: <span th:text="${precioDia}"></span>€</p>
-
-          <div th:if="${numEntradasDia > 0}">
-            <button type="button" onclick="decreaseCount('paseDia')">-</button>
-            <input type="number" id="paseDia" name="paseDia" value="0" min="0" max="${numEntradasDia}" readonly/>
-            <button type="button" onclick="increaseCount('paseDia')">+</button>
-          </div>
-          <div th:if="${numEntradasDia <= 0}">
-            <p style="color: red;font-size: 15px">No quedan entradas de día a la venta</p>
-          </div>
-
-        </div>
+<div class="container" style="height: 110vh;">
+  <div class="containerinfo" style="padding-top: 5%; padding-left: 20%; padding-right: 0%; background-color: transparent;">
+    <div class="festival-header" style="background-color: #84BDC7">
+      <div>
+        <h1 id="festival-name">Comprar Entradas:</h1>
+        <h2 th:text="${festival.nom}" style=" font-size: 40px;font-weight: bold;align:center"></h2>
       </div>
     </div>
 
-    <!-- Date Pickers for Pase de un Día -->
-    <div id="datePickersContainer"></div>
+      <form style="margin-top: 20px;" class="form" th:action="@{/compra-entradas/compra}" th:object="${compraForm}" method="POST" novalidate>
 
-    <!-- Resumen de Compra -->
-    <div class="form-group">
-      <label for="resumenCompra">Resumen de Compra</label>
-      <ul id="resumenCompra"></ul>
-      <div id="total"></div>
+        <div style=" background-color: #B1EDF7;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 16px;margin-top: 25px">
+
+          <div style="margin-top: 20px;display: flex; justify-content: center; text-align: center">
+            <!-- telefono -->
+            <div class="form-group" style="display: flex; justify-content: center; text-align: center; margin-right: 40px">
+              <label for="telefono"><strong>Teléfono:&nbsp;</strong></label>
+              <input style="width: 70%; height: 20px" type="number" id="telefono" name="telefon" class="form-control" required maxlength="9">
+            </div>
+
+            <!-- Email -->
+            <div class="form-group" style="display: flex; justify-content: center; text-align: center">
+              <label for="email"><strong>Email:&nbsp;</strong></label>
+              <input style="width: 70%; height: 20px" type="email" id="email" name="email" class="form-control" required maxlength="120">
+            </div>
+
+          </div>
+
+          <div style="display: flex">
+            <!-- Festival Completo -->
+            <div class="form-group" style="margin-top: 10px; margin-left: auto; margin-right: auto; margin-bottom: 40px">
+              <label style="font-family: 'Roboto', sans-serif;font-size: 20px; text-decoration: underline;font-weight: bold" for="festivalCompleto">Festival Completo</label>
+
+              <div class="counter">
+                <p style="margin-bottom: 30px"> Precio: <span th:text="${precioCompleto}"></span>€</p>
+                <button  type="button" class="btn btn-primary btn-sm" onclick="decreaseCount('festivalCompleto')">-</button>
+                <input style="width: 50px" type="number" id="festivalCompleto" name="festivalCompleto" value="0" min="0" max="${numEntradasCompleto}" readonly/>
+                <button  type="button" class="btn btn-primary btn-sm" onclick="increaseCount('festivalCompleto')">+</button>
+              </div>
+            </div>
+
+            <!-- Pase de un Día -->
+            <div class="form-group" style="margin-top: 10px; margin-left: auto; margin-right: auto; margin-bottom: 40px">
+              <label style="font-family: 'Roboto', sans-serif;font-size: 20px; text-decoration: underline;font-weight: bold"  for="paseDia">Pase de un Día</label>
+              <div class="counter">
+                <p style="margin-top: 0px; margin-bottom: 30px"> Precio: <span th:text="${precioDia}"></span>€</p>
+
+                <div th:if="${numEntradasDia > 0}">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="decreaseCount('paseDia')">-</button>
+                  <input style="width: 50px" type="number" id="paseDia" name="paseDia" value="0" min="0" max="${numEntradasDia}" readonly/>
+                  <button  type="button" class="btn btn-primary btn-sm" onclick="increaseCount('paseDia')">+</button>
+                </div>
+                <div th:if="${numEntradasDia <= 0}">
+                  <p style="color: red;font-size: 15px; font-weight: bold">No quedan entradas de día a la venta</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr style="border-top: 1px solid #ccc; margin: 20px 0;">
+
+        <div style=" background-color: #B1EDF7;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 16px;margin-top: 25px">
+
+          <!-- Date Pickers for Pase de un Día -->
+          <div id="datePickersContainer"></div>
+
+          <!-- Resumen de Compra -->
+          <div class="form-group">
+            <label style="font-family: 'Roboto', sans-serif;font-size: 20px; text-decoration: underline;font-weight: bold" for="resumenCompra">Resumen de  tu compra</label>
+            <ul id="resumenCompra"></ul>
+            <div id="total"></div>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-success">Comprar Entradas</button>
+          </div>
+
+        </div>
+
+
+      </form>
+
+
+
     </div>
 
-    <div class="form-group">
-      <button type="submit" class="button">Comprar Entradas</button>
-    </div>
-  </form>
+  </div>
+
 </div>
 </body>
-<!-- JavaScript to handle dynamic elements -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
@@ -180,6 +287,7 @@
         } else if (type === 'paseDia' && paseDiaCount < maxEntradasDia && festivalCompletoCount === 0) {
             paseDiaCount++;
             document.getElementById(type).value = paseDiaCount;
+            addResumenItem(type, paseDiaCount);
             addDatePicker(paseDiaCount);
         }
         updateTotal();
@@ -187,13 +295,14 @@
 
     function decreaseCount(type) {
         if (type === 'festivalCompleto' && festivalCompletoCount > 0) {
-            removeResumenItem(type, festivalCompletoCount);
             festivalCompletoCount--;
             document.getElementById(type).value = festivalCompletoCount;
+            removeResumenItem(type, festivalCompletoCount + 1);
         } else if (type === 'paseDia' && paseDiaCount > 0) {
-            removeDatePicker(paseDiaCount);
             paseDiaCount--;
             document.getElementById(type).value = paseDiaCount;
+            removeResumenItem(type, paseDiaCount + 1);
+            removeDatePicker(paseDiaCount + 1);
         }
         updateTotal();
     }
@@ -204,7 +313,7 @@
 
         const datePicker = document.createElement('input');
         datePicker.type = 'text';
-        datePicker.classList.add('form-control', 'flatpickr-input');
+        datePicker.classList.add('form-control', 'flatpickr-input', 'datepicker-margin');
         datePicker.name = `listaFechas[${count - 1}]`; // Nombre del input adecuado
         datePicker.required = true;
         listItem.textContent = `Pase de un Día ${count} - Fecha: `;
@@ -228,10 +337,23 @@
     }
 
     function addResumenItem(type, count) {
-        const item = document.createElement('li');
-        item.id = `${type}${count}`;
-        item.textContent = `${type.replace('paseDia', 'Pase de un Día').replace('festivalCompleto', 'Festival Completo')} ${count}`;
-        resumenCompra.appendChild(item);
+        let item = document.getElementById(`${type}-item`);
+        if (!item) {
+            item = document.createElement('li');
+            item.id = `${type}-item`;
+            resumenCompra.appendChild(item);
+        }
+        item.textContent = `${type.replace('paseDia', 'Pase de un Día').replace('festivalCompleto', 'Festival Completo')} x${count}`;
+    }
+
+    function removeResumenItem(type, count) {
+        const item = document.getElementById(`${type}-item`);
+        if (item) {
+            item.textContent = `${type.replace('paseDia', 'Pase de un Día').replace('festivalCompleto', 'Festival Completo')} x${count - 1}`;
+            if (count - 1 === 0) {
+                resumenCompra.removeChild(item);
+            }
+        }
     }
 
     function removeDatePicker(count) {
@@ -242,10 +364,6 @@
         console.log('Lista de fechas seleccionadas:', listaFechas);
     }
 
-    function removeResumenItem(type, count) {
-        const item = document.getElementById(`${type}${count}`);
-        resumenCompra.removeChild(item);
-    }
 
 function validateForm(event) {
             if (paseDiaCount == 0 && festivalCompletoCount == 0) {
@@ -263,6 +381,16 @@ function validateForm(event) {
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Debes seleccionar al menos una fecha.',
+                });
+                event.preventDefault(); // Evita que el formulario se envíe
+                return;
+            }
+
+            if (Object.keys(listaFechas).length < paseDiaCount && paseDiaCount > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Tienes fechas sin especificar para algunas entradas.',
                 });
                 event.preventDefault(); // Evita que el formulario se envíe
                 return;
@@ -294,7 +422,6 @@ function validateForm(event) {
                 return;
             }
 
-            // Aquí podrías agregar lógica adicional de validación si es necesario
         }
 
   // Agrega el evento onsubmit al formulario

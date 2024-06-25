@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -37,17 +38,28 @@ public class GFArtistaController {
                                          Model model) {
 
 
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
 
         if (session.getAttribute("size") != null && size == 1) {
             size = (int) session.getAttribute("size");
         } else {
             session.setAttribute("size", size);
         }
+
+        if (session.getAttribute("mensajeConfirmacionArtista") != null && session.getAttribute("mensajeConfirmacionArtista") != "nada") {
+            model.addAttribute("mensajeConfirmacionArtista", session.getAttribute("mensajeConfirmacionArtista"));
+            session.setAttribute("mensajeConfirmacionArtista", "nada");
+        } else {
+            model.addAttribute("mensajeConfirmacionArtista", "nada");
+        }
+
         List<ArtistaGrup> artistasTotales = artistaGrupDao.getArtistaGrups();
         List<ArtistaGrup> artistas = artistaGrupDao.getArtistaGrups(page, size);
+
+        artistas.sort(Comparator.comparingInt(ArtistaGrup::getIdArtista));
+
         int totalArtistas = artistasTotales.size();
         int totalPages = (int) Math.ceil((double) totalArtistas / size);
 
@@ -62,7 +74,7 @@ public class GFArtistaController {
 
     @RequestMapping("/add")
     public String addArtista(HttpSession session, Model model) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         model.addAttribute("artista", new ArtistaGrup());
@@ -73,9 +85,9 @@ public class GFArtistaController {
     public String processAddSubmit(
             @ModelAttribute("artista") ArtistaGrup artista,
             BindingResult bindingResult, HttpSession session) {
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
         validarAddArtista(artista, bindingResult);
         if (bindingResult.hasErrors()) {
             return "responsablecontratacion/gestionArtistas/add";
@@ -83,6 +95,7 @@ public class GFArtistaController {
 
         try {
             artistaGrupDao.addArtistaGrup(artista);
+            session.setAttribute("mensajeConfirmacionArtista", " añadido ");
         } catch (DuplicateKeyException e) {
             // Manejar la excepción de clave duplicada si es necesario
         } catch (DataAccessException e) {
@@ -96,7 +109,7 @@ public class GFArtistaController {
 
     @RequestMapping(value = "/update/{idArtista}", method = RequestMethod.GET)
     public String editArtista(HttpSession session, Model model, @PathVariable int idArtista) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         model.addAttribute("artista", artistaGrupDao.getArtistaGrup(idArtista));
@@ -108,7 +121,7 @@ public class GFArtistaController {
     public String processUpdateSubmit(HttpSession session,
                                       @ModelAttribute("artista") ArtistaGrup artista,
                                       BindingResult bindingResult) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         validarAddArtista(artista, bindingResult);
@@ -118,16 +131,18 @@ public class GFArtistaController {
         }
         artista.setIdArtista(Integer.parseInt(session.getAttribute("lastArtistaUpdate").toString()));
         artistaGrupDao.updateArtistaGrup(artista);
+        session.setAttribute("mensajeConfirmacionArtista", " editado ");
         return "redirect:list";
     }
 
     @RequestMapping(value = "/delete/{idArtista}")
     public String processDelete(HttpSession session, @PathVariable int idArtista) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         artistaGrupDao.deleteArtistaGrup(idArtista);
-        return "redirect:list";
+        session.setAttribute("mensajeConfirmacionArtista", " eliminado ");
+        return "redirect:/responsablecontratacion/artista/list";
     }
 
     private void validarAddArtista(ArtistaGrup artista, BindingResult bindingResult) {

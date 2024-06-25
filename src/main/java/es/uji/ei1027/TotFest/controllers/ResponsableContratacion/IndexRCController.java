@@ -11,7 +11,7 @@ public class IndexRCController {
 
     @RequestMapping("/indexRC")
     public String goToIndex(HttpSession session) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
         return "/responsableContratacion/indexRC";

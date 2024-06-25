@@ -33,12 +33,12 @@
         .table th, .table td {
             white-space: nowrap; /* Evita que el contenido se ajuste automáticamente */
             overflow: hidden; /* Oculta el contenido desbordado */
-            text-overflow: ellipsis; /* Muestra puntos suspensivos para contenido desbordado */
             max-width: 150px; /* Ajusta el ancho máximo de las celdas */
         }
 
         .table-striped tbody tr:nth-of-type(odd) {
             background-color: #f9f9f9; /* Color de fondo para filas alternas */
+            overflow-x: auto;
         }
 
         .table-bordered {
@@ -55,6 +55,12 @@
 
         .btn-sm {
             font-size: 0.8rem; /* Reducir el tamaño del texto de los botones */
+        }
+
+        th {
+            white-space: normal;
+            word-wrap: break-word;
+            min-width: 100px;
         }
 
         .form-select {
@@ -99,6 +105,42 @@
             </ul>
         </div>
     </nav>
+    <!-- Modal mensaje Confirmación-->
+    <div class="container">
+        <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="margin-top: 40%; margin-left: 15%;background-color: #C3F892">
+                    <div class="modal-body">
+                        <p style="font-size: 25px; text-align: center"><strong>Se ha<span th:text="${mensajeConfirmacionFestival}"></span> correctamente el festival.</strong></p>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="aceptarMensajeConfirmacion" href="/gestorFestival/list" class="btn btn-success">Aceptar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Borrado -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">¿Estás seguro de que deseas borrar este festival?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div style="font-size: 25px; text-align: center" class="modal-body">
+                    Se eliminarán todas las actuaciones asociadas a este festival
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <a id="confirmDeleteButton" href="#" class="btn btn-danger">Borrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="mainc">
         <div style="width: 70%; margin-left: 22%; margin-right: 10%">
             <div>
@@ -190,8 +232,8 @@
                                        class="btn btn-warning btn-sm" role="button" title="Editar">
                                         <i class="fa-solid fa-edit"></i>
                                     </a>
-                                    <a th:href="@{/gestorFestival/delete/{id}(id=${festival.idFestival})}"
-                                       class="btn btn-danger btn-sm" role="button" title="Borrar">
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" role="button" title="Borrar"
+                                       th:onclick="'confirmDelete(' + ${festival.idFestival} + ')'">
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 </td>
@@ -234,12 +276,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-  if (festivales && festivales.length > 0) {
-    console.log('La lista de festivales no está vacía');
-} else {
-    console.log('La lista de festivales está vacía o no está definida');
-}
+<script th:inline="javascript">
+      $(document).ready(function() {
+        var mensajeConfirmacionFestival = /*[[${mensajeConfirmacionFestival}]]*/ '';
+        $('#successModal').modal('hide');
+        $('#deleteConfirmationModal').modal('hide');
+
+        console.log(mensajeConfirmacionFestival);
+        if (mensajeConfirmacionFestival !== "nada") {
+            $('#successModal').modal('show');
+            $(document).off('focusin.modal');
+        }
+    });
+
+    function confirmDelete(idContrato) {
+      // Actualiza el href del botón de confirmación en el modal
+      document.getElementById('confirmDeleteButton').setAttribute('href', '/gestorFestival/delete/' + idContrato);
+
+      // Muestra el modal de confirmación
+      $('#deleteConfirmationModal').modal('show');
+    }
 </script>
 </body>
 </html>

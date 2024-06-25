@@ -40,7 +40,7 @@ public class ContracteArtistaDao {
 
     public void updateContracteArtista(ContracteArtista contracte) {
         jdbcTemplate.update("UPDATE contracteartista SET idartista=?, datainici=?, datafi=?, condicionsdescriptiu=?, numactuacionsany=?, importcontracte=?, idgestorcomercial=? WHERE idcontracte=?",
-                contracte.getIdArtista(), contracte.getDataInici(), contracte.getDataFi(), contracte.getCondicionsDescriptiu(), contracte.getNumActuacionsAny(), contracte.getImportContracte(), contracte.getIdContracte(), contracte.getIdComercial());
+                contracte.getIdArtista(), contracte.getDataInici(), contracte.getDataFi(), contracte.getCondicionsDescriptiu(), contracte.getNumActuacionsAny(), contracte.getImportContracte(), contracte.getIdComercial(), contracte.getIdContracte());
     }
 
     public List<ContracteArtista> getContractesArtistes() {

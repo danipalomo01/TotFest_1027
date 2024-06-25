@@ -85,4 +85,22 @@ public class ActuacioDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{fecha, horaInicio, horaInicio, horaFinPrevista, horaFinPrevista, horaInicio, horaFinPrevista, horaInicio, horaFinPrevista, idArtista}, Integer.class) > 0;
 
     }
+
+    public List<Actuacio> getActuacionsDia(int idFestival, Date date) {
+        try {
+            String sql = "SELECT * FROM actuacio WHERE idfestival=? AND data=?";
+            return jdbcTemplate.query(sql, new Object[]{idFestival, date}, new ActuacioRowMapper());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Actuacio> getActuacionsFestival(int idFestival) {
+        try {
+            String sql = "SELECT * FROM actuacio WHERE idfestival=?";
+            return jdbcTemplate.query(sql, new Object[]{idFestival}, new ActuacioRowMapper());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
 }

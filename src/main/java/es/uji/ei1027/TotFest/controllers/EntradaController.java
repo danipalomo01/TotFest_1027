@@ -47,7 +47,7 @@ public class EntradaController {
         } else {
             model.addAttribute("noDisponible", "false");
         }
-        int numEntradasDia = Math.min((festivalDao.getFestival(idFestival).getAforamentMaxim() - entradaDao.getEntradesVenudesPerDia(idFestival, java.sql.Date.valueOf(LocalDate.now())))/10, 10);
+        int numEntradasDia = Math.min((festivalDao.getFestival(idFestival).getAforamentMaxim() - entradaDao.getEntradesVenudesPerDiaDeDia(idFestival, java.sql.Date.valueOf(LocalDate.now())))/10, 10);
         int numEntradasCompleto = Math.min(festivalDao.getFestival(idFestival).getAforamentMaxim() - festivalDao.getFestival(idFestival).getNumEntradasVendidas(), 10);
 
         model.addAttribute("numEntradasDia", numEntradasDia);
@@ -89,6 +89,8 @@ public class EntradaController {
                     Entrada entrada = new Entrada();
                     entrada.setData(new java.sql.Date(compraForm.getListaFechas().get(i).getTime()));
                     entrada.setIdFestival(idfestival);
+                    entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
+                    entrada.setEntradaTipus(1);
                     entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioDia"));
                     entradaDao.addEntrada(entrada);
                 }
@@ -97,6 +99,8 @@ public class EntradaController {
                 Entrada entrada = new Entrada();
                 entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioCompleto"));
                 entrada.setIdFestival(idfestival);
+                entrada.setEntradaTipus(2);
+                entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
                 entradaDao.addEntrada(entrada);
                 entradaDao.addNumEntradasVendidasEntradaTipus(idfestival, EntradaTipusEnum.festivalComplet.name(), compraForm.getListaFechas().size());
 
@@ -105,7 +109,8 @@ public class EntradaController {
         } catch (Exception e) {
             return "redirect:/festival/list";
         }
-        return "redirect:/festival/list";
+        model.addAttribute("emailUltimaCompra", compraForm.getEmail());
+        return "entrades/compraExitosa";
 
     }
 

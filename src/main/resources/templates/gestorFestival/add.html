@@ -48,7 +48,7 @@
 </nav>
 <div class="content">
     <form class="form" th:action="@{/gestorFestival/add}" th:object="${festival}" style="padding-top: 4%; width: 80%" method="POST" novalidate>
-        <h1>Añadir un festival</h1>
+        <h1 style="font-size: 40px">Añadir un festival</h1>
 
         <div style="display: flex; align-items: center; justify-content: center; margin-top: 30px">
             <div class="form-group" style="margin-right: 60px;">
@@ -59,7 +59,7 @@
 
             <div class="form-group" style="margin-right: 60px;">
                 <label for="anyo">Año</label>
-                <input type="text" class="form-control" id="anyo" th:value="${2024}" th:field="*{anyo}" maxlength="4" required/>
+                <input type="number" class="form-control" id="anyo" th:value="${2024}" th:field="*{anyo}" style="height: 30px" maxlength="4" required/>
                 <div th:if="${#fields.hasErrors('anyo')}" th:errors="*{anyo}" class="error-message"></div>
             </div>
 
@@ -114,7 +114,7 @@
 
             <div class="form-group" style="margin-right: 20px;">
                 <label for="pressupostContractacio">Presupuesto de Contratación</label>
-                <input type="text" class="form-control" id="pressupostContractacio" th:field="*{pressupostContractacio}" maxlength="100" required/>
+                <input type="number" class="form-control" id="pressupostContractacio" th:field="*{pressupostContractacio}" style="height: 30px" maxlength="10" required/>
                 <div th:if="${#fields.hasErrors('pressupostContractacio')}" th:errors="*{pressupostContractacio}" class="error-message"></div>
             </div>
 

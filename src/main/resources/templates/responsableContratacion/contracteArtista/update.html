@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Añadir Contrato - [[${session.userName}]]</title>
+    <title>Actualizar Contrato - [[${session.userName}]]</title>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/add_festival.css}"/>
-
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="topbar">
@@ -22,23 +23,22 @@
                 </a>
             </li>
 
-
             <li class="item">
-                <a href="responsablecontratacion/contracteartista/list" class="submenu-item">
+                <a href="/responsablecontratacion/contracteartista/list" class="submenu-item">
                     <span>Gestionar Contratos</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
             </li>
 
             <li class="item">
-                <a href="responsablecontratacion/artista/list" class="submenu-item">
+                <a href="/responsablecontratacion/artista/list" class="submenu-item">
                     <span>Gestionar Artistas</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
             </li>
 
             <li class="item">
-                <a href="festival/list" class="submenu-item">
+                <a href="/festival/list" class="submenu-item">
                     <span>Festivales</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
@@ -56,11 +56,11 @@
 
 <div class="content">
     <form class="form" th:action="@{/responsablecontratacion/contracteartista/update}" th:object="${contracteArtista}" method="POST" novalidate>
-        <h1>Actualizar Contrato de Artista</h1>
+        <h1 style="font-size: 40px">Actualizar un contrato</h1>
 
         <div class="form-group">
-            <label for="idArtista">Seleccionar Artista</label>
-            <select class="form-control" id="idArtista" th:field="*{idArtista}" required>
+            <p style="font-size: 18px;font-weight:bold; margin-bottom: 8px">Artistas</p>
+            <select style="width: 40%" class="form-control" id="idArtista" th:field="*{idArtista}" required>
                 <option th:each="artista : ${artistas}" th:value="${artista.idArtista}" th:text="${artista.nom}"></option>
             </select>
             <div th:if="${#fields.hasErrors('idArtista')}" th:errors="*{idArtista}" class="error-message"></div>
@@ -68,31 +68,31 @@
 
         <div class="form-group">
             <label for="dataInici">Fecha de Inicio</label>
-            <input type="date" class="form-control" id="dataInici" th:field="*{dataInici}" required/>
+            <input style="width: 40%" type="date" class="form-control" id="dataInici" th:field="*{dataInici}" required/>
             <div th:if="${#fields.hasErrors('dataInici')}" th:errors="*{dataInici}" class="error-message"></div>
         </div>
 
         <div class="form-group">
             <label for="dataFi">Fecha de Fin</label>
-            <input type="date" class="form-control" id="dataFi" th:field="*{dataFi}" required/>
+            <input style="width: 40%" type="date" class="form-control" id="dataFi" th:field="*{dataFi}" required/>
             <div th:if="${#fields.hasErrors('dataFi')}" th:errors="*{dataFi}" class="error-message"></div>
         </div>
 
         <div class="form-group">
             <label for="condicionsDescriptiu">Condiciones Descriptivas</label>
-            <textarea class="form-control" id="condicionsDescriptiu" th:field="*{condicionsDescriptiu}" maxlength="500" required></textarea>
+            <textarea style="resize: none;" class="form-control" id="condicionsDescriptiu" th:field="*{condicionsDescriptiu}" maxlength="500" required></textarea>
             <div th:if="${#fields.hasErrors('condicionsDescriptiu')}" th:errors="*{condicionsDescriptiu}" class="error-message"></div>
         </div>
 
         <div class="form-group">
             <label for="numActuacionsAny">Número de Actuaciones por Año</label>
-            <input type="number" class="form-control" id="numActuacionsAny" th:field="*{numActuacionsAny}" required/>
+            <input style="width: 80px" type="number" class="form-control" id="numActuacionsAny" th:field="*{numActuacionsAny}" required/>
             <div th:if="${#fields.hasErrors('numActuacionsAny')}" th:errors="*{numActuacionsAny}" class="error-message"></div>
         </div>
 
         <div class="form-group">
-            <label for="importContracte">Importe del Contrato</label>
-            <input type="number" class="form-control" id="importContracte" th:field="*{importContracte}" required/>
+            <label for="importContracte">Importe del Contrato (€)</label>
+            <input style="width: 80px" type="number" class="form-control" id="importContracte" th:field="*{importContracte}" required/>
             <div th:if="${#fields.hasErrors('importContracte')}" th:errors="*{importContracte}" class="error-message"></div>
         </div>
 
@@ -102,6 +102,10 @@
     </form>
 </div>
 
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 </body>
 </html>

@@ -4,14 +4,115 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Listado de Festivales</title>
-  <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
-  <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival.css}" />
+
+  <title>Información del Festival</title>
+
+  <!-- CSS de terceros primero -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+  <!-- CSS personalizados después -->
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <link rel="stylesheet" type="text/css" th:href="@{/styles/list_festival_true.css}" />
+
+  <!-- JavaScript de terceros -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+
+  <style>
+        body {
+            font-family: 'sans-serif', sans-serif;
+            color: #333;
+            background-size: cover;
+            background-position: center;
+            background-image: url('/images/siptiop.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat; height: 100vh;
+        }
+
+        .p {
+          font-family: 'Roboto', sans-serif;
+        }
+
+        .festival-header {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700; /* Para negrita */
+            color: #ffffff; /* Color blanco */
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .festival-header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s;
+        }
+        .festival-header p {
+            font-size: 1.5em;
+            animation: fadeInUp 1s;
+        }
+        .festival-body {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 20px 20px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s;
+        }
+        .festival-body p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }.festival-body {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 0 0 20px 20px;
+      padding: 30px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content form {
+      padding: 10px;
+    }
+    .dropdown-content form .form-group {
+      margin-bottom: 10px;
+    }
+    .dropdown-content form .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .dropdown-content form .form-group select,
+    .dropdown-content form .form-group input {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  </style>
 </head>
 <body>
 <div class="topbar"></div>
@@ -21,7 +122,7 @@
   <div class="menu-content">
     <ul class="menu-items">
       <li class="item">
-        <a href="index.html" class="submenu-item">
+        <a href="/index.html" class="submenu-item">
           <span>Inicio</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
@@ -42,81 +143,116 @@
       </li>
     </ul>
   </div>
-
 </nav>
+<div class="container" style="height: 100vh;">
+  <div class="containerinfo" style="padding-top: 5%; padding-left: 20%; padding-right: 0%; background-color: transparent;">
+    <div class="festival-header" style="background-color: #84BDC7">
+      <h1 id="festival-name">Listado de Festivales</h1>
+    </div>
+    <div style="background-color: #B1EDF7; padding: 20px; margin-bottom: 20px; border-radius: 8px; margin: 10px 0; font-size: 16px; margin-top: 25px;">
 
-<div class="mainc" >
-  <div class="container" style="background-image: url('/images/lfest.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat; height: 100vh;">
-    <h1>Listado de Festivales</h1>
-    <form method="get" th:action="@{/gestorFestival/list}">
-      <label style="padding-top: 3%" for="size">Festivales por página:</label>
-      <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
-        <option th:value="5" th:selected="${size == 5}">5</option>
-        <option th:value="10" th:selected="${size == 10}">10</option>
-        <option th:value="20" th:selected="${size == 20}">20</option>
-        <option th:value="50" th:selected="${size == 50}">50</option>
-      </select>
-      <input type="hidden" name="page" th:value="${currentPage}" />
-    </form>
-    <div class="initiative-list">
-      <div class="initiative-card" th:each="festival : ${festivales}">
-        <h2 th:text="${festival.nom}" style="text-transform: capitalize;">Título </h2>
-        <div class="field">
-          <span th:text="${festival.anyo}" style="text-transform: capitalize;"></span>
+      <div style="display: flex; justify-content: center">
+        <form style="margin-right: 30%" method="get" action="/festival/list">
+          <div class="form-group" style="margin-top: 15px">
+            <label for="size">Festivales por página:</label>
+            <select name="size" id="size">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </form>
+        <div class="dropdown">
+          <button class="btn btn-info">
+            <i class="fas fa-filter"></i> Filtros
+          </button>
+          <div class="dropdown-content">
+            <form method="get" action="/festival/list">
+              <div class="form-group">
+                <label for="localizacion">Localización:</label>
+                <input type="text" name="localizacion" id="localizacion" />
+              </div>
+              <div class="form-group">
+                <label for="anyo">Año:</label>
+                <input type="number" name="anyo" id="anyo" />
+              </div>
+              <div class="form-group">
+                <label for="categoria">Categoría Musical:</label>
+                <input type="text" name="categoria" id="categoria" />
+              </div>
+              <button type="submit" class="btn btn-primary">Filtrar</button>
+            </form>
+          </div>
         </div>
-        <div class="field">
-          <label><strong>Categoria Musical:</strong></label>
-          <span th:text="${festival.categoriaMusical}" style="text-transform: capitalize;"></span>
-        </div>
-        <div class="field">
-          <label><strong>Fecha de inicio:</strong></label>
-          <span th:text="${festival.dataInici}" style="text-transform: capitalize;"></span>
-        </div>
-        <div class="field">
-          <label><strong>Fecha de fin:</strong></label>
-          <span th:text="${festival.dataFi}" style="text-transform: capitalize;"></span>
-        </div>
+      </div>
 
-        <div class="field">
-          <label><strong>Número de festival:</strong></label>
-          <span th:text="${festival.idFestival}" style="text-transform: capitalize;"></span>
-        </div>
+      <div th:if="${#lists.isEmpty(festivales)}">
+        <p style="margin-top: 20px; color: red; font-size: 30px;margin-top: 80px; font-weight: bold">No se han encontrado festivales</p>
+
+      </div>
+      <div th:unless="${#lists.isEmpty(festivales)}">
+          <div class="initiative-list" style="margin-top: 30px">
+            <div class="initiative-card" th:each="festival : ${festivales}">
+              <div style="display: flex; justify-content: center">
+                <h2 th:text="${festival.nom}" style="text-transform: capitalize;">Título </h2>
+                <span>&nbsp;&nbsp;&nbsp;</span>
+                <h2 th:text="${festival.anyo}" style="text-transform: capitalize;">Año </h2>
+              </div>
+
+              <div class="field" style="margin-top: 25px">
+                <label><strong>Categoria Musical:</strong></label>
+                <span th:text="${festival.categoriaMusical}" style="text-transform: capitalize;"></span>
+              </div>
+              <div class="field">
+                <label><strong>Fechas:</strong></label>
+                <span th:text="${#dates.format(festival.dataInici, 'dd/MM/yyyy')}" style="text-transform: capitalize;"></span><span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span><span th:text="${#dates.format(festival.dataFi, 'dd/MM/yyyy')}" style="text-transform: capitalize;"></span>
+              </div>
+
+              <div class="field">
+                <label><strong>Localización:</strong></label>
+                <span th:text="${festival.localitzacioDescriptiva}" style="text-transform: capitalize;"></span>
+              </div>
+
+              <div class="field">
+                <label><strong>Aforo:</strong></label>
+                <span th:text="${festival.aforamentMaxim}" style="text-transform: capitalize;"></span><span>&nbsp;personas</span>
+              </div>
 
 
-          <div class="buttons-wrapper">
-            <a th:href="@{/festival/info/{id}(id=${festival.idFestival})}" class="btn btn-warning" role="button">Info</a>
+              <div style="display: flex">
+                  <div class="buttons-wrapper">
+                    <a style="font-weight: bold;" th:href="@{/festival/info/{id}(id=${festival.idFestival})}" class="btn btn-warning" role="button">Ver Actuaciones</a>
+                  </div>
+
+                  <div class="buttons-wrapper"
+                       th:if="${festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda'}">
+                    <strong><a style="font-weight: bold;" th:href="@{/compra-entradas/compra/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Comprar Entradas</a></strong>
+                  </div>
+              </div>
+
+
+            </div>
           </div>
 
-        <div class="buttons-wrapper"
-             th:if="${festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda'}">
-          <a th:href="@{/compra-entradas/compra/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Comprar Entradas</a>
-        </div>
-
-
+          <nav aria-label="Page navigation example" style="margin-top: 30px">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+              </li>
+              <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+              </li>
+            </ul>
+          </nav>
       </div>
     </div>
 
-    <nav aria-label="Page navigation example" style="margin-top: 30px">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-          <a class="page-link" th:href="@{/gestorFestival/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
-        </li>
-        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-          <a class="page-link" th:href="@{/gestorFestival/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
-        </li>
-        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-          <a class="page-link" th:href="@{/gestorFestival/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
-        </li>
-      </ul>
-    </nav>
-
-
   </div>
-</div>
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
 
+</div>
 </body>
 </html>

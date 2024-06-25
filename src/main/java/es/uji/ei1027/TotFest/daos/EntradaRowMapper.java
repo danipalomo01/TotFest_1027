@@ -15,6 +15,8 @@ public class EntradaRowMapper implements RowMapper<Entrada> {
         entrada.setIdFestival(rs.getInt("idfestival"));
         entrada.setData(rs.getDate("data"));
         entrada.setPreuVendaEntradaIndividual(rs.getBigDecimal("preuVendaEntradaIndividual"));
+        entrada.setDatacompra(rs.getDate("datacompra"));
+        entrada.setEntradaTipus(rs.getInt("identradatipus"));
         return entrada;
     }
 }

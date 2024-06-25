@@ -36,9 +36,9 @@ public class GFActuaciones {
 
     @RequestMapping(value = "/{id}/{idartista}")
     public String addActuacionAContrato(HttpSession session, Model model, @PathVariable("id") int idContracte, @PathVariable("idartista") int idArtista) {
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
 
         if (contracteArtistaDao.contratoCerrado(idContracte, contracteArtistaDao.getContracteArtista(idContracte).getNumActuacionsAny())) {
             List<Actuacio> actuacionesPrevias = contracteArtistaDao.getActuacionesContrato(idContracte);
@@ -82,9 +82,9 @@ public class GFActuaciones {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addActuacionAContrato(@ModelAttribute("contratoActuaciones") ContratoActuaciones contratoActuaciones, HttpSession session, BindingResult bindingResult, Model model) {
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
 
         for (Actuacio actuacion: contratoActuaciones.getActuaciones()) {
             if (seSolapanActuaciones(actuacion)) {

@@ -6,11 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Listado de Contratos</title>
   <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <style>
         .no-items-message {
             border: 1px solid #ccc;
@@ -91,7 +93,7 @@
           </a>
         </li>
         <li class="item">
-          <a href="festival/list" class="submenu-item">
+          <a href="/festival/list" class="submenu-item">
             <span>Festivales</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
@@ -105,14 +107,51 @@
       </ul>
     </div>
   </nav>
+  <input type="hidden" id="mensajeConfirmacionArtista" th:value="${mensajeConfirmacionArtista}" />
+
+  <!-- Modal mensaje Confirmación-->
+  <div class="container">
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="margin-top: 40%; margin-left: 15%;background-color: #C3F892">
+          <div class="modal-body">
+            <p style="font-size: 25px; text-align: center"><strong>Se ha<span th:text="${mensajeConfirmacionArtista}"></span> correctamente el artista.</strong></p>
+          </div>
+          <div class="modal-footer">
+            <a id="aceptarMensajeConfirmacion" href="/responsablecontratacion/artista/list" class="btn btn-success">Aceptar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Borrado -->
+  <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">¿Estás seguro de que deseas borrar a este artista?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div style="font-size: 25px; text-align: center" class="modal-body">
+          Se eliminarán todas las actuaciones asociadas a este artista
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <a id="confirmDeleteButton" href="#" class="btn btn-danger">Borrar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="mainc">
     <div style="width: 70%; margin-left: 22%; margin-right: 10%">
       <div>
         <h1 style="text-align:center; padding-top: 10%"><strong>Listado de Artistas</strong></h1>
-        <!-- Mensaje de no hay contratos -->
-        <div th:if="${#lists.isEmpty(artistas)}" class="no-items-message">
-          <p>No existe ningún contrato disponible.</p>
-        </div>
+
         <!-- Tabla de contratos -->
         <div th:unless="${#lists.isEmpty(artistas)}">
           <form method="get" th:action="@{/responsablecontratacion/artista/list}">
@@ -173,8 +212,8 @@
                      class="btn btn-warning btn-sm" role="button" title="Editar">
                     <i class="fa-solid fa-edit"></i>
                   </a>
-                  <a th:href="@{/responsablecontratacion/artista/delete/{id}(id=${artista.idArtista})}"
-                     class="btn btn-danger btn-sm" role="button" title="Borrar">
+                  <a href="javascript:void(0);" class="btn btn-danger btn-sm" role="button" title="Borrar"
+                     th:onclick="'confirmDelete(' + ${artista.idArtista} + ')'">
                     <i class="fa-solid fa-trash"></i>
                   </a>
                 </td>
@@ -215,8 +254,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-  console.log(model[currentPage]);
+<script th:inline="javascript">
+      $(document).ready(function() {
+        var mensajeConfirmacionArtista = /*[[${mensajeConfirmacionArtista}]]*/ '';
+        $('#successModal').modal('hide');
+        $('#deleteConfirmationModal').modal('hide');
+
+        console.log(mensajeConfirmacionArtista);
+        if (mensajeConfirmacionArtista !== "nada") {
+            $('#successModal').modal('show');
+            $(document).off('focusin.modal');
+        }
+    });
+
+    function confirmDelete(idArtista) {
+      // Actualiza el href del botón de confirmación en el modal
+      document.getElementById('confirmDeleteButton').setAttribute('href', '/responsablecontratacion/artista/delete/' + idArtista);
+
+      // Muestra el modal de confirmación
+      $('#deleteConfirmationModal').modal('show');
+    }
 </script>
 </body>
 </html>

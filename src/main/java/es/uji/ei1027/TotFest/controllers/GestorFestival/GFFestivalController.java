@@ -53,15 +53,23 @@ public class GFFestivalController {
                                Model model) {
 
 
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
+            return "redirect:/login";
+        }
 
         if (session.getAttribute("size") != null && size == 1) {
             size = (int) session.getAttribute("size");
         } else {
             session.setAttribute("size", size);
         }
+
+        if (session.getAttribute("mensajeConfirmacionFestival") != null && session.getAttribute("mensajeConfirmacionFestival") != "nada") {
+            model.addAttribute("mensajeConfirmacionFestival", session.getAttribute("mensajeConfirmacionFestival"));
+            session.setAttribute("mensajeConfirmacionFestival", "nada");
+        } else {
+            model.addAttribute("mensajeConfirmacionFestival", "nada");
+        }
+
         List<Festival> festivalesTotales = festivalDao.getFestivals();
         int offset = page * size;
         List<Festival> festivales = festivalDao.getFestivals(size, offset);
@@ -88,9 +96,9 @@ public class GFFestivalController {
 
     @RequestMapping("/add")
     public String addFestival(HttpSession session, Model model) {
-        //if (session == null || session.getAttribute("user") == null) {
-        //    return "redirect:/login";
-        //}
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
+            return "redirect:/login";
+        }
         FestivalForm festivalForm = new FestivalForm();
         festivalForm.setDataInici(Date.valueOf(LocalDate.of(2024,1,1)));
         festivalForm.setDataFi(Date.valueOf(LocalDate.of(2024,1,1)));
@@ -105,7 +113,7 @@ public class GFFestivalController {
     public String processAddSubmit(
             @ModelAttribute("festival") FestivalForm festivalForm,
             BindingResult bindingResult, HttpSession session) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
         // Aquí puedes incluir la validación del Festival si es necesario
@@ -147,6 +155,8 @@ public class GFFestivalController {
 
             entradaDao.addEntradaTipus(entradaTipusCompleto);
             entradaDao.addEntradaTipus(entradaTipusDia);
+            session.setAttribute("mensajeConfirmacionFestival", " añadido ");
+
             return "redirect:/gestorFestival/list";
         } catch (DuplicateKeyException e) {
             // Manejar la excepción de clave duplicada si es necesario
@@ -189,6 +199,15 @@ public class GFFestivalController {
             }
         }
 
+        if(festival.getDataFi() != null && festival.getDataIniciPublicacio() != null) {
+            LocalDate dataIniciPublicacio = festival.getDataIniciPublicacio().toLocalDate();
+            LocalDate dataFi = festival.getDataFi().toLocalDate();
+
+            if (dataFi.isBefore(dataIniciPublicacio)) {
+                bindingResult.rejectValue("dataIniciVenda", "error.dataIniciPublicacio", "La fecha de inicio de venta no puede ser posterior a la fecha de fin del festival.");
+            }
+        }
+
 
 
         if (festival.getPressupostContractacio() != null && festival.getPressupostContractacio().compareTo(BigDecimal.ZERO) < 0) {
@@ -199,37 +218,54 @@ public class GFFestivalController {
 
     @RequestMapping(value = "/update/{idFestival}", method = RequestMethod.GET)
     public String editFestival(HttpSession session, Model model, @PathVariable int idFestival) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
-        model.addAttribute("festival", festivalDao.getFestival(idFestival));
+        Festival festival = festivalDao.getFestival(idFestival);
+
+        if (festival.getDataIniciVenda().toLocalDate().isEqual(LocalDate.now()) || festival.getDataIniciVenda().toLocalDate().isBefore(LocalDate.now())) {
+            model.addAttribute("editable", false);
+        } else {
+            model.addAttribute("editable", true);
+        }
+        FestivalEntradas festivalEntradas = new FestivalEntradas(festival);
+        festivalEntradas.setPreuDia(entradaDao.getPrecioDiaFestival(idFestival));
+        festivalEntradas.setPreuComplet(entradaDao.getPrecioCompletoFestival(idFestival));
+        model.addAttribute("festivalEntradas", festivalEntradas);
+
         session.setAttribute("lastFestivalUpdate", idFestival);
         return "gestorFestival/update";
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String processUpdateSubmit(HttpSession session,
-            @ModelAttribute("festival") Festival festival,
+            @ModelAttribute("festivalEntradas") FestivalEntradas festivalEntradas,
             BindingResult bindingResult) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
         // Puedes incluir la validación del Festival si es necesario
         if (bindingResult.hasErrors()) {
             return "gestorFestival/update";
         }
+        Festival festival = festivalEntradas.getFestival();
         festival.setIdFestival(Integer.parseInt(session.getAttribute("lastFestivalUpdate").toString()));
         festival.setCifPromotor(session.getAttribute("cif").toString());
         festivalDao.updateFestival(festival);
+        entradaDao.updatePrecioEntradaTipus(festival.getIdFestival(), festivalEntradas.getPreuDia(), festivalEntradas.getPreuComplet());
+        session.setAttribute("mensajeConfirmacionFestival", " editado ");
+
         return "redirect:list";
     }
 
     @RequestMapping(value = "/delete/{idFestival}")
     public String processDelete(HttpSession session, @PathVariable int idFestival) {
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
         festivalDao.deleteFestival(idFestival);
+        session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
+
         return "redirect:/gestorFestival/list";
     }
 

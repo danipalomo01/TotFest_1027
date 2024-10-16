@@ -26,6 +26,9 @@
             margin: 20px auto;
         }
 
+        .table-responsive {
+            max-height: 500px;
+        }
         .table {
             background-color: #ffffff; /* Color de fondo de la tabla */
             width: 100%;
@@ -63,6 +66,11 @@
             display: inline-block;
             width: auto;
             margin-left: 10px;
+        }
+        .table thead th {
+            vertical-align: middle;
+            border-bottom: 2px solid #dee2e6;
+            text-align: center;
         }
     </style>
 </head>
@@ -136,7 +144,7 @@
           </button>
         </div>
         <div style="font-size: 25px; text-align: center" class="modal-body">
-          Se eliminarán todas las actuaciones asociadas a este artista
+          Se eliminarán todas las actuaciones y contratos asociados a este artista
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -150,7 +158,7 @@
   <div class="mainc">
     <div style="width: 70%; margin-left: 22%; margin-right: 10%">
       <div>
-        <h1 style="text-align:center; padding-top: 10%"><strong>Listado de Artistas</strong></h1>
+        <h1 style="text-align:center; padding-top: 5%"><strong>Listado de Artistas</strong></h1>
 
         <!-- Tabla de contratos -->
         <div th:unless="${#lists.isEmpty(artistas)}">
@@ -164,21 +172,27 @@
             </select>
             <input type="hidden" name="page" th:value="${currentPage}" />
           </form>
+
+          <form id="deleteSelectedForm" th:action="@{/responsablecontratacion/artista/delete-selected}" method="POST">
           <div class="table-responsive">
             <table class="table table-bordered table-striped rounded">
               <thead>
               <tr>
+                <th>Seleccionar</th>
                 <th>ID Artista</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Tipo de Música</th>
                 <th>Cachet Actual (€)</th>
-                <th>Acciones</th>
+                <th style="background-color: #dfd7d7;">Acciones</th>
               </tr>
               </thead>
               <tbody id="artist-table-body">
               <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
               <tr th:each="artista : ${artistas}">
+                <td>
+                  <input type="checkbox" th:name="selectedArtistas" th:value="${artista.idArtista}">
+                </td>
                 <td th:text="${artista.idArtista}"></td>
                 <td th:text="${artista.nom}"></td>
                 <td>
@@ -207,20 +221,75 @@
                 </td>
                 <td th:text="${artista.tipusMusica}"></td>
                 <td th:text="${artista.cachetActual}"></td>
-                <td>
+                <td style="background-color: #dfd7d7;">
+                  <a th:href="@{/responsablecontratacion/artista/list/{idArtista}(idArtista=${artista.idArtista})}" class="btn btn-success btn-sm" role="button" title="Gestionar Contratos"><i class="fa-solid fa-list"></i></a>
                   <a th:href="@{/responsablecontratacion/artista/update/{id}(id=${artista.idArtista})}"
                      class="btn btn-warning btn-sm" role="button" title="Editar">
                     <i class="fa-solid fa-edit"></i>
                   </a>
-                  <a href="javascript:void(0);" class="btn btn-danger btn-sm" role="button" title="Borrar"
-                     th:onclick="'confirmDelete(' + ${artista.idArtista} + ')'">
+                  <button data-toggle="modal" th:data-target="'#deleteModal' + ${artista.idArtista}" class="btn btn-danger btn-sm" type="button" title="Borrar">
                     <i class="fa-solid fa-trash"></i>
-                  </a>
+                  </button>
+                  <div class="modal" style="margin-top:10%;" th:id="'deleteModal' + ${artista.idArtista}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content" style="background-color: #F57164;">
+                        <div class="modal-header">
+                          <h5 style="font-weight: bold" class="modal-title" id="exampleDeleteModalLabel">Confirmar acción</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <p><strong>¿Estás seguro de que quieres eliminar este artista?<br>Se eliminarán permanentemente todas sus contratos y <br>actuaciones</strong></p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                          <a th:href="@{/responsablecontratacion/artista/delete/{id}(id=${artista.idArtista})}" type="button" class="btn btn-danger">Borrar</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
               </tbody>
             </table>
           </div>
+
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteSelectedModal">
+              Eliminar Seleccionados
+            </button>
+
+            <!-- Modal de confirmación para eliminar seleccionados -->
+            <div class="modal fade" id="deleteSelectedModal" tabindex="-1" role="dialog" aria-labelledby="deleteSelectedModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content" style="background-color: #F57164;">
+                  <div class="modal-header">
+                    <h5 style="font-weight: bold" class="modal-title" id="deleteSelectedModalLabel">Confirmar acción</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>¿Estás seguro de que quieres eliminar los festivales seleccionados? Esta acción no se puede deshacer.</strong></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <!-- Este botón hace el submit del formulario -->
+                    <button type="submit" form="deleteSelectedForm" class="btn btn-danger">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </form>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(artistas)}" style="float: right">
+          <p>Mostrando <span th:text="${size * (currentPage)}"></span> -
+            <span th:text="${( (currentPage + 1)   != null ? page : 1) == 1 ? #lists.size(artistas) : (size * currentPage) + #lists.size(artistas)}"></span>
+            de
+            <span th:text="${totalElems}"></span>
+            elementos
+          </p>
         </div>
 
         <!-- Mensajes de no hay artistas o festivales -->
@@ -228,24 +297,26 @@
           <p>No existe ningún artista</p>
         </div>
         <!-- Botón de añadir contrato -->
-        <div style="margin-left:44%; margin-top: 30px" class="btn-anyadir">
+        <div style="margin-left:44%" class="btn-anyadir">
           <a th:href="@{/responsablecontratacion/artista/add}" class="btn btn-success" role="button">Añadir Artista</a>
         </div>
       </div>
       <!-- Paginación -->
-      <nav aria-label="Page navigation example" style="margin-top: 30px">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-            <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
-          </li>
-          <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-            <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
-          </li>
-          <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-            <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
-          </li>
-        </ul>
-      </nav>
+      <div th:unless="${#lists.isEmpty(artistas)}">
+        <nav aria-label="Page navigation example" style="margin-top: 30px">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+              <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+              <a class="page-link" th:href="@{/responsablecontratacion/artista/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 
@@ -254,26 +325,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script th:inline="javascript">
-      $(document).ready(function() {
-        var mensajeConfirmacionArtista = /*[[${mensajeConfirmacionArtista}]]*/ '';
-        $('#successModal').modal('hide');
-        $('#deleteConfirmationModal').modal('hide');
 
-        console.log(mensajeConfirmacionArtista);
-        if (mensajeConfirmacionArtista !== "nada") {
-            $('#successModal').modal('show');
-            $(document).off('focusin.modal');
-        }
-    });
-
-    function confirmDelete(idArtista) {
-      // Actualiza el href del botón de confirmación en el modal
-      document.getElementById('confirmDeleteButton').setAttribute('href', '/responsablecontratacion/artista/delete/' + idArtista);
-
-      // Muestra el modal de confirmación
-      $('#deleteConfirmationModal').modal('show');
-    }
-</script>
 </body>
 </html>

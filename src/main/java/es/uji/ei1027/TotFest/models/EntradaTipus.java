@@ -5,25 +5,24 @@ import java.util.Date;
 
 public class EntradaTipus {
 
+    private int id;
     private EntradaTipusEnum entradaTipus;
     private int idFestival;
     private BigDecimal preu;
     private String descripcio;
     private int nombreMaxim;
-    private int nombreVendes;
     private Date dataPerTipusDia;
     private BigDecimal percentatgeMaximAforament;
 
     public EntradaTipus(){
 
     }
-    public EntradaTipus(EntradaTipusEnum entradaTipus, int idFestival, BigDecimal preu, String descripcio, int nombreMaxim, int nombreVendes, Date dataPerTipusDia, BigDecimal percentatgeMaximAforament) {
+    public EntradaTipus(EntradaTipusEnum entradaTipus, int idFestival, BigDecimal preu, String descripcio, int nombreMaxim, Date dataPerTipusDia, BigDecimal percentatgeMaximAforament) {
         this.entradaTipus = entradaTipus;
         this.idFestival = idFestival;
         this.preu = preu;
         this.descripcio = descripcio;
         this.nombreMaxim = nombreMaxim;
-        this.nombreVendes = nombreVendes;
         this.dataPerTipusDia = dataPerTipusDia;
         this.percentatgeMaximAforament = percentatgeMaximAforament;
     }
@@ -66,14 +65,6 @@ public class EntradaTipus {
 
     public void setNombreMaxim(int nombreMaxim) {
         this.nombreMaxim = nombreMaxim;
-    }
-
-    public int getNombreVendes() {
-        return nombreVendes;
-    }
-
-    public void setNombreVendes(int nombreVendes) {
-        this.nombreVendes = nombreVendes;
     }
 
     public Date getDataPerTipusDia() {

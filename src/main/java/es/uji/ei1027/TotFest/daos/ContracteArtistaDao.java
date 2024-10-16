@@ -66,6 +66,14 @@ public class ContracteArtistaDao {
         }
     }
 
+    public int getContractesArtista(int idArtista) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM contracteartista WHERE idartista = ?", Integer.class, idArtista);
+        } catch (EmptyResultDataAccessException e) {
+            return -1;
+        }
+    }
+
     public List<Actuacio> getActuacionesContrato(int idContracte) {
         try {
             String sql = "SELECT * FROM actuacio WHERE idcontracte=?";
@@ -75,11 +83,26 @@ public class ContracteArtistaDao {
         }
     }
 
+    public int getNumActuacionesContrato(int idContracte) {
+        try {
+            String sql = "SELECT numactuacionsany FROM contracteartista WHERE idcontracte=?";
+            return jdbcTemplate.queryForObject(sql, Integer.class, idContracte);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     public Boolean contratoCerrado(int idcontrato, int numActuacionsAny) {
         try {
             return jdbcTemplate.queryForObject("SELECT COUNT(*) as count FROM actuacio WHERE idcontracte = ?", Integer.class, idcontrato) == numActuacionsAny;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    public List<ContracteArtista> getContractesArtista(int page, int size, int idArtista) {
+
+        int offset = page * size;
+        return jdbcTemplate.query("SELECT * FROM contracteartista WHERE idArtista = ? LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), idArtista, size, offset);
     }
 }

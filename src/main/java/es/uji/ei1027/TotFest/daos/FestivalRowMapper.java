@@ -29,7 +29,6 @@ public class FestivalRowMapper implements RowMapper<Festival> {
         festival.setRequisitMinimEdat(rs.getInt("requisitMinimEdat"));
         festival.setDataIniciPublicacio(rs.getDate("dataIniciPublicacio"));
         festival.setDataIniciVenda(rs.getDate("dataIniciVenda"));
-        festival.setNumEntradasVendidas(rs.getInt("num_entradas_vendidas"));
         return festival;
     }
 }

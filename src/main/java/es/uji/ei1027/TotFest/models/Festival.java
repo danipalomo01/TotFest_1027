@@ -1,5 +1,7 @@
 package es.uji.ei1027.TotFest.models;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 
@@ -22,12 +24,11 @@ public class Festival {
     private int requisitMinimEdat;
     private Date dataIniciPublicacio;
     private Date dataIniciVenda;
-    private int numEntradasVendidas;
 
     public Festival(){
 
     }
-    public Festival(int idFestival, String cifPromotor, String nom, int anyo, Date dataInici, Date dataFi, EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda, int numEntradasVendidas) {
+    public Festival(int idFestival, String cifPromotor, String nom, int anyo, Date dataInici, Date dataFi, EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda) {
         this.idFestival = idFestival;
         this.cifPromotor = cifPromotor;
         this.nom = nom;
@@ -45,7 +46,6 @@ public class Festival {
         this.requisitMinimEdat = requisitMinimEdat;
         this.dataIniciPublicacio = dataIniciPublicacio;
         this.dataIniciVenda = dataIniciVenda;
-        this.numEntradasVendidas = numEntradasVendidas;
     }
 
     public int getIdFestival() {
@@ -184,12 +184,5 @@ public class Festival {
         this.dataIniciVenda = dataIniciVenda;
     }
 
-    public int getNumEntradasVendidas() {
-        return numEntradasVendidas;
-    }
-
-    public void setNumEntradasVendidas(int numEntradasVendidas) {
-        this.numEntradasVendidas = numEntradasVendidas;
-    }
 }
 

@@ -58,22 +58,22 @@
     <h1>Actualizar Artista/Grupo</h1>
     <div class="form-group">
       <label for="nom">Nombre</label>
-      <input type="text" class="form-control" id="nom" th:field="*{nom}" maxlength="250" required th:value="${artista.nom}" />
+      <input style="width: 400px" type="text" class="form-control" id="nom" th:field="*{nom}" maxlength="250" required th:value="${artista.nom}" />
       <div th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="error-message"></div>
     </div>
     <div class="form-group">
       <label for="tipusMusica">Tipo de Música</label>
-      <input type="text" class="form-control" id="tipusMusica" th:field="*{tipusMusica}" maxlength="100" required th:value="${artista.tipusMusica}" />
+      <input style="width: 400px" type="text" class="form-control" id="tipusMusica" th:field="*{tipusMusica}" maxlength="100" required th:value="${artista.tipusMusica}" />
       <div th:if="${#fields.hasErrors('tipusMusica')}" th:errors="*{tipusMusica}" class="error-message"></div>
     </div>
     <div class="form-group">
       <label for="descripcio">Descripción</label>
-      <input type="text" class="form-control" id="descripcio" th:field="*{descripcio}" maxlength="250" required th:value="${artista.descripcio}" />
+      <input  style="width: 400px" type="text" class="form-control" id="descripcio" th:field="*{descripcio}" maxlength="250" required th:value="${artista.descripcio}" />
       <div th:if="${#fields.hasErrors('descripcio')}" th:errors="*{descripcio}" class="error-message"></div>
     </div>
     <div class="form-group">
       <label for="cachetActual">Cachet Actual</label>
-      <input type="number" class="form-control" id="cachetActual" th:field="*{cachetActual}" required th:value="${artista.cachetActual}" />
+      <input style="width: 120px; text-align: center; font-size: 16px; height: 30px" type="number" class="form-control" id="cachetActual" th:field="*{cachetActual}" step="10.0" required th:value="${artista.cachetActual}" min="0"/>
       <div th:if="${#fields.hasErrors('cachetActual')}" th:errors="*{cachetActual}" class="error-message"></div>
     </div>
     <div class="form-group">
@@ -82,7 +82,6 @@
   </form>
 
 </div>
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
 
 </body>
 </html>

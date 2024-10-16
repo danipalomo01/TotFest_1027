@@ -24,22 +24,20 @@ public class EntradaDao {
     }
 
     public void addEntradaTipus(EntradaTipus entradaTipus) {
-        jdbcTemplate.update("INSERT INTO entradatipus (entradatipus, idfestival, tipusentrada, preu, descripcio, nombremaxim, nombrevendes, datapertipusdia, percentatgemaximaforament) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO entradatipus (entradatipus, idfestival, preu, descripcio, nombremaxim, datapertipusdia, percentatgemaximaforament) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 entradaTipus.getEntradaTipus().toString(),
                 entradaTipus.getIdFestival(),
-                entradaTipus.getEntradaTipus().toString(),
                 entradaTipus.getPreu(),
                 entradaTipus.getDescripcio(),
                 entradaTipus.getNombreMaxim(),
-                entradaTipus.getNombreVendes(),
                 entradaTipus.getDataPerTipusDia(),
                 entradaTipus.getPercentatgeMaximAforament());
     }
 
-    public EntradaTipus getEntradaTipus(int idFestival, String tipusEntrada) {
+    public EntradaTipus getEntradaTipus(int idFestival, String entradatipus) {
         try {
-            String sql = "SELECT * FROM entradatipus WHERE idfestival=? AND tipusentrada=?";
-            return jdbcTemplate.queryForObject(sql, new Object[]{idFestival, tipusEntrada}, new EntradaTipusRowMapper());
+            String sql = "SELECT * FROM entradatipus WHERE idfestival=? AND entradatipus=?";
+            return jdbcTemplate.queryForObject(sql, new Object[]{idFestival, entradatipus}, new EntradaTipusRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -55,11 +53,7 @@ public class EntradaDao {
         int nextId = maxId + 1;
         entrada.setNumero(nextId);
 
-        jdbcTemplate.update("INSERT INTO entrada VALUES (?, ?, ?, ?, ?, ?)", entrada.getNumero(), entrada.getPreuVendaEntradaIndividual(), entrada.getData(), entrada.getIdFestival(), entrada.getDatacompra(), entrada.getEntradaTipus());
-    }
-
-    public void addNumEntradasVendidasEntradaTipus(int idfestival, String tipusEntrada, int num) {
-        jdbcTemplate.update("UPDATE entradatipus SET nombrevendes=nombrevendes + ? WHERE idfestival=? AND tipusentrada=?", num, idfestival, tipusEntrada);
+        jdbcTemplate.update("INSERT INTO entrada VALUES (?, ?, ?, ?, ?, ?, ?, ?)", entrada.getNumero(), entrada.getPreuVendaEntradaIndividual(), entrada.getData(), entrada.getIdFestival(), entrada.getDatacompra(), entrada.getEntradaTipus(), entrada.getEmail(), entrada.getTelefono());
     }
 
     public List<Entrada> getEntradas() {
@@ -109,8 +103,78 @@ public class EntradaDao {
     }
 
     public void updatePrecioEntradaTipus(int idFestival, BigDecimal precioDia, BigDecimal precioCompleto) {
-        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND tipusentrada='dia'", precioDia, idFestival);
-        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND tipusentrada='festivalComplet'", precioCompleto, idFestival);
+        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND entradatipus='dia'", precioDia, idFestival);
+        jdbcTemplate.update("UPDATE entradatipus SET preu=? WHERE idfestival=? AND entradatipus='festivalComplet'", precioCompleto, idFestival);
 
     }
+
+    public List<Entrada> getEntradasByFestival(int idFestival, int page, int size) {
+        int offset = page * size;
+        String sql = "SELECT * FROM entrada WHERE idfestival = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new EntradaRowMapper(), idFestival, size, offset);
+    }
+
+    public List<Entrada> getEntradasByFestivalAndTipo(int idFestival, int tipoEntrada, int page, int size) {
+        int offset = page * size;
+        String sql = "SELECT * FROM entrada WHERE idfestival = ? AND identradatipus = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new EntradaRowMapper(), idFestival, tipoEntrada, size, offset);
+    }
+
+    public int getTotalPagesByFestival(int idFestival, int size) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ?";
+        int totalEntries = jdbcTemplate.queryForObject(sql, Integer.class, idFestival);
+        return (int) Math.ceil(totalEntries / (double) size);
+    }
+
+    public int getTotalPagesByFestivalAndTipo(int idFestival, int tipoEntrada, int size) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ? AND identradatipus = ?";
+        int totalEntries = jdbcTemplate.queryForObject(sql, Integer.class, idFestival, tipoEntrada);
+        return (int) Math.ceil(totalEntries / (double) size);
+    }
+
+    public int getNumTotalEntradasFestival(int idFestival) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, idFestival);
+    }
+
+    public int getNumTotalEntradasFestivalPorTipo(int idFestival, int tipoEntrada) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE idfestival = ? AND identradatipus = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, idFestival, tipoEntrada);
+    }
+
+
+    public List<Entrada> getEntradasByUsuario(String email, int page, int size) {
+        int offset = page * size;
+        String sql = "SELECT * FROM entrada WHERE email = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new EntradaRowMapper(), email, size, offset);
+    }
+
+    public List<Entrada> getEntradasByUsuarioAndTipo(String email, int tipoEntrada, int page, int size) {
+        int offset = page * size;
+        String sql = "SELECT * FROM entrada WHERE email = ? AND identradatipus = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new EntradaRowMapper(), email, tipoEntrada, size, offset);
+    }
+
+    public int getTotalPagesByUsuario(String email, int size) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE email = ?";
+        int totalEntries = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return (int) Math.ceil(totalEntries / (double) size);
+    }
+
+    public int getTotalPagesByUsuarioAndTipo(String email, int tipoEntrada, int size) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE email = ? AND identradatipus = ?";
+        int totalEntries = jdbcTemplate.queryForObject(sql, Integer.class, email, tipoEntrada);
+        return (int) Math.ceil(totalEntries / (double) size);
+    }
+
+    public int getNumTotalEntradasUsuario(String email) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE email = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, email);
+    }
+
+    public int getNumTotalEntradasUsuarioPorTipo(String email, int tipoEntrada) {
+        String sql = "SELECT COUNT(*) FROM entrada WHERE email = ? AND identradatipus = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, email, tipoEntrada);
+    }
+
 }

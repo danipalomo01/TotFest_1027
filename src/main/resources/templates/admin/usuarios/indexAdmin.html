@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -21,22 +21,26 @@
     <ul class="menu-items">
 
       <li class="item">
-        <a href="index.html" class="submenu-item">
+        <a href="/admin/index" class="submenu-item">
           <span>Inicio</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
-
       <li class="item">
-        <a href="/login" class="submenu-item">
-          <span>Login</span>
+        <a href="/admin/usuarios/list" class="submenu-item">
+          <span>Gestionar Usuarios</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
-
       <li class="item">
         <a href="/festival/list" class="submenu-item">
           <span>Festivales</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/logout" class="submenu-item">
+          <span>Cerrar Sesión</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
@@ -47,11 +51,14 @@
 </nav>
 
 <div class="container">
+  <h1>Administrador</h1>
   <div class="div1">
-    <h1>TotFest</h1>
+    <h1>- TotFest -</h1>
   </div>
-  <div>
+  <div style="display: flex">
+    <h2>Usuario:&nbsp;</h2> <h2 th:text="${session.userName}"></h2>
   </div>
+  <h3 style="font-size 90px;">Panel de Administrador</h3>
 
 
 </div>

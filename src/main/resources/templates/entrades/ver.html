@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Ver Entrada</title>
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <style>
+        .ticket-container {
+            width: 60%;
+            top: 250px;
+            padding: 20px;
+            border: 2px dashed #333;
+            border-radius: 15px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-left: 25%;
+            margin-right: auto;
+        }
+
+        .ticket-header {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .ticket-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .ticket-info {
+            font-size: 1.2rem;
+        }
+
+        .ticket-info strong {
+            font-weight: bold;
+        }
+
+        .barcode {
+            width: 100px;
+            height: 100px;
+            background-image: url('/images/barcode.png'); /* Ruta a tu imagen de código de barras */
+            background-size: cover;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .ticket-footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 30px;
+        }
+
+        .ticket-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+  <a href="#" class="titulo">Explorar</a>
+  <div class="menu-content">
+    <ul class="menu-items">
+      <li class="item">
+        <a href="/admin/index" class="submenu-item">
+          <span>Inicio</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/admin/entradas/list" class="submenu-item">
+          <span>Gestionar Entradas</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/logout" class="submenu-item">
+          <span>Cerrar Sesión</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Simulación de una entrada -->
+<div class="ticket-container">
+  <div class="ticket-header">
+    <span style="font-weight: bold;font-size: 40px;" th:text="${entrada.entradaTipus == 1 ? 'Entrada de Día' : 'Entrada Festival Completo'}"></span>
+  </div>
+
+  <div class="ticket-section">
+    <div class="ticket-info">
+      <p><strong>Festival:</strong> <span th:text="*{festival}">Nombre del Festival</span></p>
+      <p><strong>Fecha del Evento:</strong> <span th:text="${#dates.format(entrada.data, 'dd/MM/yyyy')}">01/10/2024</span></p>
+      <p><strong>Tipo de Entrada:</strong> <span th:text="${entrada.entradaTipus}"></span></p>
+    </div>
+
+    <div class="ticket-info">
+      <p><strong>Precio:</strong> <span th:text="${entrada.preuVendaEntradaIndividual}">10.00 €</span></p>
+      <p><strong>Teléfono:</strong> <span th:text="${entrada.telefono}">123456789</span></p>
+      <p><strong>Email:</strong> <span th:text="${entrada.email}">user1@example.com</span></p>
+    </div>
+  </div>
+
+  <!-- Código de barras simulado -->
+  <div class="ticket-footer">
+    <p style="font-weight: bold;font-size: 30px;">¡Disfruta del evento!</p>
+  </div>
+
+  <img style="margin-left: 25%;margin-right: auto;height: 200px;width: 500px;" src="/images/codigobarras.png" alt="Código de barras" />
+
+</div>
+</body>
+</html>

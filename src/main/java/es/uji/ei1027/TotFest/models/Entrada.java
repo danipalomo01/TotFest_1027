@@ -11,18 +11,22 @@ public class Entrada {
     private int idFestival;
     private Date datacompra;
     private int entradaTipus;
+    private String email;
+    private String telefono;
 
     public Entrada() {
 
     }
 
-    public Entrada(int numero, BigDecimal preuVendaEntradaIndividual, Date data, int idFestival, Date datacompra, int entradaTipus) {
+    public Entrada(int numero, BigDecimal preuVendaEntradaIndividual, Date data, int idFestival, Date datacompra, int entradaTipus, String email, String telefono) {
         this.numero = numero;
         this.preuVendaEntradaIndividual = preuVendaEntradaIndividual;
         this.data = data;
         this.idFestival = idFestival;
         this.datacompra = datacompra;
         this.entradaTipus = entradaTipus;
+        this.email = email;
+        this.telefono = telefono;
     }
 
     public int getNumero() {
@@ -71,6 +75,22 @@ public class Entrada {
 
     public void setEntradaTipus(int entradaTipus) {
         this.entradaTipus = entradaTipus;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 }
 

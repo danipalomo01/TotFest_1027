@@ -119,29 +119,110 @@
 <div class="rightbar"></div>
 <nav class="sidebar">
   <a href="#" class="titulo">Explorar</a>
-  <div class="menu-content">
-    <ul class="menu-items">
-      <li class="item">
-        <a href="/index.html" class="submenu-item">
-          <span>Inicio</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
 
-      <li class="item">
-        <a href="/login" class="submenu-item">
-          <span>Login</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
+  <div th:if="${session.cif != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
 
-      <li class="item">
-        <a href="/festival/list" class="submenu-item">
-          <span>Festivales</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-    </ul>
+        <li class="item">
+          <a href="/gestorFestival/indexGF" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/gestorFestival/list" class="submenu-item">
+            <span>Gestionar Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <div th:if="${session.idComercial != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a href="/responsableContratacion/indexRC" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/responsablecontratacion/contracteartista/list" class="submenu-item">
+            <span>Gestionar Contratos</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/responsablecontratacion/artista/list" class="submenu-item">
+            <span>Gestionar Artistas</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div th:if="${session.idComercial == null and session.cif == null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a th:href="@{/}" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <div th:if="${session.idUsuario == null}">
+          <li class="item">
+            <a href="/register" class="submenu-item">
+              <span>Registrarse</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+          <li class="item">
+            <a href="/login" class="submenu-item">
+              <span>Login</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </div>
+        <div th:if="${session.idUsuario != null}">
+          <li class="item">
+            <a th:href="@{/compra-entradas/listUsuario/{idUsuario}(idUsuario=${#session.getAttribute('idUsuario')})}" class="submenu-item">
+              <span>Ver Mis Entradas</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </div>
+      </ul>
+    </div>
   </div>
 </nav>
 <div class="container" style="height: 100vh;">
@@ -151,18 +232,18 @@
     </div>
     <div style="background-color: #B1EDF7; padding: 20px; margin-bottom: 20px; border-radius: 8px; margin: 10px 0; font-size: 16px; margin-top: 25px;">
 
-      <div style="display: flex; justify-content: center">
-        <form style="margin-right: 30%" method="get" action="/festival/list">
-          <div class="form-group" style="margin-top: 15px">
-            <label for="size">Festivales por página:</label>
-            <select name="size" id="size">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+      <div style="display: flex; justify-content: center; margin-top: 15px">
+        <form style="margin-right: 30%" method="get" th:action="@{/festival/list}">
+          <label style="padding-top: 3%" for="size">Festivales por página:</label>
+          <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
+            <option th:value="5" th:selected="${size == 5}">5</option>
+            <option th:value="10" th:selected="${size == 10}">10</option>
+            <option th:value="20" th:selected="${size == 20}">20</option>
+            <option th:value="50" th:selected="${size == 50}">50</option>
+          </select>
+          <input type="hidden" name="page" th:value="${currentPage}" />
         </form>
+
         <div class="dropdown">
           <button class="btn btn-info">
             <i class="fas fa-filter"></i> Filtros
@@ -219,15 +300,37 @@
                 <span th:text="${festival.aforamentMaxim}" style="text-transform: capitalize;"></span><span>&nbsp;personas</span>
               </div>
 
+              <div class="field">
+                <label><strong>Precio de un día:</strong></label>
+                <span th:text="${festivalesPrecios[festival.idFestival].get(0)}" style="text-transform: capitalize;"></span>
+                <span>&nbsp;€</span>
+              </div>
+
+              <div class="field">
+                <label><strong>Precio del festival completo:</strong></label>
+                <span th:text="${festivalesPrecios[festival.idFestival].get(1)}" style="text-transform: capitalize;"></span>
+                <span>&nbsp;€</span>
+              </div>
+
+              <p th:if="${festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0}" style="font-weight: bold; margin-right: 25px; text-align: right; margin-top: 10px; text-decoration: underline">Comprar entradas</p>
 
               <div style="display: flex">
                   <div class="buttons-wrapper">
-                    <a style="font-weight: bold;" th:href="@{/festival/info/{id}(id=${festival.idFestival})}" class="btn btn-warning" role="button">Ver Actuaciones</a>
+                    <a style="font-weight: bold;" th:href="@{/festival/info/{id}(id=${festival.idFestival})}" class="btn btn-warning" role="button">Actuaciones</a>
                   </div>
 
-                  <div class="buttons-wrapper"
-                       th:if="${festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda'}">
-                    <strong><a style="font-weight: bold;" th:href="@{/compra-entradas/compra/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Comprar Entradas</a></strong>
+                  <div style="margin-left: 30px" class="buttons-wrapper"
+                       th:if="${(festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda') and (session.idComercial == null and session.cif == null)}">
+
+                    <p th:unless="${festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0}" style="font-weight: bold; margin-bottom: 25px; text-align: right; text-decoration: underline; color: red">Entradas agotadas</p>
+
+                    <strong th:if="${festivalesPrecios[festival.idFestival][2] > 0}">
+                      <a style="font-weight: bold;" th:href="@{/compra-entradas/compraDia/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Dia</a>
+                    </strong>
+
+                    <strong th:if="${festivalesPrecios[festival.idFestival][3] > 0}">
+                      <a style="font-weight: bold;" th:href="@{/compra-entradas/compraCompleto/{id}(id=${festival.idFestival})}" class="btn btn-success" role="button">Completo</a>
+                    </strong>
                   </div>
               </div>
 
@@ -235,19 +338,30 @@
             </div>
           </div>
 
+        <div th:unless="${#lists.isEmpty(festivales)}" style="float: right">
+          <p>Mostrando <span th:text="${size * (currentPage)}"></span> -
+            <span th:text="${( (currentPage + 1)   != null ? page : 1) == 1 ? #lists.size(festivales) : (size * currentPage) + #lists.size(festivales)}"></span>
+            de
+            <span th:text="${totalElems}"></span>
+            elementos
+          </p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(festivales)}">
           <nav aria-label="Page navigation example" style="margin-top: 30px">
             <ul class="pagination justify-content-center">
               <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
+                <a class="page-link" th:href="@{/festival/list(page=${currentPage - 1}, size=${size})}" tabindex="-1" aria-disabled="true">Anterior</a>
               </li>
               <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-                <a class="page-link" th:href="@{/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/festival/list(page=${i}, size=${size})}" th:text="${i + 1}"></a>
               </li>
               <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+                <a class="page-link" th:href="@{/festival/list(page=${currentPage + 1}, size=${size})}">Siguiente</a>
               </li>
             </ul>
           </nav>
+        </div>
       </div>
     </div>
 

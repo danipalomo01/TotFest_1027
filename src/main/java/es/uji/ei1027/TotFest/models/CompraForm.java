@@ -7,8 +7,8 @@ import java.util.List;
 
 public class CompraForm {
     private int idFestival;
-    public EntradaTipusEnum tipusEntrada;
-    private List<Date> listaFechas = new ArrayList<>();
+    public String entradatipus;
+    private Date fecha;
     private int numEntrades;
     private String email;
     private String telefon;
@@ -22,26 +22,24 @@ public class CompraForm {
         this.idFestival = idFestival;
     }
 
-
-
     public int getNumEntrades() {
         return numEntrades;
     }
 
-    public EntradaTipusEnum getTipusEntrada() {
-        return tipusEntrada;
+    public String getEntradatipus() {
+        return entradatipus;
     }
 
-    public void setTipusEntrada(EntradaTipusEnum tipusEntrada) {
-        this.tipusEntrada = tipusEntrada;
+    public void setEntradatipus(String entradatipus) {
+        this.entradatipus = entradatipus;
     }
 
-    public List<Date> getListaFechas() {
-        return listaFechas;
+    public Date getFecha() {
+        return fecha;
     }
 
-    public void setListaFechas(List<Date> listaFechas) {
-        this.listaFechas = listaFechas;
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public void setNumEntrades(int numEntrades) {

@@ -1,22 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Compra Exitosa</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .custom-modal {
+      display: block;
+      position: fixed;
+      z-index: 1050;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      outline: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .custom-modal-dialog {
+      position: relative;
+      margin: 10% auto;
+      max-width: 500px;
+    }
+    .custom-modal-content {
+      background-color: #C3F892;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 0.3rem;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    }
+    .custom-modal-header,
+    .custom-modal-body,
+    .custom-modal-footer {
+      padding: 1rem;
+    }
+    .custom-modal-header {
+      border-bottom: 1px solid #dee2e6;
+    }
+    .custom-modal-footer {
+      border-top: 1px solid #dee2e6;
+      text-align: right;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-  <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" style="margin-top: 40%; margin-left: 15%;background-color: #C3F892">
-        <div class="modal-header">
-          <h5 class="modal-title" id="successModalLabel">Compra Exitosa</h5>
+  <div class="custom-modal">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-content">
+        <div class="custom-modal-header">
+          <h5 class="custom-modal-title">Compra Exitosa</h5>
         </div>
-        <div class="modal-body">
+        <div class="custom-modal-body">
           <p><strong>¡Tu compra se ha realizado con éxito! Se ha enviado un correo electrónico a <span th:text="${emailUltimaCompra}"></span> con los detalles de la compra.</strong></p>
         </div>
-        <div class="modal-footer">
+        <div class="custom-modal-footer">
           <button type="button" class="btn btn-primary" onclick="window.location.href='/festival/list'">Volver</button>
         </div>
       </div>
@@ -28,11 +65,5 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        $('#successModal').modal('show');
-    });
-</script>
 </body>
 </html>

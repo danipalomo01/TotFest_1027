@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Añadir Actuación</title>
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
+  <style>
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar">
+  <a href="#" class="titulo">Explorar</a>
+  <div class="menu-content">
+    <ul class="menu-items">
+      <li class="item">
+        <a href="/responsableContratacion/indexRC" class="submenu-item">
+          <span>Inicio</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/responsablecontratacion/contracteartista/list" class="submenu-item">
+          <span>Gestionar Contratos</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/responsablecontratacion/artista/list" class="submenu-item">
+          <span>Gestionar Artistas</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/festival/list" class="submenu-item">
+          <span>Festivales</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
+        <a href="/logout" class="submenu-item">
+          <span>Cerrar Sesión</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="content">
+  <form class="form" th:action="@{/responsablecontratacion/actuaciones/add}" th:object="${actuacioForm}" method="POST" novalidate>
+    <h1 style="font-size: 40px">Añadir actuación a <span th:text="${nombreArtista}"></span></h1>
+
+    <div>
+      <div style="display:flex; margin-top: 50px">
+        <div class="form-group" style="margin-left: auto; margin-right: auto; margin-bottom: 40px; font-size: 16px">
+          <label for="festival">Seleccionar Festival</label>
+          <select style="height: 40px;width: 160px; font-size: 15px; text-align: center;" class="form-control" id="festival" th:field="*{idFestival}" required>
+            <option th:each="festival : ${festivales}"
+                    th:value="${festival.idFestival}"
+                    th:text="${festival.nom}"
+                    th:attr="data-inici=${festival.dataInici}, data-fi=${festival.dataFi}">
+            </option>
+          </select>
+        </div>
+
+        <input type="hidden" th:field="*{idArtista}" />
+        <input type="hidden" th:field="*{idContracte}" />
+        <input type="hidden" th:field="*{idActuacio}" />
+
+        <!-- Campo para la fecha de la actuación -->
+        <div class="form-group" style="margin-right: auto">
+          <label for="data">Fecha de la Actuación</label>
+          <input style="width: 160px" type="date" class="form-control" id="data" th:field="*{data}" th:min="${#dates.format(inicioContrato, 'yyyy-MM-dd')}" th:max="${#dates.format(finContrato, 'yyyy-MM-dd')}" required/>
+          <div style="max-width: 150px;" th:if="${#fields.hasErrors('data')}" th:errors="*{data}" class="error-message"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <!-- Campo para la hora de inicio -->
+        <div class="form-group">
+          <label for="horaInici">Hora de Inicio</label>
+          <input style="height: 40px; width: 100px; font-size: 15px; text-align: center;" type="time" class="form-control" id="horaInici" th:field="*{horaInici}" required/>
+          <div style="max-width: 100px;text-align: center;margin-left: 25px;" th:if="${#fields.hasErrors('horaInici')}" th:errors="*{horaInici}" class="error-message"></div>
+        </div>
+
+        <!-- Campo para la hora de finalización -->
+        <div class="form-group">
+          <label for="horaFiPrevista">Hora de Fin Prevista</label>
+          <input style="height: 40px; width: 100px; font-size: 15px; text-align: center;" type="time" class="form-control" id="horaFiPrevista" th:field="*{horaFiPrevista}" required/>
+          <div style="max-width: 100px;text-align: center;margin-left: 25px;" th:if="${#fields.hasErrors('horaFiPrevista')}" th:errors="*{horaFiPrevista}" class="error-message"></div>
+        </div>
+      </div>
+
+      <!-- Campo para el precio del contrato -->
+      <div class="form-group">
+        <label for="preuContracteActuacio">Precio del Contrato de la Actuación</label>
+        <input style="height: 40px; width: 100px; font-size: 15px; text-align: center;" type="number" step="10.00" class="form-control" id="preuContracteActuacio" th:field="*{preuContracteActuacio}" required min="0"/>
+        <div th:if="${#fields.hasErrors('preuContracteActuacio')}" th:errors="*{preuContracteActuacio}" class="error-message"></div>
+      </div>
+
+      <!-- Campo para comentarios -->
+      <div class="form-group" style="margin-left: auto; margin-right: auto;margin-bottom: 0; width: 350px">
+        <label for="comentaris">Comentarios</label>
+        <textarea style="height: 50px; max-height: 150px" class="form-control" id="comentaris" th:field="*{comentaris}" maxlength="500"></textarea>
+        <div th:if="${#fields.hasErrors('comentaris')}" th:errors="*{comentaris}" class="error-message"></div>
+      </div>
+
+      <!-- Botón para enviar el formulario -->
+      <div class="form-group">
+        <button type="submit" class="button">Añadir Actuación</button>
+      </div>
+    </div>
+  </form>
+</div>
+</body>
+</html>

@@ -43,7 +43,8 @@ public class GFContracteArtistaController {
     @RequestMapping("/list")
     public String listContractesArtistes(HttpSession session,
                                          @RequestParam(value = "page", defaultValue = "0") int page,
-                                         @RequestParam(value = "size", defaultValue = "1") int size,
+                                         @RequestParam(value = "size", defaultValue = "5") int size,
+                                         @RequestParam(value = "idArtista", required = false) Integer idArtista,
                                          Model model) {
 
 
@@ -51,36 +52,41 @@ public class GFContracteArtistaController {
             return "redirect:/login";
         }
 
-        session.setAttribute("solapamiento", "false");
-        if (session.getAttribute("size") != null && size == 1) {
-            size = (int) session.getAttribute("size");
-        } else {
-            session.setAttribute("size", size);
+        try {
+            session.setAttribute("solapamiento", null);
+            if (session.getAttribute("size") != null && size == 1) {
+                size = (int) session.getAttribute("size");
+            } else {
+                session.setAttribute("size", size);
+            }
+
+            if (session.getAttribute("mensajeConfirmacionContrato") != null && session.getAttribute("mensajeConfirmacionContrato") != "nada") {
+                model.addAttribute("mensajeConfirmacionContrato", session.getAttribute("mensajeConfirmacionContrato"));
+                session.setAttribute("mensajeConfirmacionContrato", "nada");
+            } else {
+                model.addAttribute("mensajeConfirmacionContrato", "nada");
+            }
+
+            List<ContracteArtista> contractesArtistes = contracteArtistaDao.getContractesArtistes(page, size);
+
+            int totalContracts = contracteArtistaDao.getContractesArtistes().size();
+            int totalPages = (int) Math.ceil((double) totalContracts / size);
+
+            contractesArtistes.sort(Comparator.comparingInt(ContracteArtista::getIdContracte));
+
+            model.addAttribute("contratos", contractesArtistes);
+            model.addAttribute("artistas", artistaDao.getArtistaGrups());
+            model.addAttribute("festivales", festivalDao.getFestivals());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("size", size);
+            model.addAttribute("totalElems", contracteArtistaDao.getContractesArtistes().size());
+
+            return "responsablecontratacion/contracteartista/list";
+        }  catch (Exception e){
+            model.addAttribute("mensajeError", "No se han podido obtener los contratos, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
         }
-
-        if (session.getAttribute("mensajeConfirmacionContrato") != null && session.getAttribute("mensajeConfirmacionContrato") != "nada") {
-            model.addAttribute("mensajeConfirmacionContrato", session.getAttribute("mensajeConfirmacionContrato"));
-            session.setAttribute("mensajeConfirmacionContrato", "nada");
-        } else {
-            model.addAttribute("mensajeConfirmacionContrato", "nada");
-        }
-
-
-        List<ContracteArtista> contractesArtistes = contracteArtistaDao.getContractesArtistes(page, size);
-        int totalContracts = contracteArtistaDao.getContractesArtistes().size();
-        int totalPages = (int) Math.ceil((double) totalContracts / size);
-
-        contractesArtistes.sort(Comparator.comparingInt(ContracteArtista::getIdContracte));
-
-
-        model.addAttribute("contratos", contractesArtistes);
-        model.addAttribute("artistas", artistaDao.getArtistaGrups());
-        model.addAttribute("festivales", festivalDao.getFestivals());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", size);
-
-        return "responsablecontratacion/contracteartista/list";
     }
 
     @RequestMapping("/add")
@@ -91,7 +97,9 @@ public class GFContracteArtistaController {
         ContracteArtista contracteArtista = new ContracteArtista();
         contracteArtista.setDataInici(Date.valueOf(LocalDate.now()));
         contracteArtista.setDataFi(Date.valueOf(LocalDate.now()));
-        model.addAttribute("contratoNuevo", new ContracteArtista());
+        contracteArtista.setImportContracte(BigDecimal.ZERO);
+        contracteArtista.setNumActuacionsAny(1);
+        model.addAttribute("contratoNuevo", contracteArtista);
         model.addAttribute("artistas", artistaDao.getArtistaGrups());
 
         return "responsablecontratacion/contracteartista/add";
@@ -104,24 +112,30 @@ public class GFContracteArtistaController {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
-        validarAddContratoArtista(contracteArtista, bindingResult);
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("artistas", artistaDao.getArtistaGrups());
-            return "responsablecontratacion/contracteartista/add";
-        }
         try {
-            contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
-            contracteArtistaDao.addContracteArtista(contracteArtista);
-            session.setAttribute("mensajeConfirmacionContrato", " añadido ");
+            validarAddContratoArtista(contracteArtista, bindingResult);
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("artistas", artistaDao.getArtistaGrups());
+                return "responsablecontratacion/contracteartista/add";
+            }
+            try {
+                contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
+                contracteArtistaDao.addContracteArtista(contracteArtista);
+                session.setAttribute("mensajeConfirmacionContrato", " añadido ");
 
-        } catch (DuplicateKeyException e) {
-            bindingResult.rejectValue("idContracte", "duplicate", "Este ID de contrato ya existe");
-            return "responsablecontratacion/contracteartista/add";
-        } catch (DataAccessException e) {
-            bindingResult.reject("database", "Error de acceso a datos");
-            return "responsablecontratacion/contracteartista/add";
+            } catch (DuplicateKeyException e) {
+                bindingResult.rejectValue("idContracte", "duplicate", "Este ID de contrato ya existe");
+                return "responsablecontratacion/contracteartista/add";
+            } catch (DataAccessException e) {
+                bindingResult.reject("database", "Error de acceso a datos");
+                return "responsablecontratacion/contracteartista/add";
+            }
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha añadido correctamente el contrato");
+            return "responsableContratacion/contracteArtista/exito";
+        }  catch (Exception e){
+            model.addAttribute("mensajeError", "No se ha podido añadir el contrato, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
         }
-        return "redirect:list";
     }
 
     @RequestMapping(value = "/update/{idContracte}", method = RequestMethod.GET)
@@ -131,6 +145,9 @@ public class GFContracteArtistaController {
         }
         model.addAttribute("artistas", artistaDao.getArtistaGrups());
         model.addAttribute("contracteArtista", contracteArtistaDao.getContracteArtista(idContracte));
+        ContracteArtista contracteArtista = contracteArtistaDao.getContracteArtista(idContracte);
+        ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
+        model.addAttribute("nombreArtista", artistaGrup.getNom());
         session.setAttribute("lastContratoUpdate", idContracte);
         return "responsablecontratacion/contracteartista/update";
     }
@@ -142,32 +159,70 @@ public class GFContracteArtistaController {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
-        validarAddContratoArtista(contracteArtista, bindingResult);
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("artistas", artistaDao.getArtistaGrups());
-            return "responsablecontratacion/contracteartista/update";
-        }
         try {
-            contracteArtista.setIdContracte(Integer.parseInt(session.getAttribute("lastContratoUpdate").toString()));
-            contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
-            contracteArtistaDao.updateContracteArtista(contracteArtista);
-            session.setAttribute("mensajeConfirmacionContrato", " editado ");
+            validarAddContratoArtista(contracteArtista, bindingResult);
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("artistas", artistaDao.getArtistaGrups());
+                return "responsablecontratacion/contracteartista/update";
+            }
+            try {
+                contracteArtista.setIdContracte(Integer.parseInt(session.getAttribute("lastContratoUpdate").toString()));
+                contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
+                contracteArtistaDao.updateContracteArtista(contracteArtista);
+                session.setAttribute("mensajeConfirmacionContrato", " editado ");
 
-        } catch (Exception e) {
-            return "responsablecontratacion/contracteartista/update";
+            } catch (Exception e) {
+                return "responsablecontratacion/contracteartista/update";
+            }
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha editado correctamente el contrato");
+            return "responsableContratacion/contracteArtista/exito";
+        }  catch (Exception e){
+            model.addAttribute("mensajeError", "No se ha podido editar el contrato, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
         }
-        return "redirect:list";
     }
 
     @RequestMapping(value = "/delete/{idContracte}")
-    public String processDelete(HttpSession session, @PathVariable int idContracte) {
+    public String processDelete(HttpSession session, @PathVariable int idContracte, Model model) {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
             return "redirect:/login";
         }
-        contracteArtistaDao.deleteContracteArtista(idContracte);
-        session.setAttribute("mensajeConfirmacionContrato", " eliminado ");
+        try {
+            contracteArtistaDao.deleteContracteArtista(idContracte);
+            session.setAttribute("mensajeConfirmacionContrato", " eliminado ");
 
-        return "redirect:/responsablecontratacion/contracteartista/list";
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha eliminado correctamente el contrato");
+            return "responsableContratacion/contracteArtista/exito";
+
+        }  catch (Exception e){
+            model.addAttribute("mensajeError", "No se ha podido eliminar el contrato, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
+    }
+
+    @RequestMapping(value = "/delete-selected")
+    public String processDeleteSelected(HttpSession session, @RequestParam(value = "selectedContracts", required = false) List<Integer> selectedContracts, @RequestParam(value = "idArtista") Integer idArtista, Model model) {
+        if (session == null || session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            if (selectedContracts == null || selectedContracts.isEmpty()) {
+
+                return "redirect:/responsablecontratacion/artista/list/" + idArtista;
+            }
+
+            for (Integer selectedContract : selectedContracts) {
+                contracteArtistaDao.deleteContracteArtista(selectedContract);
+            }
+            session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
+
+            model.addAttribute("mensajeConfirmacionArtista", "Se han eliminado correctamente los contratos seleccionados");
+            return "redirect:/responsablecontratacion/artista/list/" + idArtista;
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se han podido eliminar los contratos, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
     }
 
     private void validarAddContratoArtista(ContracteArtista contrato, BindingResult bindingResult) {
@@ -190,14 +245,14 @@ public class GFContracteArtistaController {
             }
         }
 
+        if (contrato.getNumActuacionsAny() < 1) {
+            bindingResult.rejectValue("numActuacionsAny", "error.numActuacionsAny", "El contrato deber tener mínimo una actuación");
+        }
+
         if (contrato.getCondicionsDescriptiu() == null || contrato.getCondicionsDescriptiu().trim().isEmpty()) {
             bindingResult.rejectValue("condicionsDescriptiu", "error.condicionsDescriptiu", "Las condiciones descriptivas son requeridas.");
         } else if (contrato.getCondicionsDescriptiu().length() > 500) {
             bindingResult.rejectValue("condicionsDescriptiu", "error.condicionsDescriptiu", "Las condiciones descriptivas no pueden exceder los 500 caracteres.");
-        }
-
-        if (contrato.getNumActuacionsAny() <= 0) {
-            bindingResult.rejectValue("numActuacionsAny", "error.numActuacionsAny", "El número de actuaciones por año debe ser mayor que 0.");
         }
 
         if (contrato.getImportContracte() == null || contrato.getImportContracte().compareTo(BigDecimal.ZERO) <= 0) {

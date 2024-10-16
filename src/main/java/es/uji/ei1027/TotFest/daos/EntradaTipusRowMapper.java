@@ -17,7 +17,6 @@ public class EntradaTipusRowMapper implements RowMapper<EntradaTipus> {
         entradaTipus.setPreu(rs.getBigDecimal("preu"));
         entradaTipus.setDescripcio(rs.getString("descripcio"));
         entradaTipus.setNombreMaxim(rs.getInt("nombreMaxim"));
-        entradaTipus.setNombreVendes(rs.getInt("nombreVendes"));
         entradaTipus.setDataPerTipusDia(rs.getDate("dataPerTipusDia"));
         entradaTipus.setPercentatgeMaximAforament(rs.getBigDecimal("percentatgeMaximAforament"));
         return entradaTipus;

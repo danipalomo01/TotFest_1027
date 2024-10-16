@@ -53,6 +53,7 @@ public class GFFestivalController {
                                Model model) {
 
 
+
         if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
@@ -70,19 +71,25 @@ public class GFFestivalController {
             model.addAttribute("mensajeConfirmacionFestival", "nada");
         }
 
-        List<Festival> festivalesTotales = festivalDao.getFestivals();
-        int offset = page * size;
-        List<Festival> festivales = festivalDao.getFestivals(size, offset);
-        int totalfestivales = festivalesTotales.size();
-        int totalPages = (int) Math.ceil((double) totalfestivales / size);
+        try {
+            List<Festival> festivalesTotales = festivalDao.getFestivals();
+            int offset = page * size;
+            List<Festival> festivales = festivalDao.getFestivals(size, offset);
+            int totalfestivales = festivalesTotales.size();
+            int totalPages = (int) Math.ceil((double) totalfestivales / size);
 
-        model.addAttribute("festivales", festivales);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("size", size);
+            model.addAttribute("festivales", festivales);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("size", size);
+            model.addAttribute("totalElems", festivalDao.getFestivals().size());
+            return "gestorFestival/list";
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se han podido listar los festivales, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
 
-        return "gestorFestival/list";
     }
 
     public List<String> getNombreArtistasDeFestival(int idFestival) {
@@ -100,10 +107,10 @@ public class GFFestivalController {
             return "redirect:/login";
         }
         FestivalForm festivalForm = new FestivalForm();
-        festivalForm.setDataInici(Date.valueOf(LocalDate.of(2024,1,1)));
-        festivalForm.setDataFi(Date.valueOf(LocalDate.of(2024,1,1)));
-        festivalForm.setDataIniciPublicacio(Date.valueOf(LocalDate.of(2024,1,1)));
-        festivalForm.setDataIniciVenda(Date.valueOf(LocalDate.of(2024,1,1)));
+        festivalForm.setDataInici(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataFi(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataIniciPublicacio(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataIniciVenda(Date.valueOf(LocalDate.now()));
         festivalForm.setAnyo(2024);
         model.addAttribute("festival", festivalForm);
         return "gestorFestival/add";
@@ -112,7 +119,7 @@ public class GFFestivalController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String processAddSubmit(
             @ModelAttribute("festival") FestivalForm festivalForm,
-            BindingResult bindingResult, HttpSession session) {
+            BindingResult bindingResult, HttpSession session ,Model model) {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
@@ -135,8 +142,7 @@ public class GFFestivalController {
                 festivalForm.getPublicEnfocat(),
                 festivalForm.getRequisitMinimEdat(),
                 festivalForm.getDataIniciPublicacio(),
-                festivalForm.getDataIniciVenda(),
-                festivalForm.getNumEntradasVendidas()
+                festivalForm.getDataIniciVenda()
         );
 
         validarAddHtml(festival, bindingResult);
@@ -145,28 +151,23 @@ public class GFFestivalController {
             return "gestorFestival/add";
         }
 
-
         try {
 
             festivalDao.addFestival(festival, session);
 
-            EntradaTipus entradaTipusDia = new EntradaTipus(EntradaTipusEnum.dia, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioDia()), "", festivalForm.getAforamentMaxim()/10, 0, null, null );
-            EntradaTipus entradaTipusCompleto = new EntradaTipus(EntradaTipusEnum.festivalComplet, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioFestivalCompleto()), "", festivalForm.getAforamentMaxim(), 0, null, null );
+            EntradaTipus entradaTipusDia = new EntradaTipus(EntradaTipusEnum.dia, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioDia()), "", festivalForm.getAforamentMaxim()/10, null, null );
+            EntradaTipus entradaTipusCompleto = new EntradaTipus(EntradaTipusEnum.festivalComplet, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioFestivalCompleto()), "", festivalForm.getAforamentMaxim(), null, null );
 
             entradaDao.addEntradaTipus(entradaTipusCompleto);
             entradaDao.addEntradaTipus(entradaTipusDia);
             session.setAttribute("mensajeConfirmacionFestival", " añadido ");
 
-            return "redirect:/gestorFestival/list";
-        } catch (DuplicateKeyException e) {
-            // Manejar la excepción de clave duplicada si es necesario
-        } catch (DataAccessException e) {
-            // Manejar la excepción de acceso a datos si es necesario
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha añadido correctamente el festival");
+            return "gestorFestival/exito";
         } catch (Exception e) {
-            // Manejar otras excepciones no esperadas si es necesario
+            model.addAttribute("mensajeError", "No se ha podido añadir el festival a la base de datos");
+            return "error.html";
         }
-
-        return "redirect:/gestorFestival/list";
     }
 
     public void validarAddHtml(Festival festival, BindingResult bindingResult) {
@@ -235,12 +236,13 @@ public class GFFestivalController {
 
         session.setAttribute("lastFestivalUpdate", idFestival);
         return "gestorFestival/update";
+
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String processUpdateSubmit(HttpSession session,
             @ModelAttribute("festivalEntradas") FestivalEntradas festivalEntradas,
-            BindingResult bindingResult) {
+            BindingResult bindingResult, Model model) {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
@@ -248,25 +250,62 @@ public class GFFestivalController {
         if (bindingResult.hasErrors()) {
             return "gestorFestival/update";
         }
-        Festival festival = festivalEntradas.getFestival();
-        festival.setIdFestival(Integer.parseInt(session.getAttribute("lastFestivalUpdate").toString()));
-        festival.setCifPromotor(session.getAttribute("cif").toString());
-        festivalDao.updateFestival(festival);
-        entradaDao.updatePrecioEntradaTipus(festival.getIdFestival(), festivalEntradas.getPreuDia(), festivalEntradas.getPreuComplet());
-        session.setAttribute("mensajeConfirmacionFestival", " editado ");
+        try {
+            Festival festival = festivalEntradas.getFestival();
+            festival.setIdFestival(Integer.parseInt(session.getAttribute("lastFestivalUpdate").toString()));
+            festival.setCifPromotor(session.getAttribute("cif").toString());
+            festivalDao.updateFestival(festival);
+            entradaDao.updatePrecioEntradaTipus(festival.getIdFestival(), festivalEntradas.getPreuDia(), festivalEntradas.getPreuComplet());
+            session.setAttribute("mensajeConfirmacionFestival", " editado ");
 
-        return "redirect:list";
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha editado correctamente el festival");
+            return "gestorFestival/exito";
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se ha podido editar el festival, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
     }
 
     @RequestMapping(value = "/delete/{idFestival}")
-    public String processDelete(HttpSession session, @PathVariable int idFestival) {
+    public String processDelete(HttpSession session, @PathVariable int idFestival, Model model) {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
         }
-        festivalDao.deleteFestival(idFestival);
-        session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
+        try {
+            festivalDao.deleteFestival(idFestival);
+            session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
 
-        return "redirect:/gestorFestival/list";
+            model.addAttribute("mensajeConfirmacionArtista", "Se ha eliminado correctamente el festival");
+            return "gestorFestival/exito";
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se ha podido eliminar el festival, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
+    }
+
+    @RequestMapping(value = "/delete-selected")
+    public String processDeleteSelected(HttpSession session, @RequestParam(value = "selectedFestivals", required = false) List<Integer> selectedFestivals , Model model) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
+            return "redirect:/login";
+        }
+
+        try {
+
+            if (selectedFestivals == null || selectedFestivals.isEmpty()) {
+                return "redirect:/gestorFestival/list"; // Redirige a la misma página con el mensaje
+            }
+
+            for (Integer selectedFestival : selectedFestivals) {
+                festivalDao.deleteFestival(selectedFestival);
+            }
+            session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
+
+            model.addAttribute("mensajeConfirmacionArtista", "Se han eliminado correctamente los festivales seleccionados");
+            return "gestorFestival/exito";
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se han podido eliminar los festivales, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
     }
 
     public static void validateFestival(Festival festival, BindingResult bindingResult) {

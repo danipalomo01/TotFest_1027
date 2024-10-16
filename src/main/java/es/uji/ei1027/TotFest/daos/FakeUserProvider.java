@@ -40,8 +40,9 @@ public class FakeUserProvider implements UserDao {
     @Override
     public UserDetails loadUserByUsername(String username, String password) {
         UserDetails user = knownUsers.get(username.trim());
-        if (user == null)
+        if (user == null) {
             return null; // Usuario no encontrado
+        }
 
         BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
         if (passwordEncryptor.checkPassword(password, user.getPassword())) {

@@ -68,29 +68,107 @@
 <div class="rightbar"></div>
 <nav class="sidebar">
   <a href="#" class="titulo">Explorar</a>
-  <div class="menu-content">
-    <ul class="menu-items">
-      <li class="item">
-        <a href="/index.html" class="submenu-item">
-          <span>Inicio</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
+  <div th:if="${session.cif != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
 
-      <li class="item">
-        <a href="/login" class="submenu-item">
-          <span>Login</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
+        <li class="item">
+          <a href="/gestorFestival/indexGF" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/register" class="submenu-item">
+            <span>Registrarse</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/gestorFestival/list" class="submenu-item">
+            <span>Gestionar Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
 
-      <li class="item">
-        <a href="/festival/list" class="submenu-item">
-          <span>Festivales</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-    </ul>
+      </ul>
+    </div>
+  </div>
+
+  <div th:if="${session.idComercial != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a href="/responsableContratacion/indexRC" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/responsablecontratacion/contracteartista/list" class="submenu-item">
+            <span>Gestionar Contratos</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/responsablecontratacion/artista/list" class="submenu-item">
+            <span>Gestionar Artistas</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div th:if="${session.idComercial == null and session.cif == null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a href="/" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+        <li class="item">
+          <a href="/login" class="submenu-item">
+            <span>Login</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 <div class="container" style="height: 100vh">
@@ -118,7 +196,7 @@
           <p style="color: red; text-align:center; font-size: 25px"><strong>Aún no hay actuaciones confirmadas para este festival</strong></p>
         </div>
         <div th:unless="${#maps.isEmpty(actuaciones)}">
-           <h2 style="align-items:center; text-align:center; margin-top: 20 px; font-family: 'Poppins', sans-serif; text-decoration: underline;">-&nbsp;&nbsp;&nbsp;ACTUACIONES CONFIRMADAS&nbsp;&nbsp;-</h2>
+           <h2 style="align-items:center; text-align:center; margin-top: 20 px; font-family: 'Poppins', sans-serif; ">-&nbsp;&nbsp;&nbsp;ACTUACIONES CONFIRMADAS&nbsp;&nbsp;-</h2>
         </div>
 
         <div style="margin-top: 30px" th:if="${!#maps.isEmpty(actuaciones)}">
@@ -153,6 +231,5 @@
 
   </div>
 </div>
-<p class="footer">Universitat Jaume I Av. Vicent Sos Baynat, 12071 Castelló de la Plana, España Tel.: +34 964 72 80 00</p>
 </body>
 </html>

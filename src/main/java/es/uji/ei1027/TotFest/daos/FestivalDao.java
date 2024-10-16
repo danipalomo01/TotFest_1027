@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class FestivalDao {
@@ -36,13 +37,13 @@ public class FestivalDao {
         festival.setIdFestival(nextId);
         updateFestivalState(festival);
         festival.setCifPromotor(session.getAttribute("cif").toString());
-        jdbcTemplate.update("INSERT INTO festival VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO festival VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 festival.getIdFestival(), festival.getCifPromotor(), festival.getNom(), festival.getAnyo(),
                 festival.getDataInici(), festival.getDataFi(), festival.getEstatFestival().name(),
                 festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
                 festival.getPublicEnfocat(), festival.getRequisitMinimEdat(), festival.getDataIniciPublicacio(),
-                festival.getDataIniciVenda(), 0);
+                festival.getDataIniciVenda());
     }
 
     public void deleteFestival(int idFestival) {
@@ -62,12 +63,7 @@ public class FestivalDao {
                 festival.getEstatFestival().name(), festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
                 festival.getPublicEnfocat(), festival.getRequisitMinimEdat(), festival.getDataIniciPublicacio(), festival.getDataIniciVenda(),
-                festival.getNumEntradasVendidas(), festival.getIdFestival());
-    }
-
-    public int getNumEntradasVendidas(int idFestival) {
-        Festival festival = jdbcTemplate.query("SELECT num_entradas_vendidas FROM Festival WHERE idfestival = ?", new FestivalRowMapper(), idFestival).get(0);
-        return festival.getNumEntradasVendidas();
+                festival.getIdFestival());
     }
 
     public void updateFestivalState(Festival festival) {
@@ -89,8 +85,29 @@ public class FestivalDao {
         } else {
             festival.setEstatFestival(EstatFestivalEnum.enPreparacio);
         }
+
+        String sql = "UPDATE festival SET estatfestival = ? WHERE idfestival = ?";
+        jdbcTemplate.update(sql, festival.getEstatFestival().name(), festival.getIdFestival());
     }
 
+
+    public int getPrecioEntradaDia(int idFestival) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 'dia'", Integer.class, idFestival);
+            // List<Actuacio> actuaciones = jdbcTemplate.queryForObject("select * from actuacio where idactuacio")
+        } catch (EmptyResultDataAccessException e) {
+            return -1;
+        }
+    }
+
+    public int getPrecioEntradaCompleto(int idFestival) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 'festivalComplet'", Integer.class, idFestival);
+            // List<Actuacio> actuaciones = jdbcTemplate.queryForObject("select * from actuacio where idactuacio")
+        } catch (EmptyResultDataAccessException e) {
+            return -1;
+        }
+    }
 
     public List<Actuacio> getActuacionesFestival(int idFestival) {
         try {
@@ -103,6 +120,10 @@ public class FestivalDao {
 
     public List<Festival> getFestivals() {
         try {
+            String sql = "SELECT current_database(), inet_server_addr();";
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql);
+            System.out.println("Base de datos actual: " + result.get("current_database"));
+            System.out.println("Dirección IP del servidor: " + result.get("inet_server_addr"));
             List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival", new FestivalRowMapper());
             for(Festival festival: festivales) {
                 updateFestivalState(festival);
@@ -124,8 +145,15 @@ public class FestivalDao {
         }
     }
 
-    public List<Festival> getFestivals(int size, int offset) {
+    public int getNumEntradasVendidas(int idFestival) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM entrada WHERE idfestival=?", Integer.class, idFestival);
+        } catch (EmptyResultDataAccessException e) {
+            return -1;
+        }
+    }
 
+    public List<Festival> getFestivals(int size, int offset) {
         List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
         for(Festival festival: festivales) {
             updateFestivalState(festival);

@@ -2,12 +2,9 @@ package es.uji.ei1027.TotFest.controllers;
 
 import es.uji.ei1027.TotFest.daos.FestivalDao;
 import es.uji.ei1027.TotFest.daos.EntradaDao;
-import es.uji.ei1027.TotFest.models.CompraForm;
-import es.uji.ei1027.TotFest.models.Entrada;
+import es.uji.ei1027.TotFest.daos.UsuarioDao;
+import es.uji.ei1027.TotFest.models.*;
 
-import es.uji.ei1027.TotFest.models.EntradaTipus;
-import es.uji.ei1027.TotFest.models.EntradaTipusEnum;
-import es.uji.ei1027.TotFest.models.Festival;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/compra-entradas")
@@ -27,83 +26,184 @@ public class EntradaController {
 
     private EntradaDao entradaDao;
     private FestivalDao festivalDao;
+    private UsuarioDao usuarioDao;
 
     @Autowired
     public void setEntradaDao(EntradaDao entradaDao) {
         this.entradaDao = entradaDao;
     }
 
+    @Autowired
+    public void setUsuarioDao(UsuarioDao usuarioDao) {
+        this.usuarioDao = usuarioDao;
+    }
 
     @Autowired
     public void setFestivalDao(FestivalDao festivalDao) {
         this.festivalDao = festivalDao;
     }
 
-    @RequestMapping("/compra/{idFestival}")
-    public String showCompraForm(Model model, @PathVariable int idFestival, HttpSession session) {
+    @RequestMapping("/compraDia/{idFestival}")
+    public String showCompraDiaForm(Model model, @PathVariable int idFestival, HttpSession session) {
         Festival festival = festivalDao.getFestival(idFestival);
         if (new Date().before(festival.getDataIniciVenda())) {
             model.addAttribute("noDisponible", "true");
         } else {
             model.addAttribute("noDisponible", "false");
         }
-        int numEntradasDia = Math.min((festivalDao.getFestival(idFestival).getAforamentMaxim() - entradaDao.getEntradesVenudesPerDiaDeDia(idFestival, java.sql.Date.valueOf(LocalDate.now())))/10, 10);
-        int numEntradasCompleto = Math.min(festivalDao.getFestival(idFestival).getAforamentMaxim() - festivalDao.getFestival(idFestival).getNumEntradasVendidas(), 10);
+        int numEntradasDia = Math.min((festivalDao.getFestival(idFestival).getAforamentMaxim()/10 - entradaDao.getEntradesVenudesPerDiaDeDia(idFestival, java.sql.Date.valueOf(LocalDate.now()))), 10);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        String dataInici = festival.getDataInici().toLocalDate().format(formatter);
+        String dataFi = festival.getDataFi().toLocalDate().format(formatter);
 
         model.addAttribute("numEntradasDia", numEntradasDia);
-        model.addAttribute("numEntradasCompleto", numEntradasCompleto);
-
-        BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(idFestival, EntradaTipusEnum.dia.name()).getPreu();
-        BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(idFestival, EntradaTipusEnum.festivalComplet.name()).getPreu();
-
         model.addAttribute("festival", festival);
-        model.addAttribute("precioDia", precioEntradaDia);
-        model.addAttribute("precioCompleto", precioEntradaCompleto);
+        model.addAttribute("dataInicio", dataInici.toString());
+        model.addAttribute("dataFin", dataFi);
 
         session.setAttribute("ultimoFestivalCompra", festival);
-        session.setAttribute("ultimoPrecioDia", precioEntradaDia);
-        session.setAttribute("ultimoPrecioCompleto", precioEntradaCompleto);
-
 
         CompraForm compraForm = new CompraForm();
+        compraForm.setFecha(festival.getDataInici());
+        compraForm.setEntradatipus(EntradaTipusEnum.dia.name());
         compraForm.setIdFestival(idFestival);
         model.addAttribute("compraForm", compraForm);
-        return "entrades/compra";
+        return "entrades/compraDia";
     }
 
+    @GetMapping("/view/{numero}")
+    public String viewEntrada(HttpSession session, @PathVariable("numero") int numero, Model model) {
+        if (session == null || session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
 
+        // Obtener la entrada por su número
+        Entrada entrada = entradaDao.getEntrada(numero);
+        if (entrada == null) {
+            model.addAttribute("mensajeError", "No se ha encontrado la entrada con ese número.");
+            return "error.html";
+        }
+
+        Festival festival = festivalDao.getFestival(entrada.getIdFestival());
+        // Añadir la entrada al modelo para mostrarla en la vista
+        model.addAttribute("entrada", entrada);
+        model.addAttribute("festival", festival.getNom());
+
+        // Dirigir a la vista correspondiente según el tipo de entrada
+        return "entrades/ver";
+    }
+
+    @RequestMapping("/compraCompleto/{idFestival}")
+    public String showCompraCompletoForm(Model model, @PathVariable int idFestival, HttpSession session) {
+        Festival festival = festivalDao.getFestival(idFestival);
+        if (new Date().before(festival.getDataIniciVenda())) {
+            model.addAttribute("noDisponible", "true");
+        } else {
+            model.addAttribute("noDisponible", "false");
+        }
+        int numEntradasCompleto = Math.min(festivalDao.getFestival(idFestival).getAforamentMaxim() - festivalDao.getNumEntradasVendidas(festival.getIdFestival()), 10);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        String dataInici = festival.getDataInici().toLocalDate().format(formatter);
+        String dataFi = festival.getDataFi().toLocalDate().format(formatter);
+
+        model.addAttribute("numEntradasCompleto", numEntradasCompleto);
+        model.addAttribute("festival", festival);
+        model.addAttribute("dataInicio", dataInici.toString());
+        model.addAttribute("dataFin", dataFi);
+
+        session.setAttribute("ultimoFestivalCompra", festival);
+
+        CompraForm compraForm = new CompraForm();
+        compraForm.setFecha(festival.getDataInici());
+        compraForm.setEntradatipus(EntradaTipusEnum.festivalComplet.name());
+        compraForm.setIdFestival(idFestival);
+        model.addAttribute("compraForm", compraForm);
+        return "entrades/compraCompleto";
+    }
     @RequestMapping(value = "/compra", method = RequestMethod.POST)
     public String processCompraForm(@ModelAttribute("compraForm") CompraForm compraForm,
                                     BindingResult bindingResult, HttpSession session, Model model) {
 
         try {
+            if (session.getAttribute("ultimoFestivalCompra") == null){
+                return "redirect:/festival/list";
+            }
             int idfestival = ((Festival) session.getAttribute("ultimoFestivalCompra")).getIdFestival();
 
+            if (compraForm.getEmail() == null && compraForm.getTelefon() == null) {
+                int idUsuario = (int) session.getAttribute("idUsuario");
+
+                Usuario usuario = usuarioDao.getUsuarioById(idUsuario);
+                compraForm.setEmail(usuario.getEmail());
+                compraForm.setTelefon(usuario.getTelefono());
+            }
+            validarCompraForm(compraForm, bindingResult, model);
             if (bindingResult.hasErrors()) {
-                return ("redirect://compra-entradas/compra/"+idfestival);
+                Festival festival = (Festival) session.getAttribute("ultimoFestivalCompra");
+                int numEntradasDia = Math.min((festivalDao.getFestival(festival.getIdFestival()).getAforamentMaxim()/10 - entradaDao.getEntradesVenudesPerDiaDeDia(festival.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))), 10);
+                int numEntradasCompleto = Math.min(festivalDao.getFestival(festival.getIdFestival()).getAforamentMaxim() - festivalDao.getNumEntradasVendidas(festival.getIdFestival()), 10);
+
+                BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.dia.name()).getPreu();
+                BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.festivalComplet.name()).getPreu();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                String dataInici = festival.getDataInici().toLocalDate().format(formatter);
+                String dataFi = festival.getDataFi().toLocalDate().format(formatter);
+
+                model.addAttribute("numEntradasDia", numEntradasDia);
+                model.addAttribute("numEntradasCompleto", numEntradasCompleto);
+                model.addAttribute("festival", festival);
+                model.addAttribute("dataInicio", dataInici.toString());
+                model.addAttribute("dataFin", dataFi);
+                model.addAttribute("precioDia", precioEntradaDia);
+                model.addAttribute("precioCompleto", precioEntradaCompleto);
+
+                session.setAttribute("ultimoFestivalCompra", festival);
+                session.setAttribute("ultimoPrecioDia", precioEntradaDia);
+                session.setAttribute("ultimoPrecioCompleto", precioEntradaCompleto);
+
+
+                compraForm.setFecha(festival.getDataInici());
+                compraForm.setIdFestival(festival.getIdFestival());
+                model.addAttribute("compraForm", compraForm);
+
+                if (compraForm.getEntradatipus().equalsIgnoreCase("dia")) {
+                    return "entrades/compraDia";
+                }
+                else {
+                    return "entrades/compraCompleto";
+                }
             }
 
-            if (compraForm.getListaFechas().size() > 0) {
-                compraForm.setTipusEntrada(EntradaTipusEnum.dia);
-                for (int i = 0; i < compraForm.getListaFechas().size(); i++) {
+            if (compraForm.getEntradatipus().equalsIgnoreCase("dia")) {
+
+                for(int i=0; i< compraForm.getNumEntrades(); i++) {
                     Entrada entrada = new Entrada();
-                    entrada.setData(new java.sql.Date(compraForm.getListaFechas().get(i).getTime()));
+                    entrada.setData(new java.sql.Date(compraForm.getFecha().getTime()));
                     entrada.setIdFestival(idfestival);
                     entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
                     entrada.setEntradaTipus(1);
                     entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioDia"));
+                    entrada.setTelefono(compraForm.getTelefon());
+                    entrada.setEmail(compraForm.getEmail());
                     entradaDao.addEntrada(entrada);
                 }
-                entradaDao.addNumEntradasVendidasEntradaTipus(idfestival, EntradaTipusEnum.dia.name(), compraForm.getListaFechas().size());
             } else {
-                Entrada entrada = new Entrada();
-                entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioCompleto"));
-                entrada.setIdFestival(idfestival);
-                entrada.setEntradaTipus(2);
-                entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
-                entradaDao.addEntrada(entrada);
-                entradaDao.addNumEntradasVendidasEntradaTipus(idfestival, EntradaTipusEnum.festivalComplet.name(), compraForm.getListaFechas().size());
-
+                for(int i=0; i< compraForm.getNumEntrades(); i++) {
+                    Entrada entrada = new Entrada();
+                    entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioCompleto"));
+                    entrada.setIdFestival(idfestival);
+                    entrada.setEntradaTipus(2);
+                    entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
+                    entrada.setTelefono(compraForm.getTelefon());
+                    entrada.setEmail(compraForm.getEmail());
+                    entradaDao.addEntrada(entrada);
+                }
             }
 
         } catch (Exception e) {
@@ -114,68 +214,135 @@ public class EntradaController {
 
     }
 
+    public void validarCompraForm(CompraForm compraForm, BindingResult bindingResult, Model model) {
+        if (compraForm.getTelefon().length() != 9) {
+            bindingResult.rejectValue("telefon", "error.telefon", "El teléfono debe tener 9 numeros");
+        }
+       // int numEntradasDiaMax = (int) model.getAttribute("numEntradasDia");
 
-    //@RequestMapping(value = "/compra/{idFestival}", method = RequestMethod.POST)
-    //public String processCompraForm(@ModelAttribute("compraForm") EntradaTipus entradaTipus, @PathVariable int idFestival,
-    //                                BindingResult bindingResult, HttpSession session, Model model) {
-    //   // // Validaciones adicionales
-    //   // if (compraForm.getNumEntrades() > 10) {
-    //   //     bindingResult.rejectValue("numEntrades", "error.numEntrades", "No pots comprar més de 10 entrades a la vegada.");
-    //   // }
-//
-    //    Festival festival = festivalDao.getFestival(entradaTipus.getIdFestival());
-//
-    //    // Validar si la venta está permitida en la fecha actual
-    //    if (new Date().before(festival.getDataIniciVenda())) {
-    //        bindingResult.rejectValue("idFestival", "error.dataIniciVenda", "La venda no està disponible encara.");
-    //    }
-//
-    //    // Validar aforo
-    //    int totalEntradesVenudes = festivalDao.getNumEntradasVendidas(festival.getIdFestival());
-    //    int aforamentMaxim = festival.getAforamentMaxim();
-    //    int entradesVenudesDia = entradaDao.getEntradesVenudesPerDia(festival.getIdFestival(), compraForm.getDataPerTipusDia());
-//
-    //    if (compraForm.getIdEntradaTipus().equals(EntradaTipusEnum.festivalComplet.toString())) {
-    //        if (totalEntradesVenudes + compraForm.getNumEntrades() > aforamentMaxim) {
-    //            bindingResult.rejectValue("numEntrades", "error.aforament", "No hi ha suficient aforament per a tantes entrades.");
-    //        }
-    //    } else {
-    //        if (entradesVenudesDia + compraForm.getNumEntrades() > aforamentMaxim * 0.10) {
-    //            bindingResult.rejectValue("numEntrades", "error.aforamentDia", "No hi ha suficient aforament per a tantes entrades en aquest dia.");
-    //        }
-    //    }
-//
-    //    if (bindingResult.hasErrors()) {
-    //        model.addAttribute("festivals", festivalDao.getFestivals());
-    //        return "entrades/compra";
-    //    }
-//
-    //    // Procesar el pago (aquí iría la integración con la pasarela de pago)
-//
-    //    // Simular una respuesta exitosa de la pasarela de pagos
-    //    boolean pagamentExit = true;
-//
-    //    if (pagamentExit) {
-    //        // Registrar la venta y crear las entradas
-    //        for (int i = 0; i < compraForm.getNumEntrades(); i++) {
-    //            Entrada entrada = new Entrada();
-    //            entrada.setNumero(totalEntradesVenudes + i + 1);
-    //            entrada.setIdEntradaTipus(compraForm.getIdEntradaTipus());
-    //            entrada.setPreuVendaEntradaIndividual(entradaTipus.getPreu());
-    //            entradaDao.addEntrada(entrada);
-    //        }
-//
-    //        // Enviar correo electrónico con las entradas (simulado)
-    //        // String emailContent = generarContenidoEmail(compraForm);
-    //        // emailService.sendEmail(compraForm.getEmail(), "Les teves entrades", emailContent);
-//
-    //        return "redirect:/entrades/confirmacio";
-    //    } else {
-    //        bindingResult.rejectValue("numEntrades", "error.pagament", "Hi ha hagut un problema amb el pagament.");
-    //        model.addAttribute("festivals", festivalDao.getFestivals());
-    //        return "entrades/compra";
-    //    }
-    //}
+      //  if (compraForm.getTipusEntrada().equalsIgnoreCase("dia") && compraForm.getNumEntrades() > numEntradasDiaMax) {
+      //      bindingResult.rejectValue("numEntrades", "error.numEntrades", "Sólo hay " + numEntradasDiaMax + " entradas de día disponibles");
+      //  }
+
+        String EMAIL_REGEX =
+                "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(EMAIL_REGEX);
+
+        if(!pattern.matcher(compraForm.getEmail()).matches()) {
+            bindingResult.rejectValue("email", "error.email", "El mail no es válido");
+        }
+
+        if (compraForm.getFecha() != null) {
+            if (compraForm.getFecha().compareTo(new java.util.Date(festivalDao.getFestival(compraForm.getIdFestival()).getDataInici().getTime())) < 0) {
+                bindingResult.rejectValue("fecha", "error.fecha", "La fecha seleccionada no puede ser anterior al inicio del festival");
+            }
+
+            if (compraForm.getFecha().compareTo(new java.util.Date(festivalDao.getFestival(compraForm.getIdFestival()).getDataFi().getTime())) > 0) {
+                bindingResult.rejectValue("fecha", "error.fecha", "La fecha seleccionada no puede ser posterior al fin del festival");
+            }
+        }
+
+        if (compraForm.getNumEntrades() <= 0) {
+            bindingResult.rejectValue("numEntrades", "error.numEntrades", "El número de entradas debe ser mayor que 0");
+        }
+    }
+
+    @RequestMapping("/list/{idFestival}")
+    public String listEntradas(@PathVariable("idFestival") int idFestival,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "size", defaultValue = "5") int size,
+                               @RequestParam(value = "tipoEntrada", required = false) Integer tipoEntrada,
+                               Model model, HttpSession session) {
+        // Verificar si el usuario está en sesión
+        if (session == null || session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+
+        if (tipoEntrada != null) {
+            session.setAttribute("ultimoTipoEntrada", tipoEntrada);
+        }
+        else {
+            if (session.getAttribute("ultimoTipoEntrada") != null) {
+                tipoEntrada = (int) session.getAttribute("ultimoTipoEntrada");
+            }
+        }
+
+        List<Entrada> entradas;
+        int totalPages = 0;
+        int totalElems = 0;
+
+        // Filtrar entradas por idFestival y tipo de entrada
+        if (tipoEntrada != null && tipoEntrada != 0) {
+            totalElems = entradaDao.getNumTotalEntradasFestivalPorTipo(idFestival, tipoEntrada);
+            entradas = entradaDao.getEntradasByFestivalAndTipo(idFestival, tipoEntrada, page, size);
+            totalPages = entradaDao.getTotalPagesByFestivalAndTipo(idFestival, tipoEntrada, size);
+        } else {
+            totalElems = entradaDao.getNumTotalEntradasFestival(idFestival);
+            entradas = entradaDao.getEntradasByFestival(idFestival, page, size);
+            totalPages = entradaDao.getTotalPagesByFestival(idFestival, size);
+        }
+
+        Festival festival = festivalDao.getFestival(idFestival);
+
+        model.addAttribute("nomfestival", festival.getNom());
+        model.addAttribute("entradas", entradas);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("size", size);
+        model.addAttribute("tipoEntrada", tipoEntrada);
+        model.addAttribute("idFestival", idFestival);
+        model.addAttribute("totalElems", totalElems);
+        return "entrades/list";
+    }
+
+    @RequestMapping("/listUsuario/{idUsuario}")
+    public String listEntradasUsuario(@PathVariable("idUsuario") int idUsuario,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "size", defaultValue = "5") int size,
+                               @RequestParam(value = "tipoEntrada", required = false) Integer tipoEntrada,
+                               Model model, HttpSession session) {
+        // Verificar si el usuario está en sesión
+        if (session == null || session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+
+        if (tipoEntrada != null) {
+            session.setAttribute("ultimoTipoEntrada", tipoEntrada);
+        }
+        else {
+            if (session.getAttribute("ultimoTipoEntrada") != null) {
+                tipoEntrada = (int) session.getAttribute("ultimoTipoEntrada");
+            }
+        }
+
+        List<Entrada> entradas;
+        int totalPages = 0;
+        int totalElems = 0;
+
+        Usuario usuario = usuarioDao.getUsuarioById(idUsuario);
+        String email = usuario.getEmail();
+        // Filtrar entradas por idFestival y tipo de entrada
+        if (tipoEntrada != null && tipoEntrada != 0) {
+            totalElems = entradaDao.getNumTotalEntradasUsuarioPorTipo(email, tipoEntrada);
+            entradas = entradaDao.getEntradasByUsuarioAndTipo(email, tipoEntrada, page, size);
+            totalPages = entradaDao.getTotalPagesByUsuarioAndTipo(email, tipoEntrada, size);
+        } else {
+            totalElems = entradaDao.getNumTotalEntradasUsuario(email);
+            entradas = entradaDao.getEntradasByUsuario(email, page, size);
+            totalPages = entradaDao.getTotalPagesByUsuario(email, size);
+        }
+
+        model.addAttribute("nomusuario", usuario.getNombre());
+        model.addAttribute("entradas", entradas);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("size", size);
+        model.addAttribute("tipoEntrada", tipoEntrada);
+        model.addAttribute("idUsuario", idUsuario);
+        model.addAttribute("totalElems", totalElems);
+        return "entrades/listUsuario";
+    }
+
 }//
 
 

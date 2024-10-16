@@ -59,6 +59,7 @@ public class ActuacioDao {
                 actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
                 actuacio.getIdFestival(),
+                actuacio.getNomartista(),
                 actuacio.getIdActuacio()
         );
     }
@@ -80,10 +81,21 @@ public class ActuacioDao {
     }
 
     public boolean horasActuacionesSeSolapan(Date fecha, Time horaInicio, Time horaFinPrevista, int idArtista) throws SQLException {
-        String sql = "SELECT COUNT(*) AS count FROM actuacio WHERE data = ? AND (     (? >= horaInici AND ? < horaFiPrevista) OR     (? > horaInici AND ? <= horaFiPrevista) OR     (horaInici >= ? AND horaInici < ?) OR     (horaFiPrevista > ? AND horaFiPrevista <= ?) ) AND idartista = ?";
+        String sql = "SELECT COUNT(*) AS count FROM actuacio WHERE data = ? AND idartista = ? AND (" +
+                "(horaInici = ? OR horaFiPrevista = ?) OR " +  // Caso donde las horas de inicio o fin son iguales
+                "(? >= horaInici AND ? < horaFiPrevista) OR " +  // Caso donde horaInicio está dentro del intervalo
+                "(? > horaInici AND ? <= horaFiPrevista) OR " +  // Caso donde horaFinPrevista está dentro del intervalo
+                "(horaInici >= ? AND horaInici < ?) OR " +       // Caso donde el inicio de la otra actuación está dentro del intervalo
+                "(horaFiPrevista > ? AND horaFiPrevista <= ?)" + // Caso donde el fin de la otra actuación está dentro del intervalo
+                ")";
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{fecha, horaInicio, horaInicio, horaFinPrevista, horaFinPrevista, horaInicio, horaFinPrevista, horaInicio, horaFinPrevista, idArtista}, Integer.class) > 0;
-
+        return jdbcTemplate.queryForObject(sql, new Object[]{
+                fecha, idArtista, horaInicio, horaFinPrevista, // Para el caso donde las horas de inicio o fin son iguales
+                horaInicio, horaInicio,                       // Para el caso donde horaInicio está dentro del intervalo
+                horaFinPrevista, horaFinPrevista,             // Para el caso donde horaFinPrevista está dentro del intervalo
+                horaInicio, horaFinPrevista,                  // Para el caso donde el inicio de la otra actuación está dentro del intervalo
+                horaInicio, horaFinPrevista                   // Para el caso donde el fin de la otra actuación está dentro del intervalo
+        }, Integer.class) > 0;
     }
 
     public List<Actuacio> getActuacionsDia(int idFestival, Date date) {

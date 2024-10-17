@@ -176,28 +176,41 @@
         <!-- Tabla de entradas -->
         <div th:unless="${#lists.isEmpty(entradas)}">
           <form method="get" th:action="@{/compra-entradas/listUsuario/{idUsuario}(idUsuario=${idUsuario})}">
-            <label style="padding-top: 3%" for="size">Entradas por página:</label>
-            <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
-              <option th:value="5" th:selected="${size == 5}">5</option>
-              <option th:value="10" th:selected="${size == 10}">10</option>
-              <option th:value="20" th:selected="${size == 20}">20</option>
-              <option th:value="50" th:selected="${size == 50}">50</option>
-            </select>
 
-            <label style="padding-left: 20px;" for="tipoEntrada">Tipo de Entrada:</label>
-            <select name="tipoEntrada" id="tipoEntrada" class="form-select" style="width: 150px; display: inline-block;" th:onchange="this.form.submit()">
-              <option value="0" th:selected="${tipoEntrada == 0}">Todos</option>
-              <option value="1" th:selected="${tipoEntrada == 1}">Entradas de Día</option>
-              <option value="2" th:selected="${tipoEntrada == 2}">Festival Completo</option>
-            </select>
+            <div style="display: inline-flex; width: 70%; justify-content: center; align-items: center">
+              <label style="padding-top: 3%" for="size">Entradas por página:</label>
+              <select name="size" id="size" class="form-select" th:onchange="this.form.submit()">
+                <option th:value="5" th:selected="${size == 5}">5</option>
+                <option th:value="10" th:selected="${size == 10}">10</option>
+                <option th:value="20" th:selected="${size == 20}">20</option>
+                <option th:value="50" th:selected="${size == 50}">50</option>
 
-            <input type="hidden" name="page" th:value="${currentPage}" />
+                <div class="input-group" style="margin-top: 10px; max-width: 3000px; display: flex; margin-left: 8px">
+                  <input style="margin-left: 8px" type="text" class="form-control" placeholder="Buscar por nombre del festival" name="buscarFestival" th:value="${param.buscarFestival}">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </select>
+
+              <label style="padding-left: 20px;" for="tipoEntrada">Tipo de Entrada:</label>
+              <select name="tipoEntrada" id="tipoEntrada" class="form-select" style="width: 150px; display: inline-block;" th:onchange="this.form.submit()">
+                <option value="0" th:selected="${tipoEntrada == 0}">Todos</option>
+                <option value="1" th:selected="${tipoEntrada == 1}">Entradas de Día</option>
+                <option value="2" th:selected="${tipoEntrada == 2}">Festival Completo</option>
+              </select>
+
+              <input type="hidden" name="page" th:value="${currentPage}" />
+            </div>
           </form>
           <div class="table-responsive">
             <table class="table table-bordered table-striped rounded">
               <thead>
               <tr>
                 <th>Número de Entrada</th>
+                <th>Festival</th>
                 <th>Precio Venta</th>
                 <th>Fecha de Entrada</th>
                 <th>Fecha Compra</th>
@@ -209,16 +222,48 @@
               </thead>
               <tbody id="entrada-table-body">
               <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-              <tr th:each="entrada : ${entradas}">
+              <tr th:each="entrada, iter : ${entradas}">
                 <td th:text="${entrada.numero}"></td>
+                <td th:text="${nombresFestivales[iter.index]}"></td> <!-- Mostrar el nombre del festival correspondiente -->
                 <td th:text="${entrada.preuVendaEntradaIndividual}"></td>
                 <td th:text="${#dates.format(entrada.data, 'dd/MM/yyyy')}"></td>
                 <td th:text="${#dates.format(entrada.datacompra, 'dd/MM/yyyy')}"></td>
-                <td th:text="${entrada.entradaTipus == 1 ? 'Entradas de Día' : 'Festival Completo'}"></td>
+                <td th:text="${entrada.entradaTipus == 1 ? 'Entrada de Día' : 'Festival Completo'}"></td>
                 <td th:text="${entrada.email}"></td>
                 <td th:text="${entrada.telefono}"></td>
                 <td>
                   <a class="btn btn-success btn-sm" th:href="@{/compra-entradas/view/{numero}(numero=${entrada.numero})}">Ver</a>
+                  <button type="button" class="btn btn-warning btn-sm" th:if="${devolvibles[iter.index]}" data-toggle="modal" th:data-target="'#devolverModal' + ${entrada.numero}">
+                    Devolver
+                  </button>
+
+                  <div class="modal fade" th:id="'devolverModal' + ${entrada.numero}" tabindex="-1" role="dialog" aria-labelledby="devolverModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="devolverModalLabel">Confirmación de devolución</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          ¿Estás seguro de que deseas devolver la entrada número <strong th:text="${entrada.numero}"></strong>?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+                          <!-- Formulario para confirmar la devolución -->
+                          <form th:action="@{/compra-entradas/devolver}" method="post">
+                            <input type="hidden" name="entradaNumero" th:value="${entrada.numero}">
+                            <input type="hidden" name="idUsuario" th:value="${idUsuario}">
+                            <button type="submit" class="btn btn-danger">Confirmar devolución</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
                 </td>
               </tr>
               </tbody>
@@ -237,12 +282,21 @@
 
         <!-- Mensaje de no hay entradas -->
         <div th:if="${#lists.isEmpty(entradas)}" class="no-items-message">
-          <p>No tienes ninguna entrada aún</p>
+          <div th:if="${filtrado == null}">
+            <p>No tienes ninguna entrada aún</p>
+          </div>
+          <div th:if="${filtrado != null}">
+            <p>No tienes ninguna entrada cuyo nombre de festival contenga el filtro aplicado</p>
+          </div>
+          <div th:if="${filtradotipo != null}">
+            <p>No tienes ninguna entrada del tipo <p th:text="${entrada.entradaTipus == 1 ? 'día' : 'festival completo'}"></p></p>
+          </div>
         </div>
 
         <div style="margin-left:44%;" class="btn-anyadir">
           <a th:href="@{/festival/list}" class="btn btn-success" role="button">Comprar entradas</a>
         </div>
+
 
         <!-- Paginación -->
         <div th:unless="${#lists.isEmpty(entradas)}">

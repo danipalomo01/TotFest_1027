@@ -123,12 +123,20 @@
         </a>
       </li>
 
-      <li class="item">
-        <a href="/login" class="submenu-item">
-          <span>Login</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
+      <div th:if="${session.idUsuario == null}">
+        <li class="item">
+          <a href="/login" class="submenu-item">
+            <span>Login</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/register" class="submenu-item">
+            <span>Registrarse</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </div>
 
       <li class="item">
         <a href="/festival/list" class="submenu-item">
@@ -136,6 +144,22 @@
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
+
+      <div th:if="${session.idUsuario != null}">
+        <li class="item">
+          <a th:href="@{/compra-entradas/listUsuario/{idUsuario}(idUsuario=${#session.getAttribute('idUsuario')})}" class="submenu-item">
+            <span>Ver Mis Entradas</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Logout</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </div>
+
     </ul>
   </div>
 </nav>
@@ -160,6 +184,7 @@
                     margin-top: 25px">
 
         <h2 style="font-size: 20px;font-weight: bold;align:center">Entrada de un día, solo te da acceso al festival durante la fecha de la entrada</h2>
+        <h2 th:text="'Precio: ' + ${precio} + '€'" style="font-size: 20px; font-weight: bold; text-align: center;margin-top: 20px;"></h2>
 
         <div style="margin-top: 40px;display: flex; justify-content: center; text-align: center">
           <!-- Campo de Teléfono -->

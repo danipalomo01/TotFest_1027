@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -74,6 +75,14 @@ public class GFContracteArtistaController {
 
             contractesArtistes.sort(Comparator.comparingInt(ContracteArtista::getIdContracte));
 
+            List<String> nombresArtistas = new ArrayList<>();
+
+            for (ContracteArtista contracteArtista: contractesArtistes) {
+                ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
+                nombresArtistas.add(artistaGrup.getNom());
+            }
+
+            model.addAttribute("nombresArtistas", nombresArtistas);
             model.addAttribute("contratos", contractesArtistes);
             model.addAttribute("artistas", artistaDao.getArtistaGrups());
             model.addAttribute("festivales", festivalDao.getFestivals());
@@ -215,10 +224,11 @@ public class GFContracteArtistaController {
             for (Integer selectedContract : selectedContracts) {
                 contracteArtistaDao.deleteContracteArtista(selectedContract);
             }
-            session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
 
-            model.addAttribute("mensajeConfirmacionArtista", "Se han eliminado correctamente los contratos seleccionados");
-            return "redirect:/responsablecontratacion/artista/list/" + idArtista;
+            model.addAttribute("mensaje", "Se han eliminado los contratos correctamente");
+            model.addAttribute("redireccion", "/responsablecontratacion/artista/list/" + idArtista);
+            return "/responsableContratacion/gestionArtistas/exitoListContrato";
+
         } catch (Exception e){
             model.addAttribute("mensajeError", "No se han podido eliminar los contratos, inténtalo de nuevo más tarde o contacta con el soporte informático.");
             return "error.html";

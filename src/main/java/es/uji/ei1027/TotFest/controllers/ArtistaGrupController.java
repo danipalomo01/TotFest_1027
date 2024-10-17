@@ -2,6 +2,7 @@ package es.uji.ei1027.TotFest.controllers;
 
 import es.uji.ei1027.TotFest.daos.ArtistaGrupDao;
 import es.uji.ei1027.TotFest.models.ArtistaGrup;
+import es.uji.ei1027.TotFest.models.ContracteArtista;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 @RequestMapping("/artista")
@@ -26,7 +31,10 @@ public class ArtistaGrupController {
 
     @RequestMapping("/list")
     public String listArtistas(Model model) {
-        model.addAttribute("artistas", artistaGrupDao.getArtistaGrups());
+        List<ArtistaGrup> artistas = artistaGrupDao.getArtistaGrups();
+        artistas.sort(Comparator.comparingInt(ArtistaGrup::getIdArtista));
+
+        model.addAttribute("artistas", artistas);
         return "artista/list";
     }
 

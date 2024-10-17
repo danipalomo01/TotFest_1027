@@ -58,7 +58,17 @@ public class EntradaDao {
 
     public List<Entrada> getEntradas() {
         try {
-            return jdbcTemplate.query("SELECT * FROM entrada", new EntradaRowMapper());
+            return jdbcTemplate.query("SELECT * FROM entrada order by numero", new EntradaRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Entrada> getEntradas(int size, int page) {
+        try {
+            int offset = page * size;
+            String sql = "SELECT * FROM entrada order by numero LIMIT ? OFFSET ?";
+            return jdbcTemplate.query(sql, new EntradaRowMapper(), size, offset);
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }
@@ -110,13 +120,13 @@ public class EntradaDao {
 
     public List<Entrada> getEntradasByFestival(int idFestival, int page, int size) {
         int offset = page * size;
-        String sql = "SELECT * FROM entrada WHERE idfestival = ? LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM entrada WHERE idfestival = ? order by numero LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new EntradaRowMapper(), idFestival, size, offset);
     }
 
     public List<Entrada> getEntradasByFestivalAndTipo(int idFestival, int tipoEntrada, int page, int size) {
         int offset = page * size;
-        String sql = "SELECT * FROM entrada WHERE idfestival = ? AND identradatipus = ? LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM entrada WHERE idfestival = ? AND identradatipus = ? order by numero LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new EntradaRowMapper(), idFestival, tipoEntrada, size, offset);
     }
 
@@ -145,13 +155,13 @@ public class EntradaDao {
 
     public List<Entrada> getEntradasByUsuario(String email, int page, int size) {
         int offset = page * size;
-        String sql = "SELECT * FROM entrada WHERE email = ? LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM entrada WHERE email = ? order by numero LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new EntradaRowMapper(), email, size, offset);
     }
 
     public List<Entrada> getEntradasByUsuarioAndTipo(String email, int tipoEntrada, int page, int size) {
         int offset = page * size;
-        String sql = "SELECT * FROM entrada WHERE email = ? AND identradatipus = ? LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM entrada WHERE email = ? AND identradatipus = ? order by numero LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new EntradaRowMapper(), email, tipoEntrada, size, offset);
     }
 
@@ -176,5 +186,21 @@ public class EntradaDao {
         String sql = "SELECT COUNT(*) FROM entrada WHERE email = ? AND identradatipus = ?";
         return jdbcTemplate.queryForObject(sql, Integer.class, email, tipoEntrada);
     }
+
+    public int getNumTotalEntradasByFestival(String email, String buscarFestival) {
+        String sql = "SELECT COUNT(*) FROM entrada e JOIN festival f ON e.idfestival = f.idfestival WHERE e.email = ? AND LOWER(f.nom) LIKE LOWER(?)";
+        return jdbcTemplate.queryForObject(sql, new Object[]{email, "%" + buscarFestival + "%"}, Integer.class);
+    }
+
+    public List<Entrada> getEntradasByUsuarioAndFestival(String email, String buscarFestival, int page, int size) {
+        String sql = "SELECT e.* FROM entrada e JOIN festival f ON e.idfestival = f.idfestival WHERE e.email = ? AND LOWER(f.nom) LIKE LOWER(?) order by numero LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[]{email, "%" + buscarFestival + "%", size, page * size}, new EntradaRowMapper());
+    }
+
+    public void deleteEntrada(int numeroEntrada) {
+        String sql = "DELETE FROM entrada WHERE numero = ?";
+        jdbcTemplate.update(sql, numeroEntrada);
+    }
+
 
 }

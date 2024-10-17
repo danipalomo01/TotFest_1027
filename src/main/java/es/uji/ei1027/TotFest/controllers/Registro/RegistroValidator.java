@@ -19,6 +19,7 @@ public class RegistroValidator implements Validator {
         Usuario usuario = (Usuario) target;
 
         // Validar campos vacíos
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nombre", "error.nombre", "El nombre es obligatorio.");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "error.email", "El email es obligatorio.");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "telefono", "error.telefono", "El teléfono es obligatorio.");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "error.password", "La contraseña es obligatoria.");

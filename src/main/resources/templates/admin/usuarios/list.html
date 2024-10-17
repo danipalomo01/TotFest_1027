@@ -168,7 +168,7 @@
                   <td th:text="${usuario.nombre}"></td>
                   <td th:text="${usuario.email}"></td>
                   <td th:text="${usuario.telefono}"></td>
-                  <td th:text="${usuario.rol}"></td>
+                  <td th:text="${usuario.rol == 'RESPONSABLE_CONTRATACION' ? 'Responsable de contratación' : usuario.rol == 'ADMIN' ? 'Administrador del sistema' : usuario.rol == 'GESTOR_FESTIVALES' ? 'Gestor de festivales' : usuario.rol == 'USUARIO' ? 'Cliente' : 'Cliente'}"></td>
 
                   <td>
                     <a th:href="@{/admin/usuarios/update/{id}(id=${usuario.id})}" class="btn btn-warning btn-sm" role="button" title="Editar">

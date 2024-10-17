@@ -45,7 +45,7 @@ public class ContracteArtistaDao {
 
     public List<ContracteArtista> getContractesArtistes() {
         try {
-            return jdbcTemplate.query("SELECT * FROM contracteartista", new ContracteArtistaRowMapper());
+            return jdbcTemplate.query("SELECT * FROM contracteartista order by idcontracte", new ContracteArtistaRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }
@@ -54,7 +54,7 @@ public class ContracteArtistaDao {
     public List<ContracteArtista> getContractesArtistes(int page, int size) {
         int offset = page * size;
 
-        return jdbcTemplate.query("SELECT * FROM contracteartista LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), size, offset);
+        return jdbcTemplate.query("SELECT * FROM contracteartista order by idcontracte LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), size, offset);
 
     }
 
@@ -76,7 +76,7 @@ public class ContracteArtistaDao {
 
     public List<Actuacio> getActuacionesContrato(int idContracte) {
         try {
-            String sql = "SELECT * FROM actuacio WHERE idcontracte=?";
+            String sql = "SELECT * FROM actuacio WHERE idcontracte=? order by idcontracte";
             return jdbcTemplate.query(sql, new ActuacioRowMapper(), idContracte);
         } catch (Exception e) {
             return new ArrayList<>();
@@ -103,6 +103,6 @@ public class ContracteArtistaDao {
     public List<ContracteArtista> getContractesArtista(int page, int size, int idArtista) {
 
         int offset = page * size;
-        return jdbcTemplate.query("SELECT * FROM contracteartista WHERE idArtista = ? LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), idArtista, size, offset);
+        return jdbcTemplate.query("SELECT * FROM contracteartista WHERE idArtista = ? order by idcontracte LIMIT ? OFFSET ?", new ContracteArtistaRowMapper(), idArtista, size, offset);
     }
 }

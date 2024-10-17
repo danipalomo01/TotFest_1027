@@ -201,14 +201,14 @@
         </li>
         <div th:if="${session.idUsuario == null}">
           <li class="item">
-            <a href="/register" class="submenu-item">
-              <span>Registrarse</span>
+            <a href="/login" class="submenu-item">
+              <span>Login</span>
               <i class="fa-solid fa-chevron-right"></i>
             </a>
           </li>
           <li class="item">
-            <a href="/login" class="submenu-item">
-              <span>Login</span>
+            <a href="/register" class="submenu-item">
+              <span>Registrarse</span>
               <i class="fa-solid fa-chevron-right"></i>
             </a>
           </li>
@@ -217,6 +217,12 @@
           <li class="item">
             <a th:href="@{/compra-entradas/listUsuario/{idUsuario}(idUsuario=${#session.getAttribute('idUsuario')})}" class="submenu-item">
               <span>Ver Mis Entradas</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+          <li class="item">
+            <a href="/logout" class="submenu-item">
+              <span>Logout</span>
               <i class="fa-solid fa-chevron-right"></i>
             </a>
           </li>

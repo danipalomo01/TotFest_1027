@@ -58,7 +58,7 @@ public class FestivalDao {
         updateFestivalState(festival);
         jdbcTemplate.update("UPDATE festival SET cif_promotor=?, nom=?, anyo=?, datainici=?, datafi=?, estatfestival=?, descripcio=?, " +
                         "categoriamusical=?, pressupostcontractacio=?, aforamentmaxim=?, localitzaciodescriptiva=?, localitzaciogeografica=?, " +
-                        "publicenfocat=?, requisitminimedat=?, datainicipublicacio=?, datainicivenda=?, num_entradas_vendidas=? WHERE idfestival=?",
+                        "publicenfocat=?, requisitminimedat=?, datainicipublicacio=?, datainicivenda=? WHERE idfestival=?",
                 festival.getCifPromotor(), festival.getNom(), festival.getAnyo(), festival.getDataInici(), festival.getDataFi(),
                 festival.getEstatFestival().name(), festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
@@ -154,7 +154,7 @@ public class FestivalDao {
     }
 
     public List<Festival> getFestivals(int size, int offset) {
-        List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
+        List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival ORDER BY idfestival LIMIT ? OFFSET ?", new FestivalRowMapper(), size, offset);
         for(Festival festival: festivales) {
             updateFestivalState(festival);
         }

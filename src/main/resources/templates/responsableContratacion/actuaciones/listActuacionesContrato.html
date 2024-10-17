@@ -223,15 +223,16 @@
                                 <th>Hora de fin prevista</th>
                                 <th>Precio</th>
                                 <th>Comentarios</th>
-                                <th>Nombre del artista</th>
+                                <th>Nombre del Artista</th>
                                 <th>Id Artista</th>
+                                <th>Nombre del Festival</th>
                                 <th>Id Festival</th>
                                 <th>Acciones</th>
                             </tr>
                             </thead>
                             <tbody id="actuacion-table-body">
                             <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-                            <tr th:each="actuacion : ${actuaciones}">
+                            <tr th:each="actuacion, iter : ${actuaciones}">
                                 <td>
                                     <input type="checkbox" th:name="selectedActuaciones" th:value="${actuacion.idActuacio}">
                                 </td>
@@ -266,6 +267,7 @@
                                 </td>
                                 <td th:text="${actuacion.nomartista}"></td>
                                 <td th:text="${actuacion.idartista}"></td>
+                                <td th:text="${nombresFestivales[iter.index]}"></td> <!-- Mostrar el nombre del festival correspondiente -->
                                 <td th:text="${actuacion.idFestival}"></td>
 
                                 <td>

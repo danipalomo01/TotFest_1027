@@ -22,6 +22,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,12 +59,6 @@ public class GFFestivalController {
             return "redirect:/login";
         }
 
-        if (session.getAttribute("size") != null && size == 1) {
-            size = (int) session.getAttribute("size");
-        } else {
-            session.setAttribute("size", size);
-        }
-
         if (session.getAttribute("mensajeConfirmacionFestival") != null && session.getAttribute("mensajeConfirmacionFestival") != "nada") {
             model.addAttribute("mensajeConfirmacionFestival", session.getAttribute("mensajeConfirmacionFestival"));
             session.setAttribute("mensajeConfirmacionFestival", "nada");
@@ -77,6 +72,8 @@ public class GFFestivalController {
             List<Festival> festivales = festivalDao.getFestivals(size, offset);
             int totalfestivales = festivalesTotales.size();
             int totalPages = (int) Math.ceil((double) totalfestivales / size);
+
+            festivales.sort(Comparator.comparingInt(Festival::getIdFestival));
 
             model.addAttribute("festivales", festivales);
             model.addAttribute("currentPage", page);

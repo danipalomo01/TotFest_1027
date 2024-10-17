@@ -55,8 +55,8 @@ public class RegistroController {
         // Guardar el usuario en la base de datos
         usuarioDao.addUsuario(usuario);
 
-        model.addAttribute("mensajeConfirmacion", "Cuenta creada exitosamente.");
-        return "redirect:/login"; // Redirigir a la página de login
+        model.addAttribute("email", usuario.getEmail());
+        return "registroExito"; // Redirigir a la página de login
     }
 }
 

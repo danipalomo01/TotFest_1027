@@ -20,13 +20,13 @@ public class UsuarioDao {
 
     // Método para obtener todos los usuarios con paginación
     public List<Usuario> getUsuarios(int size, int offset) {
-        String sql = "SELECT * FROM usuarios LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM usuarios order by id LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new Object[]{size, offset}, new UsuarioRowMapper());
     }
 
     // Método para obtener todos los usuarios sin paginación
     public List<Usuario> getUsuarios() {
-        String sql = "SELECT * FROM usuarios";
+        String sql = "SELECT * FROM usuarios order by id";
         return jdbcTemplate.query(sql, new UsuarioRowMapper());
     }
 
@@ -38,14 +38,14 @@ public class UsuarioDao {
 
     // Método para agregar un nuevo usuario
     public void addUsuario(Usuario usuario) {
-        String sql = "INSERT INTO usuarios (email, password, rol) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, usuario.getEmail(), usuario.getPassword(), usuario.getRol());
+        String sql = "INSERT INTO usuarios (email, password, rol, telefono, nombre) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, usuario.getEmail(), usuario.getPassword(), usuario.getRol(), usuario.getTelefono(), usuario.getNombre());
     }
 
     // Método para actualizar un usuario existente
     public void updateUsuario(Usuario usuario) {
-        String sql = "UPDATE usuarios SET email = ?, password = ?, rol = ? WHERE id = ?";
-        jdbcTemplate.update(sql, usuario.getEmail(), usuario.getPassword(), usuario.getRol(), usuario.getId());
+        String sql = "UPDATE usuarios SET email = ?, password = ?, rol = ?, telefono = ?, nombre = ? WHERE id = ?";
+        jdbcTemplate.update(sql, usuario.getEmail(), usuario.getPassword(), usuario.getRol(), usuario.getTelefono(), usuario.getNombre(), usuario.getId());
     }
 
     public boolean telefonoExists(String telefono) {

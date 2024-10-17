@@ -1,6 +1,7 @@
 package es.uji.ei1027.TotFest.controllers.Admin;
 
 import es.uji.ei1027.TotFest.daos.UsuarioDao;
+import es.uji.ei1027.TotFest.models.ContracteArtista;
 import es.uji.ei1027.TotFest.models.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -49,6 +51,8 @@ public class UsuarioController {
             List<Usuario> usuarios = usuarioDao.getUsuarios(size, offset);
             int totalUsuarios = usuariosTotales.size();
             int totalPages = (int) Math.ceil((double) totalUsuarios / size);
+
+            usuariosTotales.sort(Comparator.comparingInt(Usuario::getId));
 
             model.addAttribute("usuarios", usuarios);
             model.addAttribute("currentPage", page);
@@ -100,8 +104,8 @@ public class UsuarioController {
 
         usuarioDao.addUsuario(usuario);
 
-        session.setAttribute("mensajeConfirmacionUsuario", "Usuario añadido correctamente.");
-        return "redirect:/admin/usuarios/list";
+        model.addAttribute("mensaje", "Usuario añadido correctamente.");
+        return "/admin/usuarios/exito";
     }
 
     @RequestMapping(value = "/update/{idUsuario}", method = RequestMethod.GET)
@@ -156,8 +160,8 @@ public class UsuarioController {
             // Actualizar el usuario en la base de datos
             usuarioDao.updateUsuario(usuario);
 
-            session.setAttribute("mensajeConfirmacionUsuario", "Usuario editado correctamente.");
-            return "redirect:/admin/usuarios/list";
+            model.addAttribute("mensaje", "Usuario editado correctamente.");
+            return "/admin/usuarios/exito";
         } catch (Exception e) {
             model.addAttribute("mensajeError", "No se ha podido editar el usuario, inténtalo de nuevo más tarde o contacta con el soporte informático.");
             return "error.html";
@@ -205,9 +209,8 @@ public class UsuarioController {
                 usuarioDao.deleteUsuario(idUsuario); // Método para eliminar usuarios por ID
             }
 
-            // Confirmación de éxito
-            session.setAttribute("mensajeConfirmacionUsuario", "Usuarios eliminados correctamente.");
-            return "redirect:/admin/usuarios/list";
+            model.addAttribute("mensaje", "Usuario eliminado correctamente.");
+            return "/admin/usuarios/exito";
         } catch (Exception e) {
             model.addAttribute("mensajeError", "No se han podido eliminar los usuarios, inténtalo de nuevo más tarde o contacta con el soporte informático.");
             return "error.html";

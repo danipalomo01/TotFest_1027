@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,12 +82,22 @@ public class GFActuaciones {
                 festivales = Collections.emptyList();
             }
 
+            actuacionesPrevias.sort(Comparator.comparingInt(Actuacio::getIdContracte));
+
             int totalfestivales = festivales.size();
             int totalPages = (int) Math.ceil((double) totalfestivales / size);
 
             int numActuacionesMaximasContrato = contracteArtista.getNumActuacionsAny();
 
+            List<String> nombresFestivales = new ArrayList<>();
+
+            for (Actuacio actuacio: actuacionesPrevias) {
+                Festival festival = festivalDao.getFestival(actuacio.getIdFestival());
+                nombresFestivales.add(festival.getNom());
+            }
+
             ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
+            model.addAttribute("nombresFestivales", nombresFestivales);
             model.addAttribute("numActuacionesMaximasContrato", numActuacionesMaximasContrato);
             model.addAttribute("festivales", festivales);
             model.addAttribute("currentPage", page);
@@ -274,8 +285,9 @@ public class GFActuaciones {
             }
             session.setAttribute("mensajeConfirmacionFestival", " eliminado ");
 
-            model.addAttribute("mensajeConfirmacionArtista", "Se han eliminado correctamente los contratos seleccionados");
-            return "redirect:/responsablecontratacion/actuaciones/list/" + idContrato;
+            model.addAttribute("mensaje", "Se han eliminado las actuaciones correctamente");
+            model.addAttribute("redireccion", "/responsablecontratacion/actuaciones/list/" + idContrato);
+            return "/responsableContratacion/actuaciones/exito";
         } catch (Exception e){
             model.addAttribute("mensajeError", "No se han podido eliminar los contratos, inténtalo de nuevo más tarde o contacta con el soporte informático.");
             return "error.html";
@@ -386,7 +398,11 @@ public class GFActuaciones {
         try {
             Actuacio actuacio = actuacioDao.getActuacio(idActuacion);
             actuacioDao.deleteActuacio(idActuacion);
-            return "redirect:/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte();
+
+            model.addAttribute("mensaje", "Se ha eliminado la actuación correctamente");
+            model.addAttribute("redireccion", "/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte());
+            return "/responsablecontratacion/actuaciones/exito";
+
         }
         catch (Exception e) {
             return "error.html";

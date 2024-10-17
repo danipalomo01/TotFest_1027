@@ -222,6 +222,7 @@ public class GFArtistaController {
             for (Integer selectedArtista : selectedArtistas) {
                 artistaDao.deleteArtistaGrup(selectedArtista);
             }
+
             model.addAttribute("mensajeConfirmacionArtista", "Se han eliminado correctamente los artistas");
             return "responsableContratacion/gestionArtistas/exito";
         } catch (Exception e){

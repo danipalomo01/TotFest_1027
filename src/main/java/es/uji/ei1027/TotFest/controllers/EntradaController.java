@@ -15,8 +15,9 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -70,6 +71,10 @@ public class EntradaController {
         compraForm.setEntradatipus(EntradaTipusEnum.dia.name());
         compraForm.setIdFestival(idFestival);
         model.addAttribute("compraForm", compraForm);
+
+        BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.dia.name()).getPreu();
+        model.addAttribute("precio", precioEntradaDia);
+
         return "entrades/compraDia";
     }
 
@@ -121,6 +126,10 @@ public class EntradaController {
         compraForm.setFecha(festival.getDataInici());
         compraForm.setEntradatipus(EntradaTipusEnum.festivalComplet.name());
         compraForm.setIdFestival(idFestival);
+
+        BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.festivalComplet.name()).getPreu();
+
+        model.addAttribute("precio", precioEntradaCompleto);
         model.addAttribute("compraForm", compraForm);
         return "entrades/compraCompleto";
     }
@@ -180,6 +189,8 @@ public class EntradaController {
                 }
             }
 
+            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
+
             if (compraForm.getEntradatipus().equalsIgnoreCase("dia")) {
 
                 for(int i=0; i< compraForm.getNumEntrades(); i++) {
@@ -188,7 +199,7 @@ public class EntradaController {
                     entrada.setIdFestival(idfestival);
                     entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
                     entrada.setEntradaTipus(1);
-                    entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioDia"));
+                    entrada.setPreuVendaEntradaIndividual(entradaTipus.getPreu());
                     entrada.setTelefono(compraForm.getTelefon());
                     entrada.setEmail(compraForm.getEmail());
                     entradaDao.addEntrada(entrada);
@@ -200,6 +211,7 @@ public class EntradaController {
                     entrada.setIdFestival(idfestival);
                     entrada.setEntradaTipus(2);
                     entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
+                    entrada.setPreuVendaEntradaIndividual(entradaTipus.getPreu());
                     entrada.setTelefono(compraForm.getTelefon());
                     entrada.setEmail(compraForm.getEmail());
                     entradaDao.addEntrada(entrada);
@@ -215,21 +227,19 @@ public class EntradaController {
     }
 
     public void validarCompraForm(CompraForm compraForm, BindingResult bindingResult, Model model) {
-        if (compraForm.getTelefon().length() != 9) {
-            bindingResult.rejectValue("telefon", "error.telefon", "El teléfono debe tener 9 numeros");
-        }
-       // int numEntradasDiaMax = (int) model.getAttribute("numEntradasDia");
 
-      //  if (compraForm.getTipusEntrada().equalsIgnoreCase("dia") && compraForm.getNumEntrades() > numEntradasDiaMax) {
-      //      bindingResult.rejectValue("numEntrades", "error.numEntrades", "Sólo hay " + numEntradasDiaMax + " entradas de día disponibles");
-      //  }
+        if (compraForm.getTelefon() == null && compraForm.getEmail() == null) {
+            if (compraForm.getTelefon().length() != 9) {
+                bindingResult.rejectValue("telefon", "error.telefon", "El teléfono debe tener 9 numeros");
+            }
 
-        String EMAIL_REGEX =
-                "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern pattern = Pattern.compile(EMAIL_REGEX);
+            String EMAIL_REGEX =
+                    "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+            Pattern pattern = Pattern.compile(EMAIL_REGEX);
 
-        if(!pattern.matcher(compraForm.getEmail()).matches()) {
-            bindingResult.rejectValue("email", "error.email", "El mail no es válido");
+            if (!pattern.matcher(compraForm.getEmail()).matches()) {
+                bindingResult.rejectValue("email", "error.email", "El mail no es válido");
+            }
         }
 
         if (compraForm.getFecha() != null) {
@@ -284,6 +294,8 @@ public class EntradaController {
 
         Festival festival = festivalDao.getFestival(idFestival);
 
+        entradas.sort(Comparator.comparingInt(Entrada::getNumero));
+
         model.addAttribute("nomfestival", festival.getNom());
         model.addAttribute("entradas", entradas);
         model.addAttribute("currentPage", page);
@@ -297,32 +309,34 @@ public class EntradaController {
 
     @RequestMapping("/listUsuario/{idUsuario}")
     public String listEntradasUsuario(@PathVariable("idUsuario") int idUsuario,
-                               @RequestParam(value = "page", defaultValue = "0") int page,
-                               @RequestParam(value = "size", defaultValue = "5") int size,
-                               @RequestParam(value = "tipoEntrada", required = false) Integer tipoEntrada,
-                               Model model, HttpSession session) {
-        // Verificar si el usuario está en sesión
+                                      @RequestParam(value = "page", defaultValue = "0") int page,
+                                      @RequestParam(value = "size", defaultValue = "5") int size,
+                                      @RequestParam(value = "tipoEntrada", required = false) Integer tipoEntrada,
+                                      @RequestParam(value = "buscarFestival", required = false) String buscarFestival,
+                                      Model model, HttpSession session) {
         if (session == null || session.getAttribute("user") == null) {
             return "redirect:/login";
         }
 
-        if (tipoEntrada != null) {
-            session.setAttribute("ultimoTipoEntrada", tipoEntrada);
-        }
-        else {
-            if (session.getAttribute("ultimoTipoEntrada") != null) {
-                tipoEntrada = (int) session.getAttribute("ultimoTipoEntrada");
-            }
-        }
-
-        List<Entrada> entradas;
-        int totalPages = 0;
-        int totalElems = 0;
-
+        // Recuperar la información del usuario
         Usuario usuario = usuarioDao.getUsuarioById(idUsuario);
         String email = usuario.getEmail();
-        // Filtrar entradas por idFestival y tipo de entrada
-        if (tipoEntrada != null && tipoEntrada != 0) {
+
+        List<Entrada> entradas;
+        List<String> nombresFestivales = new ArrayList<>();
+        List<Boolean> devolvibles = new ArrayList<>();
+
+        int totalElems;
+        int totalPages;
+
+        // Filtrar por festival si el campo de búsqueda no está vacío
+        if (buscarFestival != null && !buscarFestival.isEmpty()) {
+            model.addAttribute("filtrado", "Si");
+            totalElems = entradaDao.getNumTotalEntradasByFestival(email, buscarFestival);
+            entradas = entradaDao.getEntradasByUsuarioAndFestival(email, buscarFestival, page, size);
+            totalPages = (int) Math.ceil((double) totalElems / size);
+        } else if (tipoEntrada != null && tipoEntrada != 0) {
+            model.addAttribute("filtradotipo", tipoEntrada);
             totalElems = entradaDao.getNumTotalEntradasUsuarioPorTipo(email, tipoEntrada);
             entradas = entradaDao.getEntradasByUsuarioAndTipo(email, tipoEntrada, page, size);
             totalPages = entradaDao.getTotalPagesByUsuarioAndTipo(email, tipoEntrada, size);
@@ -332,6 +346,17 @@ public class EntradaController {
             totalPages = entradaDao.getTotalPagesByUsuario(email, size);
         }
 
+        for (Entrada entrada: entradas) {
+            Festival festival = festivalDao.getFestival(entrada.getIdFestival());
+            nombresFestivales.add(festival.getNom());
+            LocalDate today = LocalDate.now();
+            devolvibles.add(festival.getDataInici().toLocalDate().isAfter(today));
+        }
+
+        entradas.sort(Comparator.comparingInt(Entrada::getNumero));
+
+        model.addAttribute("devolvibles", devolvibles);
+        model.addAttribute("nombresFestivales", nombresFestivales);
         model.addAttribute("nomusuario", usuario.getNombre());
         model.addAttribute("entradas", entradas);
         model.addAttribute("currentPage", page);
@@ -340,8 +365,23 @@ public class EntradaController {
         model.addAttribute("tipoEntrada", tipoEntrada);
         model.addAttribute("idUsuario", idUsuario);
         model.addAttribute("totalElems", totalElems);
+        model.addAttribute("buscarFestival", buscarFestival); // Para que se mantenga el valor en el input
         return "entrades/listUsuario";
     }
+
+    @RequestMapping("/devolver")
+    public String devolverEntrada(@RequestParam("entradaNumero") int numeroEntrada, @RequestParam("idUsuario") int idUsuario, Model model, HttpSession session) {
+
+        if (session == null || session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+
+        entradaDao.deleteEntrada(numeroEntrada);
+
+        model.addAttribute("idUsuario", idUsuario);
+        return "/entrades/exitoDevolucion";
+    }
+
 
 }//
 

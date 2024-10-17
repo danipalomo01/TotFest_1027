@@ -47,7 +47,7 @@ public class ArtistaGrupDao {
 
     public List<ArtistaGrup> getArtistaGrups() {
         try {
-            return jdbcTemplate.query("SELECT * FROM artistagrup", new ArtistaGrupRowMapper());
+            return jdbcTemplate.query("SELECT * FROM artistagrup order by idartista", new ArtistaGrupRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<ArtistaGrup>();
         }
@@ -64,7 +64,7 @@ public class ArtistaGrupDao {
     public List<ArtistaGrup> getArtistaGrups(int page, int size) {
         int offset = page * size;
 
-        return jdbcTemplate.query("SELECT * FROM artistagrup LIMIT ? OFFSET ?", new ArtistaGrupRowMapper(), size, offset);
+        return jdbcTemplate.query("SELECT * FROM artistagrup order by idartista LIMIT ? OFFSET ?", new ArtistaGrupRowMapper(), size, offset);
 
     }
 }

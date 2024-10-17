@@ -180,6 +180,7 @@
                             <tr>
                                 <th>ID Contrato</th>
                                 <th>ID Artista</th>
+                                <th>Nombre Artista</th>
                                 <th>Fecha de Inicio</th>
                                 <th>Fecha de Fin</th>
                                 <th>Condiciones<br> Descriptivas</th>
@@ -191,9 +192,10 @@
                             </thead>
                             <tbody id="contract-table-body">
                             <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-                            <tr th:each="contracte : ${contratos}">
+                            <tr th:each="contracte, iter : ${contratos}">
                                 <td th:text="${contracte.idContracte}"></td>
                                 <td th:text="${contracte.idArtista}"></td>
+                                <td th:text="${nombresArtistas[iter.index]}"></td> 
                                 <td th:text="${#dates.format(contracte.dataInici, 'dd/MM/yyyy')}"></td>
                                 <td th:text="${#dates.format(contracte.dataFi, 'dd/MM/yyyy')}"></td>
                                 <td>

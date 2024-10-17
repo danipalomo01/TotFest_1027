@@ -66,7 +66,7 @@ public class ActuacioDao {
 
     public List<Actuacio> getActuacions() {
         try {
-            return jdbcTemplate.query("SELECT * FROM actuacio", new ActuacioRowMapper());
+            return jdbcTemplate.query("SELECT * FROM actuacio order by idactuacio", new ActuacioRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }
@@ -100,7 +100,7 @@ public class ActuacioDao {
 
     public List<Actuacio> getActuacionsDia(int idFestival, Date date) {
         try {
-            String sql = "SELECT * FROM actuacio WHERE idfestival=? AND data=?";
+            String sql = "SELECT * FROM actuacio WHERE idfestival=? AND data=? order by idactuacio";
             return jdbcTemplate.query(sql, new Object[]{idFestival, date}, new ActuacioRowMapper());
         } catch (Exception e) {
             return new ArrayList<>();
@@ -109,7 +109,7 @@ public class ActuacioDao {
 
     public List<Actuacio> getActuacionsFestival(int idFestival) {
         try {
-            String sql = "SELECT * FROM actuacio WHERE idfestival=?";
+            String sql = "SELECT * FROM actuacio WHERE idfestival=? order by idactuacio";
             return jdbcTemplate.query(sql, new Object[]{idFestival}, new ActuacioRowMapper());
         } catch (Exception e) {
             return new ArrayList<>();

@@ -4,6 +4,7 @@ import es.uji.ei1027.TotFest.daos.ActuacioDao;
 import es.uji.ei1027.TotFest.daos.EntradaDao;
 import es.uji.ei1027.TotFest.daos.FestivalDao;
 import es.uji.ei1027.TotFest.models.Actuacio;
+import es.uji.ei1027.TotFest.models.EntradaTipus;
 import es.uji.ei1027.TotFest.models.Festival;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -104,8 +107,12 @@ public class FestivalController {
             for(int i = 0; i < festivales.size(); i++) {
                 int precioDia = festivalDao.getPrecioEntradaDia(festivales.get(i).getIdFestival());
                 int precioCompleto = festivalDao.getPrecioEntradaCompleto(festivales.get(i).getIdFestival());
-                int numEntradasDia = Math.min((festivalDao.getFestival(festivales.get(i).getIdFestival()).getAforamentMaxim()/10 - entradaDao.getEntradesVenudesPerDiaDeDia(festivales.get(i).getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))), 10);
-                int numEntradasCompleto = Math.min(festivalDao.getFestival(festivales.get(i).getIdFestival()).getAforamentMaxim() - festivalDao.getNumEntradasVendidas(festivales.get(i).getIdFestival()), 10);
+
+                EntradaTipus entradaTipusDia = entradaDao.getEntradaTipus(festivales.get(i).getIdFestival(), 1);
+                EntradaTipus entradaTipusCompleto = entradaDao.getEntradaTipus(festivales.get(i).getIdFestival(), 2);
+
+                int numEntradasDia = Math.min((BigDecimal.valueOf(festivales.get(i).getAforamentMaxim()).multiply(entradaTipusDia.getPercentatgeMaximAforament()).divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).subtract(BigDecimal.valueOf(entradaDao.getEntradesVenudesPerDiaDeDia(entradaTipusDia.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))))).intValue(), 10);
+                int numEntradasCompleto = Math.min((BigDecimal.valueOf(festivales.get(i).getAforamentMaxim()).multiply(entradaTipusCompleto.getPercentatgeMaximAforament()).divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).subtract(BigDecimal.valueOf(entradaDao.getEntradesVenudesPerDiaDeDia(entradaTipusDia.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))))).intValue(), 10);
 
                 List<Integer> listaPrecios = new ArrayList<Integer>();
                 listaPrecios.add(precioDia);

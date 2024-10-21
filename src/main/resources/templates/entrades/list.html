@@ -232,25 +232,23 @@
                             <thead>
                             <tr>
                                 <th>Número de Entrada</th>
+                                <th>Festival</th>
                                 <th>Precio Venta</th>
                                 <th>Fecha de Entrada</th>
                                 <th>Fecha Compra</th>
                                 <th>Tipo de Entrada</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
                             </tr>
                             </thead>
                             <tbody id="entrada-table-body">
                             <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-                            <tr th:each="entrada : ${entradas}">
-                                <td th:text="${entrada.numero}"></td>
-                                <td th:text="${entrada.preuVendaEntradaIndividual}"></td>
-                                <td th:text="${#dates.format(entrada.data, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${#dates.format(entrada.datacompra, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${entrada.entradaTipus == 1 ? 'Entradas de Día' : 'Festival Completo'}"></td>
-                                <td th:text="${entrada.email}"></td>
-                                <td th:text="${entrada.telefono}"></td>
 
+                            <tr th:each="entrada, iter : ${entradas}">
+                                <td th:text="${entrada.numero}"></td>
+                                <td th:text="${nombresFestivales[iter.index]}"></td> <!-- Mostrar el nombre del festival correspondiente -->
+                                <td th:text="${preciosEntrada[iter.index]}"></td>
+                                <td th:text="${#dates.format(entrada.datacompra, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${fechasEntrada[iter.index]}"></td>
+                                <td th:text="${tiposEntrada[iter.index] == 1 ? 'Entrada de Día' : 'Festival Completo'}"></td>
                             </tr>
                             </tbody>
                         </table>

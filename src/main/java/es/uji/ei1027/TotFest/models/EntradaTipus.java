@@ -10,20 +10,16 @@ public class EntradaTipus {
     private int idFestival;
     private BigDecimal preu;
     private String descripcio;
-    private int nombreMaxim;
-    private Date dataPerTipusDia;
     private BigDecimal percentatgeMaximAforament;
 
     public EntradaTipus(){
 
     }
-    public EntradaTipus(EntradaTipusEnum entradaTipus, int idFestival, BigDecimal preu, String descripcio, int nombreMaxim, Date dataPerTipusDia, BigDecimal percentatgeMaximAforament) {
+    public EntradaTipus(EntradaTipusEnum entradaTipus, int idFestival, BigDecimal preu, String descripcio, BigDecimal percentatgeMaximAforament) {
         this.entradaTipus = entradaTipus;
         this.idFestival = idFestival;
         this.preu = preu;
         this.descripcio = descripcio;
-        this.nombreMaxim = nombreMaxim;
-        this.dataPerTipusDia = dataPerTipusDia;
         this.percentatgeMaximAforament = percentatgeMaximAforament;
     }
 
@@ -59,28 +55,20 @@ public class EntradaTipus {
         this.descripcio = descripcio;
     }
 
-    public int getNombreMaxim() {
-        return nombreMaxim;
-    }
-
-    public void setNombreMaxim(int nombreMaxim) {
-        this.nombreMaxim = nombreMaxim;
-    }
-
-    public Date getDataPerTipusDia() {
-        return dataPerTipusDia;
-    }
-
-    public void setDataPerTipusDia(Date dataPerTipusDia) {
-        this.dataPerTipusDia = dataPerTipusDia;
-    }
-
     public BigDecimal getPercentatgeMaximAforament() {
         return percentatgeMaximAforament;
     }
 
     public void setPercentatgeMaximAforament(BigDecimal percentatgeMaximAforament) {
         this.percentatgeMaximAforament = percentatgeMaximAforament;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
 

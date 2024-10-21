@@ -93,7 +93,7 @@ public class FestivalDao {
 
     public int getPrecioEntradaDia(int idFestival) {
         try {
-            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 'dia'", Integer.class, idFestival);
+            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 1", Integer.class, idFestival);
             // List<Actuacio> actuaciones = jdbcTemplate.queryForObject("select * from actuacio where idactuacio")
         } catch (EmptyResultDataAccessException e) {
             return -1;
@@ -102,7 +102,7 @@ public class FestivalDao {
 
     public int getPrecioEntradaCompleto(int idFestival) {
         try {
-            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 'festivalComplet'", Integer.class, idFestival);
+            return jdbcTemplate.queryForObject("SELECT preu FROM entradatipus WHERE idfestival = ? AND entradatipus = 2", Integer.class, idFestival);
             // List<Actuacio> actuaciones = jdbcTemplate.queryForObject("select * from actuacio where idactuacio")
         } catch (EmptyResultDataAccessException e) {
             return -1;
@@ -147,7 +147,10 @@ public class FestivalDao {
 
     public int getNumEntradasVendidas(int idFestival) {
         try {
-            return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM entrada WHERE idfestival=?", Integer.class, idFestival);
+            String sql = "SELECT COUNT(*) FROM entrada e " +
+                    "JOIN entradatipus et ON e.identradatipus = et.id " +
+                    "WHERE et.idfestival = ?";
+            return jdbcTemplate.queryForObject(sql, Integer.class, idFestival);
         } catch (EmptyResultDataAccessException e) {
             return -1;
         }

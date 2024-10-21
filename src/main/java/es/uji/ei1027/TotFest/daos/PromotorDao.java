@@ -20,12 +20,10 @@ public class PromotorDao {
     }
 
     public void addPromotor(Promotor promotor) {
-
-        jdbcTemplate.update("INSERT INTO promotor VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO promotor (cif, nomorganisme, domicilifiscal, sector, dataalta, databaixarelaciocomercial, datainicigestorfest) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 promotor.getCif(), promotor.getNomOrganisme(), promotor.getDomiciliFiscal(), promotor.getSector(),
-                promotor.getDataAlta(), promotor.getDataBaixaRelacio(), promotor.getNomGestorFestivals(),
-                promotor.getPwd(), promotor.getMailGestorFestActual(), promotor.getTelefonGestorFest(),
-                promotor.getRazonSocial(), promotor.getTipusOrganisme());
+                promotor.getDataAlta(), promotor.getDataBaixaRelacioComercial(), promotor.getDatainiciGestorFest());
     }
 
     public void deletePromotor(String cif) {
@@ -34,12 +32,10 @@ public class PromotorDao {
 
     public void updatePromotor(Promotor promotor) {
         jdbcTemplate.update("UPDATE promotor SET nomorganisme=?, domicilifiscal=?, sector=?, dataalta=?, " +
-                        "databaixarelacio=?, nomgestorfestivals=?, pwd=?, mailgestorfestactual=?, telefongestorfest=?, " +
-                        "razonsocial=?, tipusorganisme=? WHERE cif=?",
+                        "databaixarelaciocomercial=?, datainicigestorfest=? WHERE cif=?",
                 promotor.getNomOrganisme(), promotor.getDomiciliFiscal(), promotor.getSector(),
-                promotor.getDataAlta(), promotor.getDataBaixaRelacio(), promotor.getNomGestorFestivals(),
-                promotor.getPwd(), promotor.getMailGestorFestActual(), promotor.getTelefonGestorFest(),
-                promotor.getRazonSocial(), promotor.getTipusOrganisme(), promotor.getCif());
+                promotor.getDataAlta(), promotor.getDataBaixaRelacioComercial(), promotor.getDatainiciGestorFest(),
+                promotor.getCif());
     }
 
     public List<Promotor> getPromotores() {

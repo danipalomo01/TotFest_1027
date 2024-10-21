@@ -1,5 +1,6 @@
 package es.uji.ei1027.TotFest.controllers;
 
+import es.uji.ei1027.TotFest.daos.CompraDao;
 import es.uji.ei1027.TotFest.daos.FestivalDao;
 import es.uji.ei1027.TotFest.daos.EntradaDao;
 import es.uji.ei1027.TotFest.daos.UsuarioDao;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,10 +30,16 @@ public class EntradaController {
     private EntradaDao entradaDao;
     private FestivalDao festivalDao;
     private UsuarioDao usuarioDao;
+    private CompraDao compraDao;
 
     @Autowired
     public void setEntradaDao(EntradaDao entradaDao) {
         this.entradaDao = entradaDao;
+    }
+
+    @Autowired
+    public void setCompraDao(CompraDao compraDao) {
+        this.compraDao = compraDao;
     }
 
     @Autowired
@@ -52,7 +60,9 @@ public class EntradaController {
         } else {
             model.addAttribute("noDisponible", "false");
         }
-        int numEntradasDia = Math.min((festivalDao.getFestival(idFestival).getAforamentMaxim()/10 - entradaDao.getEntradesVenudesPerDiaDeDia(idFestival, java.sql.Date.valueOf(LocalDate.now()))), 10);
+
+        EntradaTipus entradaTipus = entradaDao.getEntradaTipus(idFestival, EntradaTipusEnum.DIA.getValue());
+        int numEntradasDia = Math.min((BigDecimal.valueOf(festivalDao.getFestival(idFestival).getAforamentMaxim()).multiply(entradaTipus.getPercentatgeMaximAforament()).divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).subtract(BigDecimal.valueOf(entradaDao.getEntradesVenudesPerDiaDeDia(idFestival, java.sql.Date.valueOf(LocalDate.now()))))).intValue(), 10);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -68,11 +78,11 @@ public class EntradaController {
 
         CompraForm compraForm = new CompraForm();
         compraForm.setFecha(festival.getDataInici());
-        compraForm.setEntradatipus(EntradaTipusEnum.dia.name());
+        compraForm.setEntradatipus(EntradaTipusEnum.DIA.getValue());
         compraForm.setIdFestival(idFestival);
         model.addAttribute("compraForm", compraForm);
 
-        BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.dia.name()).getPreu();
+        BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.DIA.getValue()).getPreu();
         model.addAttribute("precio", precioEntradaDia);
 
         return "entrades/compraDia";
@@ -91,9 +101,16 @@ public class EntradaController {
             return "error.html";
         }
 
-        Festival festival = festivalDao.getFestival(entrada.getIdFestival());
+        EntradaTipus entradaTipus = entradaDao.getEntradaTipus(entrada.getEntradaTipus());
+        Compra compra = compraDao.getCompra(entrada.getIdcompra());
+        Festival festival = festivalDao.getFestival(entradaTipus.getIdFestival());
         // Añadir la entrada al modelo para mostrarla en la vista
         model.addAttribute("entrada", entrada);
+        model.addAttribute("telefono", compra.getTelefon());
+        model.addAttribute("preu", entradaTipus.getPreu());
+        model.addAttribute("email", compra.getEmail());
+        model.addAttribute("entradaTipus", entradaTipus.getEntradaTipus().getValue() == 1 ? "Entrada de Día" : "Entrada del Festival Completo");
+
         model.addAttribute("festival", festival.getNom());
 
         // Dirigir a la vista correspondiente según el tipo de entrada
@@ -108,7 +125,12 @@ public class EntradaController {
         } else {
             model.addAttribute("noDisponible", "false");
         }
-        int numEntradasCompleto = Math.min(festivalDao.getFestival(idFestival).getAforamentMaxim() - festivalDao.getNumEntradasVendidas(festival.getIdFestival()), 10);
+        int numEntradasCompleto = Math.min(
+                BigDecimal.valueOf(festivalDao.getFestival(idFestival).getAforamentMaxim())
+                        .subtract(BigDecimal.valueOf(festivalDao.getNumEntradasVendidas(festival.getIdFestival())))
+                        .intValue(),
+                10
+        );
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -124,10 +146,10 @@ public class EntradaController {
 
         CompraForm compraForm = new CompraForm();
         compraForm.setFecha(festival.getDataInici());
-        compraForm.setEntradatipus(EntradaTipusEnum.festivalComplet.name());
+        compraForm.setEntradatipus(EntradaTipusEnum.FESTIVAL_COMPLETO.getValue());
         compraForm.setIdFestival(idFestival);
 
-        BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.festivalComplet.name()).getPreu();
+        BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.FESTIVAL_COMPLETO.getValue()).getPreu();
 
         model.addAttribute("precio", precioEntradaCompleto);
         model.addAttribute("compraForm", compraForm);
@@ -145,19 +167,27 @@ public class EntradaController {
 
             if (compraForm.getEmail() == null && compraForm.getTelefon() == null) {
                 int idUsuario = (int) session.getAttribute("idUsuario");
-
                 Usuario usuario = usuarioDao.getUsuarioById(idUsuario);
                 compraForm.setEmail(usuario.getEmail());
                 compraForm.setTelefon(usuario.getTelefono());
             }
             validarCompraForm(compraForm, bindingResult, model);
+
+            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
+
             if (bindingResult.hasErrors()) {
                 Festival festival = (Festival) session.getAttribute("ultimoFestivalCompra");
-                int numEntradasDia = Math.min((festivalDao.getFestival(festival.getIdFestival()).getAforamentMaxim()/10 - entradaDao.getEntradesVenudesPerDiaDeDia(festival.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))), 10);
-                int numEntradasCompleto = Math.min(festivalDao.getFestival(festival.getIdFestival()).getAforamentMaxim() - festivalDao.getNumEntradasVendidas(festival.getIdFestival()), 10);
 
-                BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.dia.name()).getPreu();
-                BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.festivalComplet.name()).getPreu();
+                int numEntradasDia = Math.min((BigDecimal.valueOf(festival.getAforamentMaxim()).multiply(entradaTipus.getPercentatgeMaximAforament()).divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).subtract(BigDecimal.valueOf(entradaDao.getEntradesVenudesPerDiaDeDia(entradaTipus.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))))).intValue(), 10);
+                int numEntradasCompleto = Math.min(
+                        BigDecimal.valueOf(festival.getAforamentMaxim())
+                                .subtract(BigDecimal.valueOf(festivalDao.getNumEntradasVendidas(festival.getIdFestival())))
+                                .intValue(),
+                        10
+                );
+
+                BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.DIA.getValue()).getPreu();
+                BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.FESTIVAL_COMPLETO.getValue()).getPreu();
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -181,7 +211,7 @@ public class EntradaController {
                 compraForm.setIdFestival(festival.getIdFestival());
                 model.addAttribute("compraForm", compraForm);
 
-                if (compraForm.getEntradatipus().equalsIgnoreCase("dia")) {
+                if (compraForm.getEntradatipus() == 1) {
                     return "entrades/compraDia";
                 }
                 else {
@@ -189,34 +219,30 @@ public class EntradaController {
                 }
             }
 
-            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
+            Compra compra = new Compra(java.sql.Date.valueOf(LocalDate.now()), entradaTipus.getPreu().multiply(BigDecimal.valueOf(compraForm.getNumEntrades())).doubleValue(), compraForm.getEmail(), compraForm.getTelefon());
+            int idCompra = compraDao.addCompra(compra);
 
-            if (compraForm.getEntradatipus().equalsIgnoreCase("dia")) {
+            if (compraForm.getEntradatipus() == 1) {
 
                 for(int i=0; i< compraForm.getNumEntrades(); i++) {
                     Entrada entrada = new Entrada();
+                    entrada.setIdcompra(idCompra);
                     entrada.setData(new java.sql.Date(compraForm.getFecha().getTime()));
-                    entrada.setIdFestival(idfestival);
                     entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
-                    entrada.setEntradaTipus(1);
-                    entrada.setPreuVendaEntradaIndividual(entradaTipus.getPreu());
-                    entrada.setTelefono(compraForm.getTelefon());
-                    entrada.setEmail(compraForm.getEmail());
+                    entrada.setEntradaTipus(entradaTipus.getId());
                     entradaDao.addEntrada(entrada);
                 }
+
             } else {
                 for(int i=0; i< compraForm.getNumEntrades(); i++) {
                     Entrada entrada = new Entrada();
-                    entrada.setPreuVendaEntradaIndividual((BigDecimal) session.getAttribute("ultimoPrecioCompleto"));
-                    entrada.setIdFestival(idfestival);
-                    entrada.setEntradaTipus(2);
+                    entrada.setIdcompra(idCompra);
+                    entrada.setEntradaTipus(entradaTipus.getId());
                     entrada.setDatacompra(java.sql.Date.valueOf(LocalDate.now()));
-                    entrada.setPreuVendaEntradaIndividual(entradaTipus.getPreu());
-                    entrada.setTelefono(compraForm.getTelefon());
-                    entrada.setEmail(compraForm.getEmail());
                     entradaDao.addEntrada(entrada);
                 }
             }
+
 
         } catch (Exception e) {
             return "redirect:/festival/list";
@@ -294,7 +320,30 @@ public class EntradaController {
 
         Festival festival = festivalDao.getFestival(idFestival);
 
+        List<String> nombresFestivales = new ArrayList<>();
+        List<Integer> tiposEntrada = new ArrayList<>();
+        List<java.sql.Date> fechasEntrada = new ArrayList<>();
+        List<Double> preciosEntrada = new ArrayList<>();
+
+        for (Entrada entrada: entradas) {
+
+            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(entrada.getEntradaTipus());
+            festival = festivalDao.getFestival(entradaTipus.getIdFestival());
+            nombresFestivales.add(festival.getNom());
+
+            tiposEntrada.add(entradaTipus.getEntradaTipus().getValue());
+            preciosEntrada.add(entradaTipus.getPreu().doubleValue());
+
+            Compra compra = compraDao.getCompra(entrada.getIdcompra());
+            fechasEntrada.add(compra.getData());
+        }
+
         entradas.sort(Comparator.comparingInt(Entrada::getNumero));
+
+        model.addAttribute("nombresFestivales", nombresFestivales);
+        model.addAttribute("fechasEntrada", fechasEntrada);
+        model.addAttribute("tiposEntrada", tiposEntrada);
+        model.addAttribute("preciosEntrada", preciosEntrada);
 
         model.addAttribute("nomfestival", festival.getNom());
         model.addAttribute("entradas", entradas);
@@ -323,7 +372,7 @@ public class EntradaController {
         String email = usuario.getEmail();
 
         List<Entrada> entradas;
-        List<String> nombresFestivales = new ArrayList<>();
+
         List<Boolean> devolvibles = new ArrayList<>();
 
         int totalElems;
@@ -346,17 +395,36 @@ public class EntradaController {
             totalPages = entradaDao.getTotalPagesByUsuario(email, size);
         }
 
+        List<String> nombresFestivales = new ArrayList<>();
+        List<Integer> tiposEntrada = new ArrayList<>();
+        List<java.sql.Date> fechasEntrada = new ArrayList<>();
+        List<Double> preciosEntrada = new ArrayList<>();
+
         for (Entrada entrada: entradas) {
-            Festival festival = festivalDao.getFestival(entrada.getIdFestival());
+
+
+            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(entrada.getEntradaTipus());
+            Festival festival = festivalDao.getFestival(entradaTipus.getIdFestival());
             nombresFestivales.add(festival.getNom());
             LocalDate today = LocalDate.now();
             devolvibles.add(festival.getDataInici().toLocalDate().isAfter(today));
+
+            tiposEntrada.add(entradaTipus.getEntradaTipus().getValue());
+            preciosEntrada.add(entradaTipus.getPreu().doubleValue());
+
+            Compra compra = compraDao.getCompra(entrada.getIdcompra());
+            fechasEntrada.add(compra.getData());
         }
 
         entradas.sort(Comparator.comparingInt(Entrada::getNumero));
 
-        model.addAttribute("devolvibles", devolvibles);
         model.addAttribute("nombresFestivales", nombresFestivales);
+        model.addAttribute("fechasEntrada", fechasEntrada);
+        model.addAttribute("tiposEntrada", tiposEntrada);
+        model.addAttribute("preciosEntrada", preciosEntrada);
+
+        model.addAttribute("devolvibles", devolvibles);
+        model.addAttribute("entradaTipo", tipoEntrada);
         model.addAttribute("nomusuario", usuario.getNombre());
         model.addAttribute("entradas", entradas);
         model.addAttribute("currentPage", page);

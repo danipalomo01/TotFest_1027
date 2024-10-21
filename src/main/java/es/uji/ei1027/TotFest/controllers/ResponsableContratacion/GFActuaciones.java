@@ -176,12 +176,8 @@ public class GFActuaciones {
                 return "responsablecontratacion/actuaciones/addActuacionContrato";
             }
 
-            ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(actuacioForm.getIdArtista());
-
             Actuacio actuacio = new Actuacio();
-            actuacio.setNomartista(artistaGrup.getNom());
             actuacio.setIdFestival(actuacioForm.getIdFestival());
-            actuacio.setIdartista(actuacioForm.getIdArtista());
             actuacio.setHoraFiPrevista(actuacioForm.getHoraFiPrevista());
             actuacio.setHoraInici(actuacioForm.getHoraInici());
             actuacio.setIdContracte(actuacioForm.getIdContracte());
@@ -218,10 +214,14 @@ public class GFActuaciones {
             actuacioForm.setHoraFiPrevista(actuacio.getHoraFiPrevista());
             actuacioForm.setPreuContracteActuacio(actuacio.getPreuContracteActuacio());
             actuacioForm.setIdContracte(actuacio.getIdContracte());
-            actuacioForm.setIdArtista(actuacio.getIdartista());
             actuacioForm.setIdFestival(actuacio.getIdFestival());
 
-            model.addAttribute("nombreArtista", actuacio.getNomartista());
+            ContracteArtista contracteArtista = contracteArtistaDao.getContracteArtista(actuacioForm.getIdContracte());
+            ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
+
+            model.addAttribute("nombreArtista", artistaGrup.getNom());
+            actuacioForm.setIdArtista(artistaGrup.getIdArtista());
+
             return "responsablecontratacion/actuaciones/updateActuacionContrato";
         }
         catch (Exception e) {
@@ -247,13 +247,10 @@ public class GFActuaciones {
                 model.addAttribute("nombreArtista", artistaGrup.getNom());
                 return "responsablecontratacion/actuaciones/updateActuacionContrato";
             }
-            ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(actuacioForm.getIdArtista());
 
             Actuacio actuacio = new Actuacio();
             actuacio.setIdActuacio(actuacioForm.getIdActuacio());
-            actuacio.setNomartista(artistaGrup.getNom());
             actuacio.setIdFestival(actuacioForm.getIdFestival());
-            actuacio.setIdartista(actuacioForm.getIdArtista());
             actuacio.setHoraFiPrevista(actuacioForm.getHoraFiPrevista());
             actuacio.setHoraInici(actuacioForm.getHoraInici());
             actuacio.setIdContracte(actuacioForm.getIdContracte());
@@ -356,7 +353,6 @@ public class GFActuaciones {
 
                             ).collect(Collectors.toList());
 
-
             List<Actuacio> actuacionesNuevas = new ArrayList<>();
             for (int i=0; i< contracteArtista.getNumActuacionsAny(); i++) {
                 Actuacio actuacio = new Actuacio();
@@ -365,6 +361,7 @@ public class GFActuaciones {
                 actuacio.setHoraFiPrevista(java.sql.Time.valueOf(LocalTime.of(0, 0)));
                 actuacionesNuevas.add(actuacio);
             }
+
             ContratoActuaciones contratoActuaciones = new ContratoActuaciones();
             contratoActuaciones.setContrato(contracteArtista);
             contratoActuaciones.setActuaciones(actuacionesNuevas);

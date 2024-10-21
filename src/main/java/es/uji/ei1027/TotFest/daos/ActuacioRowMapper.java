@@ -19,8 +19,6 @@ public class ActuacioRowMapper implements RowMapper<Actuacio> {
         actuacio.setPreuContracteActuacio(rs.getBigDecimal("preuContracteActuacio"));
         actuacio.setComentaris(rs.getString("comentaris"));
         actuacio.setIdFestival(rs.getInt("idFestival"));
-        actuacio.setNomartista(rs.getString("nomartista"));
-        actuacio.setIdartista(rs.getInt("idartista"));
         return actuacio;
     }
 }

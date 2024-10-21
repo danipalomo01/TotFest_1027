@@ -318,7 +318,7 @@
                 <span>&nbsp;€</span>
               </div>
 
-              <p th:if="${festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0}" style="font-weight: bold; margin-right: 25px; text-align: right; margin-top: 10px; text-decoration: underline">Comprar entradas</p>
+              <p th:if="${festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0 && (festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda') and (session.idComercial == null and session.cif == null)}" style="font-weight: bold; margin-right: 25px; text-align: right; margin-top: 10px; text-decoration: underline">Comprar entradas</p>
 
               <div style="display: flex">
                   <div class="buttons-wrapper">

@@ -12,13 +12,12 @@ public class EntradaRowMapper implements RowMapper<Entrada> {
     public Entrada mapRow(ResultSet rs, int rowNum) throws SQLException {
         Entrada entrada = new Entrada();
         entrada.setNumero(rs.getInt("numero"));
-        entrada.setIdFestival(rs.getInt("idfestival"));
-        entrada.setData(rs.getDate("data"));
-        entrada.setPreuVendaEntradaIndividual(rs.getBigDecimal("preuVendaEntradaIndividual"));
-        entrada.setDatacompra(rs.getDate("datacompra"));
+       // entrada.setIdFestival(rs.getInt("idfestival"));
+        entrada.setDatacompra(rs.getDate("data"));
         entrada.setEntradaTipus(rs.getInt("identradatipus"));
-        entrada.setTelefono(rs.getString("telefono"));
-        entrada.setEmail(rs.getString("email"));
+        entrada.setIdcompra(rs.getInt("idcompra"));
+        //entrada.setTelefono(rs.getString("telefono"));
+        //entrada.setEmail(rs.getString("email"));
         return entrada;
     }
 }

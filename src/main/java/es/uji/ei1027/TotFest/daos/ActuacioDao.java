@@ -32,7 +32,7 @@ public class ActuacioDao {
         int nextId = maxId + 1;
         actuacio.setIdActuacio(nextId);
 
-        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                 actuacio.getIdActuacio(),
                 actuacio.getIdContracte(),
                 actuacio.getData(),
@@ -40,9 +40,7 @@ public class ActuacioDao {
                 actuacio.getHoraFiPrevista(),
                 actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
-                actuacio.getIdFestival(),
-                actuacio.getNomartista(),
-                actuacio.getIdartista()
+                actuacio.getIdFestival()
         );
     }
 
@@ -51,7 +49,7 @@ public class ActuacioDao {
     }
 
     public void updateActuacio(Actuacio actuacio) {
-        jdbcTemplate.update("UPDATE actuacio SET idContracte = ?, data = ?, horaInici = ?, horaFiPrevista = ?, preuContracteActuacio = ?, comentaris = ?, idFestival = ?, nomartista=? WHERE idActuacio = ?",
+        jdbcTemplate.update("UPDATE actuacio SET idContracte = ?, data = ?, horaInici = ?, horaFiPrevista = ?, preuContracteActuacio = ?, comentaris = ?, idFestival = ? WHERE idActuacio = ?",
                 actuacio.getIdContracte(),
                 actuacio.getData(),
                 actuacio.getHoraInici(),
@@ -59,7 +57,6 @@ public class ActuacioDao {
                 actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
                 actuacio.getIdFestival(),
-                actuacio.getNomartista(),
                 actuacio.getIdActuacio()
         );
     }

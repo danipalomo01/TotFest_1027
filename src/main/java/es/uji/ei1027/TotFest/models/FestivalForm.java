@@ -25,12 +25,16 @@ public class FestivalForm {
     private int numEntradasVendidas;
     private float precioFestivalCompleto;
     private float precioDia;
+    private float porcentajeCompleto;
+    private float porcentajeDia;
+    public String descripcionCompleto;
+    public String descripcionDia;
 
     public FestivalForm(){
 
     }
 
-    public FestivalForm(int idFestival, String cifPromotor, String nom, int anyo, Date dataInici, Date dataFi, es.uji.ei1027.TotFest.models.EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda, int numEntradasVendidas, float precioFestivalCompleto, float precioDia) {
+    public FestivalForm(int idFestival, String cifPromotor, String nom, int anyo, Date dataInici, Date dataFi, EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda, int numEntradasVendidas, float precioFestivalCompleto, float precioDia, float porcentajeCompleto, float porcentajeDia) {
         this.idFestival = idFestival;
         this.cifPromotor = cifPromotor;
         this.nom = nom;
@@ -51,6 +55,8 @@ public class FestivalForm {
         this.numEntradasVendidas = numEntradasVendidas;
         this.precioFestivalCompleto = precioFestivalCompleto;
         this.precioDia = precioDia;
+        this.porcentajeCompleto = porcentajeCompleto;
+        this.porcentajeDia = porcentajeDia;
     }
 
     public int getIdFestival() {
@@ -211,5 +217,37 @@ public class FestivalForm {
 
     public void setPrecioDia(float precioDia) {
         this.precioDia = precioDia;
+    }
+
+    public float getPorcentajeCompleto() {
+        return porcentajeCompleto;
+    }
+
+    public void setPorcentajeCompleto(float porcentajeCompleto) {
+        this.porcentajeCompleto = porcentajeCompleto;
+    }
+
+    public float getPorcentajeDia() {
+        return porcentajeDia;
+    }
+
+    public void setPorcentajeDia(float porcentajeDia) {
+        this.porcentajeDia = porcentajeDia;
+    }
+
+    public String getDescripcionCompleto() {
+        return descripcionCompleto;
+    }
+
+    public void setDescripcionCompleto(String descripcionCompleto) {
+        this.descripcionCompleto = descripcionCompleto;
+    }
+
+    public String getDescripcionDia() {
+        return descripcionDia;
+    }
+
+    public void setDescripcionDia(String descripcionDia) {
+        this.descripcionDia = descripcionDia;
     }
 }

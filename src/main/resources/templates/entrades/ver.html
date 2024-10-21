@@ -121,14 +121,14 @@
   <div class="ticket-section">
     <div class="ticket-info">
       <p><strong>Festival:</strong> <span th:text="*{festival}">Nombre del Festival</span></p>
-      <p><strong>Fecha del Evento:</strong> <span th:text="${#dates.format(entrada.data, 'dd/MM/yyyy')}">01/10/2024</span></p>
-      <p><strong>Tipo de Entrada:</strong> <span th:text="${entrada.entradaTipus}"></span></p>
+      <p><strong>Fecha del Evento:</strong> <span th:text="${#dates.format(entrada.datacompra, 'dd/MM/yyyy')}">01/10/2024</span></p>
+      <p><strong>Tipo de Entrada:</strong> <span th:text="${entradaTipus}"></span></p>
     </div>
 
     <div class="ticket-info">
-      <p><strong>Precio:</strong> <span th:text="${entrada.preuVendaEntradaIndividual}">10.00 €</span></p>
-      <p><strong>Teléfono:</strong> <span th:text="${entrada.telefono}">123456789</span></p>
-      <p><strong>Email:</strong> <span th:text="${entrada.email}">user1@example.com</span></p>
+      <p><strong>Precio:</strong> <span th:text="${preu}">10.00 €</span></p>
+      <p><strong>Teléfono:</strong> <span th:text="${telefono}">123456789</span></p>
+      <p><strong>Email:</strong> <span th:text="${email}">user1@example.com</span></p>
     </div>
   </div>
 

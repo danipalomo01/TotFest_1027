@@ -36,15 +36,17 @@ public class GFFestivalController {
     private ActuacionsFestivalDao actuacionsFestivalDao;
     private ActuacioDao actuacioDao;
     private EntradaDao entradaDao;
+    private PromotorDao promotorDao;
 
     @Autowired
-    public void setFestivalDao(FestivalDao festivalDao, ContracteArtistaDao contracteArtistaDao, ArtistaGrupDao artistaGrupDao, ActuacionsFestivalDao actuacionsFestivalDao, ActuacioDao actuacioDao, EntradaDao entradaDao) {
+    public void setFestivalDao(FestivalDao festivalDao, ContracteArtistaDao contracteArtistaDao, ArtistaGrupDao artistaGrupDao, ActuacionsFestivalDao actuacionsFestivalDao, ActuacioDao actuacioDao, EntradaDao entradaDao, PromotorDao promotorDao) {
         this.festivalDao = festivalDao;
         this.contracteArtistaDao = contracteArtistaDao;
         this.artistaGrupDao = artistaGrupDao;
         this.actuacionsFestivalDao = actuacionsFestivalDao;
         this.actuacioDao = actuacioDao;
         this.entradaDao = entradaDao;
+        this.promotorDao = promotorDao;
     }
 
     @RequestMapping("/list")
@@ -110,6 +112,10 @@ public class GFFestivalController {
         festivalForm.setDataIniciVenda(Date.valueOf(LocalDate.now()));
         festivalForm.setAnyo(2024);
         model.addAttribute("festival", festivalForm);
+
+        List<Promotor> promotores = promotorDao.getPromotores();
+        model.addAttribute("promotores", promotores);
+
         return "gestorFestival/add";
     }
 
@@ -121,6 +127,12 @@ public class GFFestivalController {
             return "redirect:/login";
         }
         // Aquí puedes incluir la validación del Festival si es necesario
+
+        validarAddHtml(festivalForm, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            return "gestorFestival/add";
+        }
 
         Festival festival = new Festival(
                 festivalForm.getIdFestival(),
@@ -142,18 +154,11 @@ public class GFFestivalController {
                 festivalForm.getDataIniciVenda()
         );
 
-        validarAddHtml(festival, bindingResult);
-
-        if (bindingResult.hasErrors()) {
-            return "gestorFestival/add";
-        }
-
         try {
-
             festivalDao.addFestival(festival, session);
 
-            EntradaTipus entradaTipusDia = new EntradaTipus(EntradaTipusEnum.dia, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioDia()), "", festivalForm.getAforamentMaxim()/10, null, null );
-            EntradaTipus entradaTipusCompleto = new EntradaTipus(EntradaTipusEnum.festivalComplet, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioFestivalCompleto()), "", festivalForm.getAforamentMaxim(), null, null );
+            EntradaTipus entradaTipusDia = new EntradaTipus(EntradaTipusEnum.DIA, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioDia()), festivalForm.getDescripcionDia(), BigDecimal.valueOf(festivalForm.getPorcentajeDia()));
+            EntradaTipus entradaTipusCompleto = new EntradaTipus(EntradaTipusEnum.FESTIVAL_COMPLETO, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioFestivalCompleto()), festivalForm.getDescripcionCompleto(), BigDecimal.valueOf(festivalForm.getPorcentajeCompleto()));
 
             entradaDao.addEntradaTipus(entradaTipusCompleto);
             entradaDao.addEntradaTipus(entradaTipusDia);
@@ -167,7 +172,7 @@ public class GFFestivalController {
         }
     }
 
-    public void validarAddHtml(Festival festival, BindingResult bindingResult) {
+    public void validarAddHtml(FestivalForm festival, BindingResult bindingResult) {
         validateFestival(festival, bindingResult);
 
         if(festival.getDataInici() != null && festival.getDataFi() != null) {
@@ -206,7 +211,21 @@ public class GFFestivalController {
             }
         }
 
+        if (festival.getPorcentajeCompleto() < 0) {
+            bindingResult.rejectValue("porcentajeCompleto", "error.porcentajeCompleto","El porcentaje no puede ser un número negativo.");
+        }
 
+        if (festival.getPorcentajeDia() < 0) {
+            bindingResult.rejectValue("porcentajeDia", "error.porcentajeDia","El porcentaje no puede ser un número negativo.");
+        }
+
+        if (festival.getPorcentajeCompleto() > 100) {
+            bindingResult.rejectValue("porcentajeCompleto", "error.porcentajeCompleto","El porcentaje no puede ser mayor que 100.");
+        }
+
+        if (festival.getPorcentajeDia() > 100) {
+            bindingResult.rejectValue("porcentajeDia", "error.porcentajeDia","El porcentaje no puede ser mayor que 100.");
+        }
 
         if (festival.getPressupostContractacio() != null && festival.getPressupostContractacio().compareTo(BigDecimal.ZERO) < 0) {
             bindingResult.rejectValue("pressupostContractacio", "error.pressupostContractacio","El presupuesto de contratación no puede ser un número negativo.");
@@ -226,19 +245,49 @@ public class GFFestivalController {
         } else {
             model.addAttribute("editable", true);
         }
-        FestivalEntradas festivalEntradas = new FestivalEntradas(festival);
-        festivalEntradas.setPreuDia(entradaDao.getPrecioDiaFestival(idFestival));
-        festivalEntradas.setPreuComplet(entradaDao.getPrecioCompletoFestival(idFestival));
-        model.addAttribute("festivalEntradas", festivalEntradas);
+        FestivalForm festivalForm = new FestivalForm();
+
+        festivalForm.setAnyo(festival.getAnyo());
+        festivalForm.setIdFestival(festival.getIdFestival());
+        festivalForm.setNom(festival.getNom());
+        festivalForm.setEstatFestival(festival.getEstatFestival());
+        festivalForm.setCifPromotor(festival.getCifPromotor());
+        festivalForm.setDataInici(festival.getDataInici());
+        festivalForm.setDataFi(festival.getDataFi());
+        festivalForm.setAforamentMaxim(festival.getAforamentMaxim());
+        festivalForm.setCategoriaMusical(festival.getCategoriaMusical());
+        festivalForm.setRequisitMinimEdat(festival.getRequisitMinimEdat());
+        festivalForm.setPublicEnfocat(festival.getPublicEnfocat());
+        festivalForm.setPressupostContractacio(festival.getPressupostContractacio());
+        festivalForm.setLocalitzacioGeografica(festival.getLocalitzacioGeografica());
+        festivalForm.setLocalitzacioDescriptiva(festival.getLocalitzacioDescriptiva());
+        festivalForm.setDescripcio(festival.getDescripcio());
+        festivalForm.setDataIniciVenda(festival.getDataIniciVenda());
+        festivalForm.setDataIniciPublicacio(festival.getDataIniciPublicacio());
+
+        EntradaTipus entradaTipusDia = entradaDao.getEntradaTipus(idFestival, 1);
+        EntradaTipus entradaTipusCompleto = entradaDao.getEntradaTipus(idFestival, 2);
+
+        festivalForm.setPorcentajeDia(entradaTipusDia.getPercentatgeMaximAforament().floatValue());
+        festivalForm.setPorcentajeCompleto(entradaTipusCompleto.getPercentatgeMaximAforament().floatValue());
+        festivalForm.setDescripcionDia(entradaTipusDia.getDescripcio());
+        festivalForm.setDescripcionCompleto(entradaTipusCompleto.getDescripcio());
+        festivalForm.setPrecioDia(entradaTipusDia.getPreu().floatValue());
+        festivalForm.setPrecioFestivalCompleto(entradaTipusCompleto.getPreu().floatValue());
+
+        model.addAttribute("festival", festivalForm);
 
         session.setAttribute("lastFestivalUpdate", idFestival);
+
+        List<Promotor> promotores = promotorDao.getPromotores();
+        model.addAttribute("promotores", promotores);
         return "gestorFestival/update";
 
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String processUpdateSubmit(HttpSession session,
-            @ModelAttribute("festivalEntradas") FestivalEntradas festivalEntradas,
+            @ModelAttribute("festival") FestivalForm festival,
             BindingResult bindingResult, Model model) {
         if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
             return "redirect:/login";
@@ -248,11 +297,47 @@ public class GFFestivalController {
             return "gestorFestival/update";
         }
         try {
-            Festival festival = festivalEntradas.getFestival();
-            festival.setIdFestival(Integer.parseInt(session.getAttribute("lastFestivalUpdate").toString()));
-            festival.setCifPromotor(session.getAttribute("cif").toString());
-            festivalDao.updateFestival(festival);
-            entradaDao.updatePrecioEntradaTipus(festival.getIdFestival(), festivalEntradas.getPreuDia(), festivalEntradas.getPreuComplet());
+
+            Festival festivalNuevo = new Festival();
+
+            festivalNuevo.setAnyo(festival.getAnyo());
+            festivalNuevo.setIdFestival(festival.getIdFestival());
+            festivalNuevo.setNom(festival.getNom());
+            festivalNuevo.setEstatFestival(festival.getEstatFestival());
+            festivalNuevo.setCifPromotor(festival.getCifPromotor());
+            festivalNuevo.setDataInici(festival.getDataInici());
+            festivalNuevo.setDataFi(festival.getDataFi());
+            festivalNuevo.setAforamentMaxim(festival.getAforamentMaxim());
+            festivalNuevo.setCategoriaMusical(festival.getCategoriaMusical());
+            festivalNuevo.setRequisitMinimEdat(festival.getRequisitMinimEdat());
+            festivalNuevo.setPublicEnfocat(festival.getPublicEnfocat());
+            festivalNuevo.setPressupostContractacio(festival.getPressupostContractacio());
+            festivalNuevo.setLocalitzacioGeografica(festival.getLocalitzacioGeografica());
+            festivalNuevo.setLocalitzacioDescriptiva(festival.getLocalitzacioDescriptiva());
+            festivalNuevo.setDescripcio(festival.getDescripcio());
+            festivalNuevo.setDataIniciVenda(festival.getDataIniciVenda());
+            festivalNuevo.setDataIniciPublicacio(festival.getDataIniciPublicacio());
+
+            EntradaTipus entradaTipusDia = new EntradaTipus();
+            EntradaTipus entradaTipusCompleto = new EntradaTipus();
+
+            entradaTipusDia.setPercentatgeMaximAforament(BigDecimal.valueOf(festival.getPorcentajeDia()));
+            entradaTipusCompleto.setPercentatgeMaximAforament(BigDecimal.valueOf(festival.getPorcentajeCompleto()));
+
+            entradaTipusDia.setDescripcio(festival.getDescripcionDia());
+            entradaTipusCompleto.setDescripcio(festival.getDescripcionCompleto());
+
+            entradaTipusDia.setPreu(BigDecimal.valueOf(festival.getPrecioDia()));
+            entradaTipusCompleto.setPreu(BigDecimal.valueOf(festival.getPrecioFestivalCompleto()));
+
+            entradaTipusDia.setEntradaTipus(EntradaTipusEnum.DIA);
+            entradaTipusCompleto.setEntradaTipus(EntradaTipusEnum.FESTIVAL_COMPLETO);
+
+            festivalDao.updateFestival(festivalNuevo);
+
+            entradaDao.updateEntradaTipus(entradaTipusDia);
+            entradaDao.updateEntradaTipus(entradaTipusCompleto);
+
             session.setAttribute("mensajeConfirmacionFestival", " editado ");
 
             model.addAttribute("mensajeConfirmacionArtista", "Se ha editado correctamente el festival");
@@ -305,7 +390,7 @@ public class GFFestivalController {
         }
     }
 
-    public static void validateFestival(Festival festival, BindingResult bindingResult) {
+    public static void validateFestival(FestivalForm festival, BindingResult bindingResult) {
         if (festival == null) {
             bindingResult.rejectValue("festival", "error.festival", "El festival no puede ser nulo.");
             return;

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CompraForm {
     private int idFestival;
-    public String entradatipus;
+    public int entradatipus;
     private Date fecha;
     private int numEntrades;
     private String email;
@@ -26,11 +26,11 @@ public class CompraForm {
         return numEntrades;
     }
 
-    public String getEntradatipus() {
+    public int getEntradatipus() {
         return entradatipus;
     }
 
-    public void setEntradatipus(String entradatipus) {
+    public void setEntradatipus(int entradatipus) {
         this.entradatipus = entradatipus;
     }
 

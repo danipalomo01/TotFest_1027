@@ -215,28 +215,24 @@
                 <th>Fecha de Entrada</th>
                 <th>Fecha Compra</th>
                 <th>Tipo de Entrada</th>
-                <th>Email</th>
-                <th>Teléfono</th>
                 <th>Ver Entrada</th>
               </tr>
               </thead>
               <tbody id="entrada-table-body">
               <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
+
               <tr th:each="entrada, iter : ${entradas}">
                 <td th:text="${entrada.numero}"></td>
                 <td th:text="${nombresFestivales[iter.index]}"></td> <!-- Mostrar el nombre del festival correspondiente -->
-                <td th:text="${entrada.preuVendaEntradaIndividual}"></td>
-                <td th:text="${#dates.format(entrada.data, 'dd/MM/yyyy')}"></td>
+                <td th:text="${preciosEntrada[iter.index]}"></td>
                 <td th:text="${#dates.format(entrada.datacompra, 'dd/MM/yyyy')}"></td>
-                <td th:text="${entrada.entradaTipus == 1 ? 'Entrada de Día' : 'Festival Completo'}"></td>
-                <td th:text="${entrada.email}"></td>
-                <td th:text="${entrada.telefono}"></td>
+                <td th:text="${fechasEntrada[iter.index]}"></td>
+                <td th:text="${tiposEntrada[iter.index] == 1 ? 'Entrada de Día' : 'Festival Completo'}"></td>
                 <td>
                   <a class="btn btn-success btn-sm" th:href="@{/compra-entradas/view/{numero}(numero=${entrada.numero})}">Ver</a>
                   <button type="button" class="btn btn-warning btn-sm" th:if="${devolvibles[iter.index]}" data-toggle="modal" th:data-target="'#devolverModal' + ${entrada.numero}">
                     Devolver
                   </button>
-
                   <div class="modal fade" th:id="'devolverModal' + ${entrada.numero}" tabindex="-1" role="dialog" aria-labelledby="devolverModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">
@@ -289,7 +285,7 @@
             <p>No tienes ninguna entrada cuyo nombre de festival contenga el filtro aplicado</p>
           </div>
           <div th:if="${filtradotipo != null}">
-            <p>No tienes ninguna entrada del tipo <p th:text="${entrada.entradaTipus == 1 ? 'día' : 'festival completo'}"></p></p>
+            <p>No tienes ninguna entrada del tipo <p th:text="${entradaTipo == 1 ? 'día' : 'festival completo'}"></p></p>
           </div>
         </div>
 

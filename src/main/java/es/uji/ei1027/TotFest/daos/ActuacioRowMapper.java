@@ -16,7 +16,6 @@ public class ActuacioRowMapper implements RowMapper<Actuacio> {
         actuacio.setData(rs.getDate("data"));
         actuacio.setHoraInici(rs.getTime("horaInici"));
         actuacio.setHoraFiPrevista(rs.getTime("horaFiPrevista"));
-        actuacio.setPreuContracteActuacio(rs.getBigDecimal("preuContracteActuacio"));
         actuacio.setComentaris(rs.getString("comentaris"));
         actuacio.setIdFestival(rs.getInt("idFestival"));
         return actuacio;

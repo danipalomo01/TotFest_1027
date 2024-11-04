@@ -10,6 +10,7 @@ public class PromotorRowMapper implements RowMapper<Promotor> {
     @Override
     public Promotor mapRow(ResultSet rs, int rowNum) throws SQLException {
         Promotor promotor = new Promotor();
+        promotor.setId(rs.getInt("id"));
         promotor.setCif(rs.getString("cif"));
         promotor.setNomOrganisme(rs.getString("nomorganisme"));
         promotor.setDomiciliFiscal(rs.getString("domicilifiscal"));

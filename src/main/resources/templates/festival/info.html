@@ -68,6 +68,7 @@
 <div class="rightbar"></div>
 <nav class="sidebar">
   <a href="#" class="titulo">Explorar</a>
+
   <div th:if="${session.cif != null}">
     <div class="menu-content">
       <ul class="menu-items">
@@ -79,14 +80,14 @@
           </a>
         </li>
         <li class="item">
-          <a href="/register" class="submenu-item">
-            <span>Registrarse</span>
+          <a href="/gestorFestival/list" class="submenu-item">
+            <span>Gestionar Festivales</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
         <li class="item">
-          <a href="/gestorFestival/list" class="submenu-item">
-            <span>Gestionar Festivales</span>
+          <a href="/promotor/list" class="submenu-item">
+            <span>Promotores</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
@@ -96,6 +97,7 @@
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
+
         <li class="item">
           <a href="/logout" class="submenu-item">
             <span>Cerrar Sesión</span>
@@ -107,6 +109,30 @@
     </div>
   </div>
 
+  <div th:if="${session.admin != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a href="/admin/index" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/admin/usuarios/list" class="submenu-item">
+            <span>Gestionar Usuarios</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
   <div th:if="${session.idComercial != null}">
     <div class="menu-content">
       <ul class="menu-items">
@@ -148,25 +174,39 @@
     <div class="menu-content">
       <ul class="menu-items">
         <li class="item">
-          <a href="/" class="submenu-item">
+          <a th:href="@{/}" class="submenu-item">
             <span>Inicio</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
-
-        <li class="item">
-          <a href="/login" class="submenu-item">
-            <span>Login</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-        </li>
-
-        <li class="item">
-          <a href="/festival/list" class="submenu-item">
-            <span>Festivales</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-        </li>
+        <div th:if="${session.idUsuario == null}">
+          <li class="item">
+            <a href="/login" class="submenu-item">
+              <span>Login</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+          <li class="item">
+            <a href="/register" class="submenu-item">
+              <span>Registrarse</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </div>
+        <div th:if="${session.idUsuario != null}">
+          <li class="item">
+            <a th:href="@{/compra-entradas/listUsuario/{idUsuario}(idUsuario=${#session.getAttribute('idUsuario')})}" class="submenu-item">
+              <span>Ver Mis Entradas</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+          <li class="item">
+            <a href="/logout" class="submenu-item">
+              <span>Logout</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </div>
       </ul>
     </div>
   </div>
@@ -212,9 +252,9 @@
             <div style="margin-left: 50%;">
 
 
-              <div th:each="actuacion : ${entry.value}" style="display: flex">
+              <div th:each="actuacion, iter : ${entry.value}" style="display: flex">
                 <div style="width: 150px;">
-                    <td style="margin-left: 25%" th:text="${actuacion.nomartista}"></td>
+                    <td style="margin-left: 25%" th:text="${nombresArtistas[iter.index]}"></td>
                 </div>
                 <div style="width: 400px;margin-left: 22%">
                     <td style="margin-left: 30px" th:text="${actuacion.horaInici}"><span></span></td>

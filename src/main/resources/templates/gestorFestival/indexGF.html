@@ -17,35 +17,44 @@
 <nav class="sidebar">
   <a href="#" class="titulo">Explorar</a>
 
-  <div class="menu-content">
-    <ul class="menu-items">
+  <div th:if="${session.cif != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
 
-      <li class="item">
-        <a href="/gestorFestival/indexGF" class="submenu-item">
-          <span>Inicio</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-      <li class="item">
-        <a href="/gestorFestival/list" class="submenu-item">
-          <span>Gestionar Festivales</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-      <li class="item">
-        <a href="/festival/list" class="submenu-item">
-          <span>Festivales</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-      <li class="item">
-        <a href="/logout" class="submenu-item">
-          <span>Cerrar Sesión</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
+        <li class="item">
+          <a href="/gestorFestival/indexGF" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/gestorFestival/list" class="submenu-item">
+            <span>Gestionar Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/promotor/list" class="submenu-item">
+            <span>Gestionar Promotores</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
 
-    </ul>
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
   </div>
 
 </nav>

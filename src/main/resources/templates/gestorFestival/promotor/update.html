@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Modificar Promotor</title>
+  <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
+  <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
+  <style>
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="rightbar"></div>
+<nav class="sidebar" style="margin-top:30px">
+  <a href="#" class="titulo">Explorar</a>
+  <div th:if="${session.cif != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+
+        <li class="item">
+          <a href="/gestorFestival/indexGF" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/gestorFestival/list" class="submenu-item">
+            <span>Gestionar Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/promotor/list" class="submenu-item">
+            <span>Gestionar Promotores</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/festival/list" class="submenu-item">
+            <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="content">
+  <form class="form" th:action="@{/promotor/update}" th:object="${promotor}" method="POST" novalidate>
+    <h1 style="font-size: 40px">Modificar Promotor <span th:text="${promotor.nomOrganisme}"></span></h1>
+
+    <div>
+      <div style="display:flex; margin-top: 50px">
+        <div class="form-group" style="margin-left: auto; margin-right: auto; margin-bottom: 40px; font-size: 16px">
+          <label for="cif">CIF</label>
+          <input style="height: 40px;width: 160px; font-size: 15px; text-align: center;" type="text" class="form-control" id="cif" th:field="*{cif}" readonly/>
+        </div>
+
+        <input type="hidden" th:field="${id}">
+        <div class="form-group" style="margin-right: auto">
+          <label for="nomOrganisme">Nombre del Organismo</label>
+          <input style="height: 40px; width: 160px" type="text" class="form-control" id="nomOrganisme" th:field="*{nomOrganisme}" required/>
+          <div style="max-width: 150px;" th:if="${#fields.hasErrors('nomOrganisme')}" th:errors="*{nomOrganisme}" class="error-message"></div>
+        </div>
+      </div>
+
+      <!-- Campo para el domicilio fiscal -->
+      <div class="form-group">
+        <label for="domiciliFiscal">Domicilio Fiscal</label>
+        <input style="height: 40px; width: 300px;" type="text" class="form-control" id="domiciliFiscal" th:field="*{domiciliFiscal}" required/>
+        <div style="max-width: 300px;" th:if="${#fields.hasErrors('domiciliFiscal')}" th:errors="*{domiciliFiscal}" class="error-message"></div>
+      </div>
+
+      <!-- Campo para el sector -->
+      <div class="form-group">
+        <label for="sector">Sector</label>
+        <input style="height: 40px; width: 200px;" type="text" class="form-control" id="sector" th:field="*{sector}" required/>
+        <div style="max-width: 200px;" th:if="${#fields.hasErrors('sector')}" th:errors="*{sector}" class="error-message"></div>
+      </div>
+
+      <!-- Campo para la fecha de alta -->
+      <div class="form-group">
+        <label for="datainiciGestorFest">Fecha de Alta</label>
+        <input style="height: 40px; width: 160px;" type="date" class="form-control" id="datainiciGestorFest" th:field="*{datainiciGestorFest}" required/>
+        <div style="max-width: 160px;" th:if="${#fields.hasErrors('datainiciGestorFest')}" th:errors="*{datainiciGestorFest}" class="error-message"></div>
+      </div>
+
+      <!-- Campo para la fecha de baja de la relación comercial -->
+      <div class="form-group">
+        <label for="dataBaixaRelacioComercial">Fecha de Baja Relación Comercial</label>
+        <input style="height: 40px; width: 160px;" type="date" class="form-control" id="dataBaixaRelacioComercial" th:field="*{dataBaixaRelacioComercial}" />
+        <div style="max-width: 160px;" th:if="${#fields.hasErrors('dataBaixaRelacioComercial')}" th:errors="*{dataBaixaRelacioComercial}" class="error-message"></div>
+      </div>
+
+      <!-- Botón para enviar el formulario -->
+      <div class="form-group">
+        <button type="submit" class="button">Modificar Promotor</button>
+      </div>
+    </div>
+  </form>
+</div>
+</body>
+</html>

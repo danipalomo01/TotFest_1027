@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class Promotor {
 
+    private int id;
     private String cif;
     private String nomOrganisme;
     private String domiciliFiscal;
@@ -35,6 +36,14 @@ public class Promotor {
 
     public String getNomOrganisme() {
         return nomOrganisme;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setNomOrganisme(String nomOrganisme) {

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -155,6 +157,89 @@ public class EntradaController {
         model.addAttribute("compraForm", compraForm);
         return "entrades/compraCompleto";
     }
+
+    @RequestMapping(value = "/compraParcial", method = RequestMethod.POST)
+    public String processCompraParcialForm(@ModelAttribute("compraForm") CompraForm compraForm,
+                                    BindingResult bindingResult, HttpSession session, Model model) {
+
+        try {
+            if (session.getAttribute("ultimoFestivalCompra") == null){
+                return "redirect:/festival/list";
+            }
+            int idfestival = ((Festival) session.getAttribute("ultimoFestivalCompra")).getIdFestival();
+
+            if (compraForm.getEmail() == null && compraForm.getTelefon() == null) {
+                int idUsuario = (int) session.getAttribute("idUsuario");
+                Usuario usuario = usuarioDao.getUsuarioById(idUsuario);
+                compraForm.setEmail(usuario.getEmail());
+                compraForm.setTelefon(usuario.getTelefono());
+            }
+            validarCompraForm(compraForm, bindingResult, model);
+
+            EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
+
+            if (bindingResult.hasErrors()) {
+                Festival festival = (Festival) session.getAttribute("ultimoFestivalCompra");
+
+                int numEntradasDia = Math.min((BigDecimal.valueOf(festival.getAforamentMaxim()).multiply(entradaTipus.getPercentatgeMaximAforament()).divide(BigDecimal.valueOf(100), RoundingMode.FLOOR).subtract(BigDecimal.valueOf(entradaDao.getEntradesVenudesPerDiaDeDia(entradaTipus.getIdFestival(), java.sql.Date.valueOf(LocalDate.now()))))).intValue(), 10);
+                int numEntradasCompleto = Math.min(
+                        BigDecimal.valueOf(festival.getAforamentMaxim())
+                                .subtract(BigDecimal.valueOf(festivalDao.getNumEntradasVendidas(festival.getIdFestival())))
+                                .intValue(),
+                        10
+                );
+
+                BigDecimal precioEntradaDia = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.DIA.getValue()).getPreu();
+                BigDecimal precioEntradaCompleto = entradaDao.getEntradaTipus(festival.getIdFestival(), EntradaTipusEnum.FESTIVAL_COMPLETO.getValue()).getPreu();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                String dataInici = festival.getDataInici().toLocalDate().format(formatter);
+                String dataFi = festival.getDataFi().toLocalDate().format(formatter);
+
+                model.addAttribute("numEntradasDia", numEntradasDia);
+                model.addAttribute("numEntradasCompleto", numEntradasCompleto);
+                model.addAttribute("festival", festival);
+                model.addAttribute("dataInicio", dataInici.toString());
+                model.addAttribute("dataFin", dataFi);
+                model.addAttribute("precioDia", precioEntradaDia);
+                model.addAttribute("precioCompleto", precioEntradaCompleto);
+
+                session.setAttribute("ultimoFestivalCompra", festival);
+                session.setAttribute("ultimoPrecioDia", precioEntradaDia);
+                session.setAttribute("ultimoPrecioCompleto", precioEntradaCompleto);
+
+
+                compraForm.setFecha(festival.getDataInici());
+                compraForm.setIdFestival(festival.getIdFestival());
+                model.addAttribute("compraForm", compraForm);
+
+                if (compraForm.getEntradatipus() == 1) {
+                    return "entrades/compraDia";
+                }
+                else {
+                    return "entrades/compraCompleto";
+                }
+            }
+        } catch (Exception e) {
+            return "redirect:/festival/list";
+        }
+
+        session.setAttribute("ultimaFecha", compraForm.getFecha());
+
+        model.addAttribute("emailUltimaCompra", compraForm.getEmail());
+
+        model.addAttribute("compraForm", compraForm);
+
+        String redireccion = "/compra-entradas/compra";
+        model.addAttribute("redireccion", redireccion);
+        model.addAttribute("numEntrades", compraForm.getNumEntrades());
+        EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
+        model.addAttribute("totalImporte", BigDecimal.valueOf(compraForm.getNumEntrades()).multiply(entradaTipus.getPreu()));
+        return "entrades/confirmacionCompra";
+    }
+
+
     @RequestMapping(value = "/compra", method = RequestMethod.POST)
     public String processCompraForm(@ModelAttribute("compraForm") CompraForm compraForm,
                                     BindingResult bindingResult, HttpSession session, Model model) {
@@ -171,6 +256,8 @@ public class EntradaController {
                 compraForm.setEmail(usuario.getEmail());
                 compraForm.setTelefon(usuario.getTelefono());
             }
+            compraForm.setFecha((Date) session.getAttribute("ultimaFecha"));
+
             validarCompraForm(compraForm, bindingResult, model);
 
             EntradaTipus entradaTipus = entradaDao.getEntradaTipus(compraForm.getIdFestival(), compraForm.getEntradatipus());
@@ -254,7 +341,7 @@ public class EntradaController {
 
     public void validarCompraForm(CompraForm compraForm, BindingResult bindingResult, Model model) {
 
-        if (compraForm.getTelefon() == null && compraForm.getEmail() == null) {
+        if (compraForm.getTelefon() == null || compraForm.getEmail() == null || compraForm.getTelefon().length() == 0  || compraForm.getEmail().length() == 0) {
             if (compraForm.getTelefon().length() != 9) {
                 bindingResult.rejectValue("telefon", "error.telefon", "El teléfono debe tener 9 numeros");
             }
@@ -445,7 +532,7 @@ public class EntradaController {
         }
 
         entradaDao.deleteEntrada(numeroEntrada);
-
+        entradaDao.addDevolucio(numeroEntrada);
         model.addAttribute("idUsuario", idUsuario);
         return "/entrades/exitoDevolucion";
     }

@@ -89,7 +89,7 @@
             <div style="margin-left: auto; margin-right: auto;">
                 <label for="numActuacionsAny">Nº de Actuaciones</label>
                 <input style="width: 80px; text-align: center; font-size: 16px; height: 30px" type="number" class="form-control" id="numActuacionsAny" th:field="*{numActuacionsAny}" required min="1"/>
-                <div th:if="${#fields.hasErrors('numActuacionsAny')}" th:errors="*{numActuacionsAny}" class="error-message"></div>
+                <div style="max-width: 200px;" th:if="${#fields.hasErrors('numActuacionsAny')}" th:errors="*{numActuacionsAny}" class="error-message"></div>
             </div>
 
             <div style="margin-left: auto; margin-right: auto;">

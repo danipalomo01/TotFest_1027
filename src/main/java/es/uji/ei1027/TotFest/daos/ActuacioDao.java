@@ -32,13 +32,12 @@ public class ActuacioDao {
         int nextId = maxId + 1;
         actuacio.setIdActuacio(nextId);
 
-        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO actuacio VALUES(?, ?, ?, ?, ?, ?, ?)",
                 actuacio.getIdActuacio(),
                 actuacio.getIdContracte(),
                 actuacio.getData(),
                 actuacio.getHoraInici(),
                 actuacio.getHoraFiPrevista(),
-                actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
                 actuacio.getIdFestival()
         );
@@ -49,12 +48,11 @@ public class ActuacioDao {
     }
 
     public void updateActuacio(Actuacio actuacio) {
-        jdbcTemplate.update("UPDATE actuacio SET idContracte = ?, data = ?, horaInici = ?, horaFiPrevista = ?, preuContracteActuacio = ?, comentaris = ?, idFestival = ? WHERE idActuacio = ?",
+        jdbcTemplate.update("UPDATE actuacio SET idContracte = ?, data = ?, horaInici = ?, horaFiPrevista = ?, comentaris = ?, idFestival = ? WHERE idActuacio = ?",
                 actuacio.getIdContracte(),
                 actuacio.getData(),
                 actuacio.getHoraInici(),
                 actuacio.getHoraFiPrevista(),
-                actuacio.getPreuContracteActuacio(),
                 actuacio.getComentaris(),
                 actuacio.getIdFestival(),
                 actuacio.getIdActuacio()
@@ -108,6 +106,16 @@ public class ActuacioDao {
         try {
             String sql = "SELECT * FROM actuacio WHERE idfestival=? order by idactuacio";
             return jdbcTemplate.query(sql, new Object[]{idFestival}, new ActuacioRowMapper());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    public List<Actuacio> getActuacionsContrato(int idContrato) {
+        try {
+            String sql = "SELECT * FROM actuacio WHERE idcontracte=? order by idactuacio";
+            return jdbcTemplate.query(sql, new Object[]{idContrato}, new ActuacioRowMapper());
         } catch (Exception e) {
             return new ArrayList<>();
         }

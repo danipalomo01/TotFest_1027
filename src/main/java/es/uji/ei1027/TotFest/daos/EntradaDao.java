@@ -52,6 +52,12 @@ public class EntradaDao {
         }
     }
 
+    public void addDevolucio(int numeroEntrada) {
+        jdbcTemplate.update("INSERT INTO devolucio (numero) " +
+                        "VALUES (?)",
+                numeroEntrada);
+    }
+
     // Añadir nueva entrada
     public void addEntrada(Entrada entrada) {
         Integer maxId = jdbcTemplate.queryForObject("SELECT MAX(numero) FROM entrada", Integer.class);

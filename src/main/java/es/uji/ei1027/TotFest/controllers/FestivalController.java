@@ -1,11 +1,7 @@
 package es.uji.ei1027.TotFest.controllers;
 
-import es.uji.ei1027.TotFest.daos.ActuacioDao;
-import es.uji.ei1027.TotFest.daos.EntradaDao;
-import es.uji.ei1027.TotFest.daos.FestivalDao;
-import es.uji.ei1027.TotFest.models.Actuacio;
-import es.uji.ei1027.TotFest.models.EntradaTipus;
-import es.uji.ei1027.TotFest.models.Festival;
+import es.uji.ei1027.TotFest.daos.*;
+import es.uji.ei1027.TotFest.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -29,8 +25,10 @@ import java.util.stream.Collectors;
 public class FestivalController {
 
     private FestivalDao festivalDao;
+    private ContracteArtistaDao contracteArtistaDao;
     private ActuacioDao actuacioDao;
     private EntradaDao entradaDao;
+    private ArtistaGrupDao artistaGrupDao;
 
     @Autowired
     public void setFestivalDao(FestivalDao festivalDao) {
@@ -45,6 +43,16 @@ public class FestivalController {
     @Autowired
     public void setEntradaDao(EntradaDao entradaDao) {
         this.entradaDao = entradaDao;
+    }
+
+    @Autowired
+    public void setArtistaGrupDao(ArtistaGrupDao artistaGrupDao) {
+        this.artistaGrupDao = artistaGrupDao;
+    }
+
+    @Autowired
+    public void setContracteArtista(ContracteArtistaDao contracteArtistaDao) {
+        this.contracteArtistaDao = contracteArtistaDao;
     }
 
     @RequestMapping("/list")
@@ -165,6 +173,15 @@ public class FestivalController {
             // Ordenar las actuaciones por hora de inicio para cada día
             listaFechasActuacionesOrdenadas.values().forEach(la -> la.sort(Comparator.comparing(Actuacio::getHoraInici)));
 
+            List<String> nombresArtistas = new ArrayList<>();
+            for (List<Actuacio> actuaciones: listaFechasActuacionesOrdenadas.values()){
+                for(Actuacio actuacio: actuaciones) {
+                    ContracteArtista contracteArtista = contracteArtistaDao.getContracteArtista(actuacio.getIdContracte());
+                    ArtistaGrup artistaGrup = artistaGrupDao.getArtistaGrup(contracteArtista.getIdArtista());
+                    nombresArtistas.add(artistaGrup.getNom());
+                }
+            }
+            model.addAttribute("nombresArtistas", nombresArtistas);
             model.addAttribute("actuaciones", listaFechasActuacionesOrdenadas);
             return "festival/info";
         }  catch (Exception e){

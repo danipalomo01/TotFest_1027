@@ -77,13 +77,71 @@ public class GFFestivalController {
 
             festivales.sort(Comparator.comparingInt(Festival::getIdFestival));
 
+            List<Integer> numEntradasVendidas = new ArrayList<>();
+
+            for(Festival festival: festivales) {
+                int numEntradas = entradaDao.getNumTotalEntradasFestival(festival.getIdFestival());
+                numEntradasVendidas.add(numEntradas);
+            }
+            model.addAttribute("numEntradasVendidas", numEntradasVendidas);
             model.addAttribute("festivales", festivales);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("currentPage", page);
             model.addAttribute("size", size);
             model.addAttribute("totalElems", festivalDao.getFestivals().size());
+
             return "gestorFestival/list";
+        } catch (Exception e){
+            model.addAttribute("mensajeError", "No se han podido listar los festivales, inténtalo de nuevo más tarde o contacta con el soporte informático.");
+            return "error.html";
+        }
+
+    }
+
+    @RequestMapping(value = "/list/{id}", method = RequestMethod.GET)
+    public String listFestivalsPromotor(HttpSession session,
+                                        @PathVariable int id,
+                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "size", defaultValue = "5") int size,
+                                Model model) {
+
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
+            return "redirect:/login";
+        }
+
+        if (session.getAttribute("mensajeConfirmacionFestival") != null && session.getAttribute("mensajeConfirmacionFestival") != "nada") {
+            model.addAttribute("mensajeConfirmacionFestival", session.getAttribute("mensajeConfirmacionFestival"));
+            session.setAttribute("mensajeConfirmacionFestival", "nada");
+        } else {
+            model.addAttribute("mensajeConfirmacionFestival", "nada");
+        }
+
+        try {
+            List<Festival> festivalesTotales = festivalDao.getFestivalsPromotor(id);
+            int offset = page * size;
+            List<Festival> festivales = festivalDao.getFestivalsPromotor(id, size, offset);
+            int totalfestivales = festivalesTotales.size();
+            int totalPages = (int) Math.ceil((double) totalfestivales / size);
+
+            festivales.sort(Comparator.comparingInt(Festival::getIdFestival));
+
+            List<Integer> numEntradasVendidas = new ArrayList<>();
+
+            for(Festival festival: festivales) {
+                int numEntradas = entradaDao.getNumTotalEntradasFestival(festival.getIdFestival());
+                numEntradasVendidas.add(numEntradas);
+            }
+            model.addAttribute("numEntradasVendidas", numEntradasVendidas);
+            model.addAttribute("festivales", festivales);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("size", size);
+            model.addAttribute("totalElems", festivalDao.getFestivals().size());
+            model.addAttribute("nombrePromotor", promotorDao.getPromotor(id).getNomOrganisme());
+            model.addAttribute("idPromotor", promotorDao.getPromotor(id).getId());
+            return "gestorFestival/promotor/festivalespromotor";
         } catch (Exception e){
             model.addAttribute("mensajeError", "No se han podido listar los festivales, inténtalo de nuevo más tarde o contacta con el soporte informático.");
             return "error.html";
@@ -115,6 +173,26 @@ public class GFFestivalController {
 
         List<Promotor> promotores = promotorDao.getPromotores();
         model.addAttribute("promotores", promotores);
+        model.addAttribute("idPromotor", null);
+
+        return "gestorFestival/add";
+    }
+
+    @RequestMapping("/add/{idPromotor}")
+    public String addFestivalPromotor(@PathVariable int idPromotor, HttpSession session, Model model) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("cif") == null) {
+            return "redirect:/login";
+        }
+        FestivalForm festivalForm = new FestivalForm();
+        festivalForm.setDataInici(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataFi(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataIniciPublicacio(Date.valueOf(LocalDate.now()));
+        festivalForm.setDataIniciVenda(Date.valueOf(LocalDate.now()));
+        festivalForm.setAnyo(2024);
+        festivalForm.setIdPromotor(idPromotor);
+        model.addAttribute("festival", festivalForm);
+
+        model.addAttribute("idPromotor", idPromotor);
 
         return "gestorFestival/add";
     }
@@ -131,12 +209,17 @@ public class GFFestivalController {
         validarAddHtml(festivalForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
+            if (festivalForm.getIdPromotor() != 0) {
+                model.addAttribute("festivalForm", festivalForm);
+                model.addAttribute("idPromotor", festivalForm.getIdPromotor());
+
+            }
             return "gestorFestival/add";
         }
 
         Festival festival = new Festival(
                 festivalForm.getIdFestival(),
-                festivalForm.getCifPromotor(),
+                festivalForm.getIdPromotor(),
                 festivalForm.getNom(),
                 festivalForm.getAnyo(),
                 festivalForm.getDataInici(),
@@ -155,7 +238,7 @@ public class GFFestivalController {
         );
 
         try {
-            festivalDao.addFestival(festival, session);
+            festivalDao.addFestival(festival, festivalForm.getIdPromotor(), session);
 
             EntradaTipus entradaTipusDia = new EntradaTipus(EntradaTipusEnum.DIA, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioDia()), festivalForm.getDescripcionDia(), BigDecimal.valueOf(festivalForm.getPorcentajeDia()));
             EntradaTipus entradaTipusCompleto = new EntradaTipus(EntradaTipusEnum.FESTIVAL_COMPLETO, festival.getIdFestival(), BigDecimal.valueOf(festivalForm.getPrecioFestivalCompleto()), festivalForm.getDescripcionCompleto(), BigDecimal.valueOf(festivalForm.getPorcentajeCompleto()));
@@ -215,6 +298,10 @@ public class GFFestivalController {
             bindingResult.rejectValue("porcentajeCompleto", "error.porcentajeCompleto","El porcentaje no puede ser un número negativo.");
         }
 
+        if (festival.getRequisitMinimEdat() < 0) {
+            bindingResult.rejectValue("requisitMinimEdat", "error.requisitMinimEdat","La edad no puede ser un número negativo.");
+        }
+
         if (festival.getPorcentajeDia() < 0) {
             bindingResult.rejectValue("porcentajeDia", "error.porcentajeDia","El porcentaje no puede ser un número negativo.");
         }
@@ -251,7 +338,7 @@ public class GFFestivalController {
         festivalForm.setIdFestival(festival.getIdFestival());
         festivalForm.setNom(festival.getNom());
         festivalForm.setEstatFestival(festival.getEstatFestival());
-        festivalForm.setCifPromotor(festival.getCifPromotor());
+        festivalForm.setIdPromotor(festival.getIdPromotor());
         festivalForm.setDataInici(festival.getDataInici());
         festivalForm.setDataFi(festival.getDataFi());
         festivalForm.setAforamentMaxim(festival.getAforamentMaxim());
@@ -304,7 +391,7 @@ public class GFFestivalController {
             festivalNuevo.setIdFestival(festival.getIdFestival());
             festivalNuevo.setNom(festival.getNom());
             festivalNuevo.setEstatFestival(festival.getEstatFestival());
-            festivalNuevo.setCifPromotor(festival.getCifPromotor());
+            festivalNuevo.setIdPromotor(festival.getIdPromotor());
             festivalNuevo.setDataInici(festival.getDataInici());
             festivalNuevo.setDataFi(festival.getDataFi());
             festivalNuevo.setAforamentMaxim(festival.getAforamentMaxim());

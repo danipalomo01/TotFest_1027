@@ -169,14 +169,15 @@ public class GFContracteArtistaController {
             return "redirect:/login";
         }
         try {
+            int idContrato = Integer.parseInt(session.getAttribute("lastContratoUpdate").toString());
+            contracteArtista.setIdContracte(idContrato);
+            contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
             validarAddContratoArtista(contracteArtista, bindingResult);
             if (bindingResult.hasErrors()) {
                 model.addAttribute("artistas", artistaDao.getArtistaGrups());
                 return "responsablecontratacion/contracteartista/update";
             }
             try {
-                contracteArtista.setIdContracte(Integer.parseInt(session.getAttribute("lastContratoUpdate").toString()));
-                contracteArtista.setIdComercial(Integer.parseInt(session.getAttribute("idComercial").toString()));
                 contracteArtistaDao.updateContracteArtista(contracteArtista);
                 session.setAttribute("mensajeConfirmacionContrato", " editado ");
 
@@ -238,6 +239,12 @@ public class GFContracteArtistaController {
     private void validarAddContratoArtista(ContracteArtista contrato, BindingResult bindingResult) {
         if (contrato.getIdArtista() == 0) {
             bindingResult.rejectValue("idArtista", "error.idArtista", "Debes seleccionar un artista.");
+        }
+
+        List<Actuacio> actuaciones = actuacioDao.getActuacionsContrato(contrato.getIdContracte());
+
+        if (contrato.getNumActuacionsAny() < actuaciones.size()){
+            bindingResult.rejectValue("numActuacionsAny", "error.numActuacionsAny", "Si quieres disminuir el número de actuaciones de este contrato primero debes eliminar actuaciones");
         }
 
         if(contrato.getDataInici() == null || contrato.getDataFi() == null) {

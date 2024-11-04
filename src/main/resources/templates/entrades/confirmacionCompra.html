@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmar Compra</title>
+
+  <!-- CSS de terceros -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        color: #333;
+        background-image: url('/images/fondocompra.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+    }
+    .container {
+        max-width: 600px;
+        margin-top: 10%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    .btn-group {
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+<div class="container">
+  <h2>¿Estás seguro de que deseas comprar las entradas?</h2>
+  <p><strong>Número de Entradas:</strong> <span th:text="${numEntrades}"></span></p>
+  <p><strong>Total Importe:</strong> <span th:text="${totalImporte} + ' €'"></span></p>
+
+  <!-- Botones de Confirmar y Volver -->
+  <div class="btn-group">
+    <form th:action="@{/compra-entradas/compra}" th:object="${compraForm}" method="post">
+      <!-- Campos ocultos de compraForm -->
+      <input type="hidden" th:field="*{numEntrades}" />
+      <input type="hidden" th:field="*{idFestival}" />
+      <input type="hidden" th:field="*{entradatipus}" />
+      <input type="hidden" th:field="*{telefon}" />
+      <input type="hidden" th:field="*{email}" />
+
+      <button type="submit" class="btn btn-success">Confirmar</button>
+    </form>
+
+    <!-- Botón de Volver con la redirección pasada en el modelo -->
+    <form th:action="${redireccion}" method="get">
+      <button type="submit" class="btn btn-secondary">Volver</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

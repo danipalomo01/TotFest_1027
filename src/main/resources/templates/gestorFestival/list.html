@@ -105,6 +105,7 @@
         <a href="#" class="titulo">Explorar</a>
         <div class="menu-content">
             <ul class="menu-items">
+
                 <li class="item">
                     <a href="/gestorFestival/indexGF" class="submenu-item">
                         <span>Inicio</span>
@@ -118,17 +119,25 @@
                     </a>
                 </li>
                 <li class="item">
+                    <a href="/promotor/list" class="submenu-item">
+                        <span>Gestionar Promotores</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
                     <a href="/festival/list" class="submenu-item">
                         <span>Festivales</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                 </li>
+
                 <li class="item">
                     <a href="/logout" class="submenu-item">
                         <span>Cerrar Sesión</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                 </li>
+
             </ul>
         </div>
     </nav>
@@ -210,17 +219,18 @@
                                     <th>Requisito Mínimo Edad</th>
                                     <th>Fecha Inicio Publicación</th>
                                     <th>Fecha Inicio Venta</th>
+                                    <th>Núm. Entradas Vendidas</th>
                                     <th class="sticky">Acciones</th>
                                 </tr>
                                 </thead>
                                 <tbody id="festival-table-body">
                                 <!-- Datos de la tabla generados dinámicamente por Thymeleaf -->
-                                <tr th:each="festival : ${festivales}">
+                                <tr th:each="festival, iter : ${festivales}">
                                     <td>
                                         <input type="checkbox" th:name="selectedFestivals" th:value="${festival.idFestival}">
                                     </td>
                                     <td th:text="${festival.idFestival}"></td>
-                                    <td th:text="${festival.cifPromotor}"></td>
+                                    <td th:text="${festival.idPromotor}"></td>
                                     <td th:text="${festival.nom}"></td>
                                     <td th:text="${festival.anyo}"></td>
                                     <td th:text="${#dates.format(festival.dataInici, 'dd/MM/yyyy')}"></td>
@@ -259,7 +269,7 @@
                                     <td th:text="${festival.requisitMinimEdat}"></td>
                                     <td th:text="${#dates.format(festival.dataIniciPublicacio, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${#dates.format(festival.dataIniciVenda, 'dd/MM/yyyy')}"></td>
-
+                                    <td th:text="${numEntradasVendidas[iter.index]}"></td>
                                     <td class="sticky">
 
                                         <a th:href="@{/compra-entradas/list/{idFestival}(idFestival=${festival.idFestival})}" class="btn btn-success btn-sm" role="button" title="Ver Entradas">
@@ -314,17 +324,17 @@
                         </p>
                     </div>
 
+                    <!-- Mensajes de no hay festivales -->
+                    <div th:if="${#lists.isEmpty(festivales)}" class="no-items-message">
+                        <p>No existe ningún festival.</p>
+                    </div>
+                    <!-- Botón de añadir festival -->
+
                     <div style="margin-left:44%;" class="btn-anyadir">
                         <a th:href="@{/gestorFestival/add}" class="btn btn-success" role="button">Añadir Festival</a>
                     </div>
                 </div>
 
-
-                <!-- Mensajes de no hay festivales -->
-                <div th:if="${#lists.isEmpty(festivales)}" class="no-items-message">
-                    <p>No existe ningún festival.</p>
-                </div>
-                <!-- Botón de añadir festival -->
 
             </div>
             <!-- Paginación -->

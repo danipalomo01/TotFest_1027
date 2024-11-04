@@ -6,7 +6,7 @@ import java.sql.Date;
 public class FestivalForm {
 
     private int idFestival;
-    private String cifPromotor;
+    private int idPromotor;
     private String nom;
     private int anyo;
     private Date dataInici;
@@ -34,9 +34,9 @@ public class FestivalForm {
 
     }
 
-    public FestivalForm(int idFestival, String cifPromotor, String nom, int anyo, Date dataInici, Date dataFi, EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda, int numEntradasVendidas, float precioFestivalCompleto, float precioDia, float porcentajeCompleto, float porcentajeDia) {
+    public FestivalForm(int idFestival, int idPromotor, String nom, int anyo, Date dataInici, Date dataFi, EstatFestivalEnum estatFestival, String descripcio, String categoriaMusical, BigDecimal pressupostContractacio, int aforamentMaxim, String localitzacioDescriptiva, String localitzacioGeografica, String publicEnfocat, int requisitMinimEdat, Date dataIniciPublicacio, Date dataIniciVenda, int numEntradasVendidas, float precioFestivalCompleto, float precioDia, float porcentajeCompleto, float porcentajeDia) {
         this.idFestival = idFestival;
-        this.cifPromotor = cifPromotor;
+        this.idPromotor = idPromotor;
         this.nom = nom;
         this.anyo = anyo;
         this.dataInici = dataInici;
@@ -67,12 +67,12 @@ public class FestivalForm {
         this.idFestival = idFestival;
     }
 
-    public String getCifPromotor() {
-        return cifPromotor;
+    public int getIdPromotor() {
+        return idPromotor;
     }
 
-    public void setCifPromotor(String cifPromotor) {
-        this.cifPromotor = cifPromotor;
+    public void setIdPromotor(int idPromotor) {
+        this.idPromotor = idPromotor;
     }
 
     public String getNom() {

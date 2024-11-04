@@ -154,7 +154,7 @@ public class GFActuaciones {
             ContracteArtista contracteArtista = contracteArtistaDao.getContracteArtista(idContracte);
             ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
             model.addAttribute("nombreArtista", artistaGrup.getNom());
-            return "responsablecontratacion/actuaciones/addActuacionContrato";
+            return "responsablecontratacion/actuaciones/addActuacionContratoFestival";
         }
         catch (Exception e) {
             return "error.html";
@@ -162,7 +162,29 @@ public class GFActuaciones {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public String addActuacionContratoFestival(HttpSession session, Model model,@ModelAttribute("actuacioForm") ActuacioForm actuacioForm) {
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
+            return "redirect:/login";
+        }
+        try {
+            addModelValuesAddActuacion(model, actuacioForm, actuacioForm.getIdContracte());
+            ContracteArtista contracteArtista = contracteArtistaDao.getContracteArtista(actuacioForm.getIdContracte());
+            ArtistaGrup artistaGrup = artistaDao.getArtistaGrup(contracteArtista.getIdArtista());
+            model.addAttribute("nombreArtista", artistaGrup.getNom());
+            Festival festival = festivalDao.getFestival(actuacioForm.getIdFestival());
+            model.addAttribute("minDate", festival.getDataInici());
+            model.addAttribute("maxDate", festival.getDataFi());
+
+            return "responsablecontratacion/actuaciones/addActuacionContrato";
+        }
+        catch (Exception e) {
+            return "error.html";
+        }
+    }
+
+    @RequestMapping(value = "/addfin/{idContracte}", method = RequestMethod.POST)
     public String addActuacionContrato(@ModelAttribute("actuacioForm") ActuacioForm actuacioForm,
+                                       @PathVariable("idContracte") String idContracte,
                                        HttpSession session, BindingResult bindingResult, Model model) {
         // Verifica la sesión
         if (session == null || session.getAttribute("user") == null || session.getAttribute("idComercial") == null) {
@@ -183,10 +205,12 @@ public class GFActuaciones {
             actuacio.setIdContracte(actuacioForm.getIdContracte());
             actuacio.setData(actuacioForm.getData());
             actuacio.setComentaris(actuacioForm.getComentaris());
-            actuacio.setPreuContracteActuacio(actuacioForm.getPreuContracteActuacio());
 
             actuacioDao.addActuacio(actuacio);
-            return "redirect:/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte();
+
+            model.addAttribute("mensaje", "Se ha añadido la actuación correctamente");
+            model.addAttribute("redireccion", "/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte());
+            return "/responsableContratacion/actuaciones/exito";
         }
         catch (Exception e) {
             return "error.html";
@@ -212,7 +236,6 @@ public class GFActuaciones {
             actuacioForm.setData(actuacio.getData());
             actuacioForm.setHoraInici(actuacio.getHoraInici());
             actuacioForm.setHoraFiPrevista(actuacio.getHoraFiPrevista());
-            actuacioForm.setPreuContracteActuacio(actuacio.getPreuContracteActuacio());
             actuacioForm.setIdContracte(actuacio.getIdContracte());
             actuacioForm.setIdFestival(actuacio.getIdFestival());
 
@@ -256,10 +279,14 @@ public class GFActuaciones {
             actuacio.setIdContracte(actuacioForm.getIdContracte());
             actuacio.setData(actuacioForm.getData());
             actuacio.setComentaris(actuacioForm.getComentaris());
-            actuacio.setPreuContracteActuacio(actuacioForm.getPreuContracteActuacio());
 
             actuacioDao.updateActuacio(actuacio);
-            return "redirect:/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte();
+
+            model.addAttribute("mensaje", "Se ha modificado la actuación correctamente");
+            model.addAttribute("redireccion", "/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte());
+
+            model.addAttribute("redireccion", "/responsablecontratacion/actuaciones/list/" + actuacio.getIdContracte());
+            return "/responsableContratacion/actuaciones/exito";
         }
         catch (Exception e) {
             return "error.html";
@@ -297,6 +324,14 @@ public class GFActuaciones {
         if (actuacioForm.getHoraFiPrevista() != null && actuacioForm.getHoraInici() != null) {
             if (actuacioForm.getHoraFiPrevista().before(actuacioForm.getHoraInici())) {
                 bindingResult.rejectValue("horaFiPrevista", "error.horaFiPrevista", "La hora de fin no puede ser anterior a la hora de inicio.");
+            } else {
+                // Comprobar que haya al menos 10 minutos de diferencia
+                long diferenciaMilisegundos = actuacioForm.getHoraFiPrevista().getTime() - actuacioForm.getHoraInici().getTime();
+                long diferenciaMinutos = (diferenciaMilisegundos / (1000 * 60)); // Convertir milisegundos a minutos
+
+                if (diferenciaMinutos < 10) {
+                    bindingResult.rejectValue("horaFiPrevista", "error.horaFiPrevista", "Debe haber al menos 10 minutos de diferencia entre la hora de inicio y fin.");
+                }
             }
         }
 

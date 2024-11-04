@@ -95,13 +95,6 @@
         </div>
       </div>
 
-      <!-- Campo para el precio del contrato -->
-      <div class="form-group">
-        <label for="preuContracteActuacio">Precio del Contrato de la Actuación</label>
-        <input style="height: 40px; width: 100px; font-size: 15px; text-align: center;" type="number" step="10.00" class="form-control" id="preuContracteActuacio" th:field="*{preuContracteActuacio}" required min="0"/>
-        <div th:if="${#fields.hasErrors('preuContracteActuacio')}" th:errors="*{preuContracteActuacio}" class="error-message"></div>
-      </div>
-
       <!-- Campo para comentarios -->
       <div class="form-group" style="margin-left: auto; margin-right: auto;margin-bottom: 0; width: 350px">
         <label for="comentaris">Comentarios</label>

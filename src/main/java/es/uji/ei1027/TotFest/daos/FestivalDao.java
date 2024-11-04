@@ -26,7 +26,7 @@ public class FestivalDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void addFestival(Festival festival, HttpSession session) {
+    public void addFestival(Festival festival, int idPromotor, HttpSession session) {
         Integer maxId = jdbcTemplate.queryForObject("SELECT MAX(idfestival) FROM festival", Integer.class);
 
         if (maxId == null) {
@@ -36,14 +36,14 @@ public class FestivalDao {
         int nextId = maxId + 1;
         festival.setIdFestival(nextId);
         updateFestivalState(festival);
-        festival.setCifPromotor(session.getAttribute("cif").toString());
+        festival.setIdPromotor(idPromotor);
         jdbcTemplate.update("INSERT INTO festival VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                festival.getIdFestival(), festival.getCifPromotor(), festival.getNom(), festival.getAnyo(),
+                festival.getIdFestival(), festival.getNom(), festival.getAnyo(),
                 festival.getDataInici(), festival.getDataFi(), festival.getEstatFestival().name(),
                 festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
                 festival.getPublicEnfocat(), festival.getRequisitMinimEdat(), festival.getDataIniciPublicacio(),
-                festival.getDataIniciVenda());
+                festival.getDataIniciVenda(), festival.getIdPromotor());
     }
 
     public void deleteFestival(int idFestival) {
@@ -56,10 +56,10 @@ public class FestivalDao {
 
     public void updateFestival(Festival festival) {
         updateFestivalState(festival);
-        jdbcTemplate.update("UPDATE festival SET cif_promotor=?, nom=?, anyo=?, datainici=?, datafi=?, estatfestival=?, descripcio=?, " +
+        jdbcTemplate.update("UPDATE festival SET idPromotor=?, nom=?, anyo=?, datainici=?, datafi=?, estatfestival=?, descripcio=?, " +
                         "categoriamusical=?, pressupostcontractacio=?, aforamentmaxim=?, localitzaciodescriptiva=?, localitzaciogeografica=?, " +
                         "publicenfocat=?, requisitminimedat=?, datainicipublicacio=?, datainicivenda=? WHERE idfestival=?",
-                festival.getCifPromotor(), festival.getNom(), festival.getAnyo(), festival.getDataInici(), festival.getDataFi(),
+                festival.getIdPromotor(), festival.getNom(), festival.getAnyo(), festival.getDataInici(), festival.getDataFi(),
                 festival.getEstatFestival().name(), festival.getDescripcio(), festival.getCategoriaMusical(), festival.getPressupostContractacio(),
                 festival.getAforamentMaxim(), festival.getLocalitzacioDescriptiva(), festival.getLocalitzacioGeografica(),
                 festival.getPublicEnfocat(), festival.getRequisitMinimEdat(), festival.getDataIniciPublicacio(), festival.getDataIniciVenda(),
@@ -132,6 +132,27 @@ public class FestivalDao {
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<Festival>();
         }
+    }
+
+
+    public List<Festival> getFestivalsPromotor(int idPromotor) {
+        try {
+            List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival where idPromotor=?", new FestivalRowMapper(), idPromotor);
+            for(Festival festival: festivales) {
+                updateFestivalState(festival);
+            }
+            return festivales;
+        } catch (EmptyResultDataAccessException e) {
+            return new ArrayList<Festival>();
+        }
+    }
+
+    public List<Festival> getFestivalsPromotor(int idPromotor, int size, int offset) {
+        List<Festival> festivales = jdbcTemplate.query("SELECT * FROM festival where idPromotor=? ORDER BY idfestival LIMIT ? OFFSET ?", new FestivalRowMapper(), idPromotor, size, offset);
+        for(Festival festival: festivales) {
+            updateFestivalState(festival);
+        }
+        return festivales;
     }
 
     public Festival getFestival(int idFestival) {

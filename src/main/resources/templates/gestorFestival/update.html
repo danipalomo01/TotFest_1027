@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Añadir Festival</title>
+  <title>Modificar Festival</title>
   <link rel="stylesheet" type="text/css" href="/styles/menu_lateral.css"/>
   <link rel="stylesheet" type="text/css" href="/styles/add_festival.css"/>
   <style>
@@ -20,6 +20,7 @@
   <a href="#" class="titulo">Explorar</a>
   <div class="menu-content">
     <ul class="menu-items">
+
       <li class="item">
         <a href="/gestorFestival/indexGF" class="submenu-item">
           <span>Inicio</span>
@@ -33,17 +34,25 @@
         </a>
       </li>
       <li class="item">
+        <a href="/promotor/list" class="submenu-item">
+          <span>Gestionar Promotores</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+      <li class="item">
         <a href="/festival/list" class="submenu-item">
           <span>Festivales</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
+
       <li class="item">
         <a href="/logout" class="submenu-item">
           <span>Cerrar Sesión</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
       </li>
+
     </ul>
   </div>
 </nav>
@@ -93,9 +102,9 @@
 
       <div class="form-group" style="margin-right: 60px; width: 250px">
         <label for="promotor">Seleccionar Promotor</label>
-        <select style="height: 40px;width: 250px; font-size: 15px; text-align: center;" class="form-control" id="promotor" th:field="*{cifPromotor}" required th:attr="readonly=${!editable}">
+        <select style="height: 40px;width: 250px; font-size: 15px; text-align: center;" class="form-control" id="promotor" th:field="*{idPromotor}" required th:attr="readonly=${!editable}">
           <option th:each="promotor : ${promotores}"
-                  th:value="${promotor.cif}"
+                  th:value="${promotor.id}"
                   th:text="${promotor.nomOrganisme}">
           </option>
         </select>

@@ -11,7 +11,6 @@ public class Actuacio {
     private Date data;
     private Time horaInici;
     private Time horaFiPrevista;
-    private BigDecimal preuContracteActuacio;
     private String comentaris;
     private int idFestival;
 
@@ -20,13 +19,12 @@ public class Actuacio {
 
     }
 
-    public Actuacio(int idActuacio, int idContracte, Date data, Time horaInici, Time horaFiPrevista, BigDecimal preuContracteActuacio, String comentaris, int idFestival) {
+    public Actuacio(int idActuacio, int idContracte, Date data, Time horaInici, Time horaFiPrevista, String comentaris, int idFestival) {
         this.idActuacio = idActuacio;
         this.idContracte = idContracte;
         this.data = data;
         this.horaInici = horaInici;
         this.horaFiPrevista = horaFiPrevista;
-        this.preuContracteActuacio = preuContracteActuacio;
         this.comentaris = comentaris;
         this.idFestival = idFestival;
     }
@@ -69,14 +67,6 @@ public class Actuacio {
 
     public void setHoraFiPrevista(Time horaFiPrevista) {
         this.horaFiPrevista = horaFiPrevista;
-    }
-
-    public BigDecimal getPreuContracteActuacio() {
-        return preuContracteActuacio;
-    }
-
-    public void setPreuContracteActuacio(BigDecimal preuContracteActuacio) {
-        this.preuContracteActuacio = preuContracteActuacio;
     }
 
     public String getComentaris() {

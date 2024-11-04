@@ -13,7 +13,7 @@ public class FestivalRowMapper implements RowMapper<Festival> {
     public Festival mapRow(ResultSet rs, int rowNum) throws SQLException {
         Festival festival = new Festival();
         festival.setIdFestival(rs.getInt("idFestival"));
-        festival.setCifPromotor(rs.getString("CIF_promotor"));
+        festival.setIdPromotor(rs.getInt("idPromotor"));
         festival.setNom(rs.getString("nom"));
         festival.setAnyo(rs.getInt("anyo"));
         festival.setDataInici(rs.getDate("dataInici"));

@@ -18,33 +18,43 @@
 <div class="rightbar"></div>
 <nav class="sidebar">
     <a href="#" class="titulo">Explorar</a>
-    <div class="menu-content">
-        <ul class="menu-items">
-            <li class="item">
-                <a href="/gestorFestival/indexGF" class="submenu-item">
-                    <span>Inicio</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/gestorFestival/list" class="submenu-item">
-                    <span>Gestionar Festivales</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/festival/list" class="submenu-item">
-                    <span>Festivales</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <li class="item">
-                <a href="/logout" class="submenu-item">
-                    <span>Cerrar Sesión</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-        </ul>
+    <div th:if="${session.cif != null}">
+        <div class="menu-content">
+            <ul class="menu-items">
+
+                <li class="item">
+                    <a href="/gestorFestival/indexGF" class="submenu-item">
+                        <span>Inicio</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/gestorFestival/list" class="submenu-item">
+                        <span>Gestionar Festivales</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/promotor/list" class="submenu-item">
+                        <span>Gestionar Promotores</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/festival/list" class="submenu-item">
+                        <span>Festivales</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="/logout" class="submenu-item">
+                        <span>Cerrar Sesión</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
     </div>
 </nav>
 <div class="content">
@@ -83,18 +93,22 @@
 
             <div class="form-group" style="margin-right: 60px;">
                 <label for="aforamentMaxim">Aforo Máx.</label>
-                <input style="height: 40px; text-align: center !important; height: 40px !important;" type="number" class="form-control" id="aforamentMaxim" th:field="*{aforamentMaxim}" min="0" required/>
+                <input style="height: 40px; text-align: center !important; height: 40px !important;" type="number" class="form-control" id="aforamentMaxim" th:field="*{aforamentMaxim}" min="1" required/>
                 <div th:if="${#fields.hasErrors('aforamentMaxim')}" th:errors="*{aforamentMaxim}" class="error-message"></div>
             </div>
 
-            <div class="form-group" style="margin-right: 60px; width: 250px">
+            <div th:if="${idPromotor == null}" class="form-group" style="margin-right: 60px; width: 250px">
                 <label for="promotor">Seleccionar Promotor</label>
-                <select style="height: 40px;width: 250px; font-size: 15px; text-align: center;" class="form-control" id="promotor" th:field="*{cifPromotor}" required>
+                <select style="height: 40px;width: 250px; font-size: 15px; text-align: center;" class="form-control" id="promotor" th:field="*{idPromotor}" required>
                     <option th:each="promotor : ${promotores}"
-                            th:value="${promotor.cif}"
+                            th:value="${promotor.id}"
                             th:text="${promotor.nomOrganisme}">
                     </option>
                 </select>
+            </div>
+
+            <div th:if="${idPromotor != null}">
+                <input type="hidden" th:field="*{idPromotor}"/>
             </div>
 
             <div style="display: flex">
@@ -149,7 +163,7 @@
 
                 <div class="form-group" style="margin-right: 70px;">
                     <label for="requisitMinimEdat">Mínimo de Edad</label>
-                    <input style="height: 40px; text-align: center !important; height: 40px !important;" type="number" class="form-control" id="requisitMinimEdat" th:field="*{requisitMinimEdat}" min="0" required/>
+                    <input style="height: 40px; text-align: center !important; height: 40px !important;" type="number" class="form-control" id="requisitMinimEdat" th:field="*{requisitMinimEdat}" min="0" max="99" required/>
                     <div th:if="${#fields.hasErrors('requisitMinimEdat')}" th:errors="*{requisitMinimEdat}" class="error-message"></div>
                 </div>
 

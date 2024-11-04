@@ -137,8 +137,41 @@
           </a>
         </li>
         <li class="item">
+          <a href="/promotor/list" class="submenu-item">
+            <span>Promotores</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
           <a href="/festival/list" class="submenu-item">
             <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+        <li class="item">
+          <a href="/logout" class="submenu-item">
+            <span>Cerrar Sesión</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <div th:if="${session.admin != null}">
+    <div class="menu-content">
+      <ul class="menu-items">
+        <li class="item">
+          <a href="/admin/index" class="submenu-item">
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/admin/usuarios/list" class="submenu-item">
+            <span>Gestionar Usuarios</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
@@ -148,7 +181,6 @@
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
-
       </ul>
     </div>
   </div>
@@ -177,6 +209,12 @@
         <li class="item">
           <a href="/festival/list" class="submenu-item">
             <span>Festivales</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        </li>
+        <li class="item">
+          <a href="/promotor/list" class="submenu-item">
+            <span>Promotores</span>
             <i class="fa-solid fa-chevron-right"></i>
           </a>
         </li>
@@ -318,7 +356,7 @@
                 <span>&nbsp;€</span>
               </div>
 
-              <p th:if="${festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0 && (festival.estatFestival.name() == 'publica' or festival.estatFestival.name() == 'obertVenda') and (session.idComercial == null and session.cif == null)}" style="font-weight: bold; margin-right: 25px; text-align: right; margin-top: 10px; text-decoration: underline">Comprar entradas</p>
+              <p th:if="${(festivalesPrecios[festival.idFestival][2] > 0 || festivalesPrecios[festival.idFestival][3] > 0) && (festival.estatFestival.name() == 'publica' and festival.estatFestival.name() == 'obertVenda') and (session.idComercial == null and session.cif == null)}" style="font-weight: bold; margin-right: 25px; text-align: right; margin-top: 10px; text-decoration: underline">Comprar entradas</p>
 
               <div style="display: flex">
                   <div class="buttons-wrapper">

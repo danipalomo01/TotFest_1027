@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Listado de Festivales</title>
+    <title>Listado de Actuaciones</title>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/menu_lateral.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -187,13 +187,7 @@
                 <h1 style="text-align:center; padding-top: 5%"><strong>Listado de Actuaciones de </strong><span style="font-weight: bold" th:text="${nomartista}"></span></h1>
 
                 <div th:if="${#lists.isEmpty(festivales)}" class="no-items-message">
-                    <p style="color: red; font-weight: bold;">
-                        No es posible añadir actuaciones al contrato porque no hay festivales disponibles durante la duración del contrato
-                    </p>
-                </div>
-
-                <div th:if="${#lists.isEmpty(festivales)}" class="no-items-message">
-                    <p style="color: red; font-weight: bold;">
+                    <p style="font-weight: bold;">
                         No es posible añadir actuaciones al contrato porque no hay festivales disponibles durante la duración del contrato
                     </p>
                 </div>
@@ -338,16 +332,16 @@
 
                 <!-- Mensajes de no hay festivales -->
                 <div th:if="${#lists.isEmpty(actuaciones)}" class="no-items-message">
-                    <p>No existe ninguna actuacion.</p>
-                </div>
-                <!-- Botón de añadir festival -->
-                <div th:if="${numActuacionesMaximasContrato > #lists.size(actuaciones)}" style="margin-left:44%;" class="btn-anyadir">
-                    <a th:href="@{/responsablecontratacion/actuaciones/add/{idcontrato}(idcontrato=${idContrato})}" class="btn btn-success" role="button">Añadir Actuación</a>
+                    <p style="font-weight: bold;">No existe ninguna actuacion en este contrato aún.</p>
                 </div>
             </div>
 
-            <div th:if="${numActuacionesMaximasContrato == #lists.size(actuaciones)}" style="margin-left:44%;" class="btn-anyadir">
+            <div th:if="${numActuacionesMaximasContrato > #lists.size(actuaciones) && !#lists.isEmpty(festivales)}" style="margin-left:44%;" class="btn-anyadir">
                 <a th:href="@{/responsablecontratacion/actuaciones/add/{idcontrato}(idcontrato=${idContrato})}" class="btn btn-success" role="button">Añadir Actuación</a>
+            </div>
+
+            <div th:unless="${numActuacionesMaximasContrato > #lists.size(actuaciones)}" class="no-items-message">
+                <p>No es posible añadir más actuaciones al contrato ya que se han alcanzado las actuaciones máximas para este contrato.</p>
             </div>
 
             <!-- Paginación -->
